@@ -1,0 +1,318 @@
+@use "../global/global" as *;
+
+.mypage{
+        .mainTitle{
+            margin-bottom: 0;
+        }
+        .toggleTitle{
+            font-weight: bold;
+            @include flex();
+            margin: auto;
+            cursor: pointer;
+            gap: 8px;
+            i{
+                transform: rotate(0deg);
+                transition: transform 0.5s ;
+            }
+            &.active{
+                i{
+                    transform: rotate(90deg);
+                }
+            }
+        }
+
+        .profile{
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            @include md{
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+            .image{
+                background-color: $lb;
+                padding: 24px;
+                @include flex();
+                border-radius: 10px;
+                width: 100%;
+                height: 100%;
+                @include md{
+                    margin: 40px;
+                }
+                img{
+                    width: 100%;
+                    height: 100%;
+                    color: white;
+                    aspect-ratio: 1/1;
+                    object-fit: cover;
+                    object-position: center;
+                }
+            }
+            .text{
+                @include flex();
+                align-items: flex-start;
+                gap: 24px;
+                flex-direction: column;
+                .name{
+                    font-weight: bold;
+                    @include fs(20);
+                }
+                button{
+                    color: white;
+                    cursor: pointer;
+                    a{
+                        padding: 8px;
+                    }
+                }
+            }
+        }//profile
+        .score{
+            background-color: $lb;
+            &__wrap{
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                @include md{
+                    grid-template-areas:
+                    "lciq like"
+                    "prof prof"; /* 横長 */
+                    grid-template-columns: 1fr 1fr; /* 上の2つを均等に */
+                }
+                .box{
+                    @include flex();
+                    flex-direction: column;
+                    position: relative;
+                    gap: 8px;
+                    height:  200px;
+                    padding: 16px;
+
+                    .point{
+                        position: absolute;
+                        bottom: 8px;
+                        left: 0;
+                        right: 0;
+                        margin: 0 auto;
+                        @include fs(10);
+                        width: fit-content;
+                        &:hover{
+                            @include transition();
+                            opacity: 0.5;
+                        }
+                    }
+                    .title{
+                        @include fs(16);
+                        font-weight: normal;
+                    }
+                    .numb{
+                        @include fs(40);
+                        font-weight: bold;
+                    }
+                    button{
+                        width: 70%;
+                        @include md{
+                        width: 100%;
+                        }
+                        a{
+                            padding: 4px;
+                            @include fs(12);
+                        }
+                        &.yellow{
+                            background-color: $lciq;
+                            &:hover {
+                                background-color:lighten($lciq, 10%);
+                            }
+                        }
+                    }
+                }
+                .lciq, .like{
+                    border-right: 1px white solid;
+                    @include md{
+                    border-right: unset;
+                    }
+                }
+                .lciq{
+                    @include md{
+                    grid-area: lciq;
+                    border-right: 1px white solid;
+                    }
+                }
+                .like{
+                    @include md{
+                        grid-area: like;
+                    }
+                    i{
+                        color: $pink;
+                        margin-right: 4px;
+                    }
+                }
+                .prof{
+                    @include md{
+                    border-top: 1px white solid;
+                    grid-area: prof;
+                    }
+                    .numb{
+                        @include flex();
+                        align-items: baseline;
+                        gap: 4px;
+                        &::after{
+                            content:'%';
+                            @include fs(16);
+                            font-weight: normal;
+                        }
+
+                    }
+                }
+            }
+        }//score
+
+        .menu{
+            ul{
+                li{
+                    border-bottom: 1px $mc dotted;
+                    a{
+                        color: $mc;
+                        display: block;
+                        padding: 16px;
+                        i{
+                            margin-right: 8px;
+                        }
+                        &:hover{
+                            @include transition();
+                            opacity: 0.5;
+                        }
+                    }
+                }
+            }
+        }
+
+        .head-title{
+            @include fs(20);
+            font-weight: bold;
+            @include flex();
+            margin: auto;
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+
+        .base-profile{
+            @include flex();
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 40px;
+            .text,.area{
+                width: 100%;
+            }
+            .name{
+                margin: auto;
+            }
+            .area{
+                .box{
+                    padding: 8px;
+                    border-bottom: 1px $mc dotted;
+                    &:last-of-type{
+                        border-bottom: unset;
+                    }
+                    .head{
+                        font-weight: bold;
+                    }
+                }
+            }
+        }//base-profile
+
+        .add-profile{
+            h2{
+                margin-bottom: 16px;
+            }
+            .area{
+                .box{
+                    padding: 16px;
+                    gap: 16px;
+                    align-items: center;
+                    &:nth-of-type(even){
+                        background-color: $lb;
+                    }
+                    .head{
+                        font-weight: bold;
+                    }
+                    .item{
+                    }
+                }
+            }
+        }
+        .user-info{
+
+            .area{
+                .box{
+                    padding: 16px;
+                    gap: 16px;
+                    align-items: center;
+                    &:nth-of-type(even){
+                        background-color: $lightgray;
+                    }
+                }
+            }
+        }
+
+
+}
+
+
+.profile-checklist{
+    max-width: 768px;
+    margin: 40px auto;
+    .lciq-caution{
+        background-color: $lciq;
+        border-radius: 100px;
+        padding: 8px 16px;
+        @include flex();
+        margin-bottom: 40px;
+        a{
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            gap: 16px;
+            img{
+                height: 30px;
+            }
+            .head{
+                font-weight: bold;
+            }
+            p{
+                @include fs(10);
+            }
+        }
+    }
+    ul{
+        li{
+            padding: 8px 16px;
+            background-color: $lb;
+            &:nth-child(even){
+                background-color: white;
+            }
+            a{
+                display: flex;
+                justify-content: center;
+                flex-direction: column;
+                width: 100%;
+                position: relative;
+                &::after{
+                    @include gi(chevron_right);
+                    position: absolute;
+                    top: 0;
+                    bottom: 0;
+                    margin: auto 0;
+                    right: 16px;
+                    @include fs(20);
+                }
+                .head{
+                    font-weight: bold;
+                }
+                p{
+                    @include fs(10);
+                    color: $mc;
+                }
+            }
+        }
+    }
+}

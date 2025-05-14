@@ -1,0 +1,7 @@
+お問い合わせが届きました
+
+送信者: {{ name }} <{{ email }}>
+件名:   {{ subject|default:"(件名なし)" }}
+
+本文:
+{{ body|default:"--empty--" }}

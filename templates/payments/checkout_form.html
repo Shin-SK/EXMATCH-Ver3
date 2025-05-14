@@ -1,0 +1,40 @@
+<!-- templates/payments/checkout_form.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>購入ページ</title>
+</head>
+<body>
+<h1>プラン購入</h1>
+<form method="POST" action="">
+  {% csrf_token %}
+
+  <div>
+    <label>プラン:</label><br>
+    <label>
+      <input type="radio" name="plan" value="standard_1m" checked> 1ヶ月
+    </label><br>
+    <label>
+      <input type="radio" name="plan" value="standard_3m"> 3ヶ月
+    </label><br>
+    <label>
+      <input type="radio" name="plan" value="standard_6m"> 6ヶ月
+    </label><br>
+    <label>
+      <input type="radio" name="plan" value="standard_12m"> 12ヶ月
+    </label><br>
+  </div>
+
+  <div>
+    <label>オプション（プラスプロフィール）:</label><br>
+    <label>
+      <input type="checkbox" name="option" value="plus_profile">
+      追加する
+    </label>
+  </div>
+
+  <button type="submit">購入に進む</button>
+</form>
+</body>
+</html>

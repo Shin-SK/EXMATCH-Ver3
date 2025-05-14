@@ -1,0 +1,25 @@
+<!-- templates/core/footprint_list.html -->
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block title %}
+あしあと
+{% endblock %}
+
+{% block content %}
+<h1>あしあと</h1>
+
+
+{% for fp in footprints %}
+	{% include "core/partials/parts-userprof-mini.html" with user_obj=fp.from_user created=fp.created_at %}
+{% empty %}
+  <p>足あとがありません</p>
+{% endfor %}
+
+
+<p><a href="{% url 'home' %}">Home</a></p>
+
+
+{% endblock %}
+

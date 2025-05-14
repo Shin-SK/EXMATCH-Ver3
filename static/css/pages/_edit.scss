@@ -1,0 +1,19 @@
+@use "../global/global" as *;
+
+.edit{
+    &__head{
+        margin-bottom: 16px;
+        .errorMessage{
+            color: red($color: #000000);
+            font-weight: bold;
+        }
+        .mainTitle{
+            margin-bottom: 16px;
+        }
+        .name{
+            font-weight: bold;
+            @include fs(20);
+            text-align: center;
+        }
+    }
+}

@@ -1,0 +1,185 @@
+@use "../global/global" as *;
+
+$formBg: #f2f2f2;
+.form{
+    &__wrap{
+        .area{
+            margin-bottom: 24px;
+            label{
+                &.title{
+                    padding: 8px;
+                    padding-left: 0;
+                    font-weight: bold;
+                    display: block;
+                }
+                &.required{
+                    &::after{
+                        content: '*';
+                        color: red;
+                        margin-left: 4px;
+                    }
+                }
+            }
+            input{
+                &[type="text"], &[type="email"], &[type="number"], &[type="password"], &[type="tel"], &[type="url"] {
+                    width: 100%;
+                    border: unset;
+                    background-color: $formBg;
+                    padding: 16px;
+                }
+                &::placeholder {
+                    color: #999; /* プレースホルダーのテキストカラー */
+                }
+            }
+            select{
+                border: none;
+                width: 100%;
+                background-color: #f8f8f8;
+                padding: 16px;
+                appearance: none; /* デフォルトの矢印を非表示 */
+                -webkit-appearance: none; /* Safari用 */
+                background-image: url('../img/arrow.svg'); /* カスタム矢印画像 */
+                background-repeat: no-repeat;
+                background-position: right 10px center;
+                background-size: 12px;
+                padding-right: 30px; /* 矢印とテキストが重ならないよう余白を調整 */
+                option{
+                    &:first-child {
+                        color: #999;
+                    }
+                }
+            }
+            textarea{
+                width: 100%;
+                width: 100%;
+                border: unset;
+                background-color: $formBg;
+                padding: 16px;
+                &.large{
+                    height: 300px;
+                }
+            }
+
+            .media{
+                &__wrap{
+                    @include flex();
+                    justify-content: flex-start;
+                    gap: 16px;
+                    margin-bottom: 16px;
+                    label{
+                        background-color: orange;
+                        padding: 8px 16px;
+                        color: white;
+                        border-radius: 8px;
+                        @include flex();
+                        &:hover{
+                            cursor:pointer;
+                        }
+                    }
+                    button{
+                        width: auto;
+                        color: white;
+                        background-color: gray;
+                        padding: 8px 16px;
+                        border-radius: 8px;
+                    }
+                }
+
+
+            }
+
+            &.btnArea{
+                margin-top: 40px;
+                @include flex();
+                gap: 16px;
+                button{
+                    &[type="submit"]{
+                        padding: 8px;
+                        color: white;
+                        font-weight: bold;
+                    }
+                }
+                input{
+                    &[type="reset"]{
+                        @include flex();
+                        background-color: unset;
+                        border: unset;
+                        border-bottom: 1px gray solid;
+                        text-align: center;
+                        @include fs(10);
+                        margin: 0 auto;
+                        margin-top: 8px;
+                    }
+                }
+                .back{
+                    background-color: gray;
+                }
+            }
+            .caution{
+                @include fs(10);
+                margin-top: 4px;
+            }
+        }//area
+        .radio {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            &__wrap {
+              input[type="radio"] {
+                display: none;
+              }
+          
+              &--label {
+                @include flex();
+                padding: 8px 16px;
+                cursor: pointer;
+                background-color: $formBg;
+                border-radius: 8px;
+                transition: background-color 0.3s, color 0.3s;
+                &:hover {
+                  background-color: #eaeaea;
+                }
+              }
+          
+              input[type="radio"]:checked + .radio__wrap--label {
+                background-color: $mc;
+                color: white;
+              }
+            }
+        }//.radio
+    }//form__wrap
+}//form
+
+
+
+.filter{
+    &__wrap{
+        margin-bottom: 40px;
+    }
+    input[type="text"]{
+        width: 100%;
+        background-color: #f5f5f5;
+        padding: 8px;
+    }
+    .button-area{
+        @include flex();
+        gap: 40px;
+        button{
+            padding: 8px;
+            color: white;
+        }
+    }
+    h2{
+        font-weight: bold;
+        text-align: center;
+        border-bottom: 1px $mc solid;
+        padding-bottom: 8px;
+        margin-bottom: 16px;
+    }
+    .radius{
+        margin-bottom: 40px;
+    }
+    .profile, .detail{
+        margin-bottom: 40px;
+    }
+}

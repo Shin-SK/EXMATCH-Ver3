@@ -1,0 +1,25 @@
+<!-- exmatch/templates/core/matched_list.html -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Matched List</title>
+</head>
+<body>
+<h1>マッチしたユーザー一覧</h1>
+<ul>
+{% for match in matches %}
+    {% if match.from_user == user %}
+        <li>あなたは {{ match.to_user.username }} とマッチしています</li>
+    {% else %}
+        <li>あなたは {{ match.from_user.username }} とマッチしています</li>
+    {% endif %}
+{% empty %}
+    <li>まだマッチしていません。</li>
+{% endfor %}
+</ul>
+
+<p><a href="{% url 'home' %}">Homeへ戻る</a></p>
+</body>
+</html>

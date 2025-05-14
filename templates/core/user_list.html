@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User List</title>
+</head>
+<body>
+<h1>他のユーザー一覧</h1>
+<ul>
+    {% for u in all_users %}
+      <li>
+        {{ u.username }}
+        <!-- プロフィールを見るボタン -->
+        <a href="{% url 'user_profile_detail' u.id %}">プロフィールを見る</a>
+
+        <!-- いいねボタン -->
+        <a href="{% url 'follow_user' u.id %}">いいねする</a>
+      </li>
+    {% endfor %}
+</ul>
+
+<p><a href="{% url 'home' %}">Homeへ</a></p>
+<p><a href="{% url 'follow_list' %}">あなたがいいねしたユーザー一覧</a></p>
+<p><a href="{% url 'matched_list' %}">マッチしたユーザー一覧</a></p>
+</body>
+</html>

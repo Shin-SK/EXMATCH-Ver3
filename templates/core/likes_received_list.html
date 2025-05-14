@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}いいねしてくれたユーザー一覧{% endblock %}
+
+{% block content %}
+<h1>いいねしてくれたユーザー</h1>
+
+{% for like in likes_received %}
+  {% include "core/partials/parts-userprof-mini.html" with user_obj=like.from_user created=like.created_at %}
+{% empty %}
+  <p>まだ「いいね」されていません</p>
+{% endfor %}
+
+<p><a href="{% url 'my_page' %}">← マイページに戻る</a></p>
+{% endblock %}

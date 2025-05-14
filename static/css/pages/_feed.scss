@@ -1,0 +1,125 @@
+@use "../global/global" as *;
+
+.feed{
+	.box{
+		box-shadow: 0px 0px 10px -5px #777777;
+		border-radius: 16px;
+		margin-bottom: 24px;
+		&__wrap{
+			display: grid;
+			grid-template-columns: 4fr 6fr;
+			align-items: center;
+			gap: 16px;
+			padding: 16px;
+			padding-bottom: 0;
+			@include md{
+			grid-template-columns: 1fr;
+			}
+			.profile{
+                @include flex();
+                border-radius: 10px;
+                width: 100%;
+                height: auto;
+				aspect-ratio: 1/1;
+				img{
+					max-width: 100%;
+					width: 100%;
+					object-fit: cover;
+					aspect-ratio: 1/1;
+					height: auto;
+					border-radius: 8px;
+				}
+			}
+			.area{
+				&__wrap{
+					display: grid;
+					grid-template-columns: 7fr 3fr;
+					align-items: center;
+					gap: 16px;
+					.left{
+						.name__area{
+							font-weight: bold;
+							@include flex();
+							justify-content: flex-start;
+							gap: 8px;
+							padding: 8px 0px;
+							.name{
+								&::after{
+									content: 'さん';
+									@include fs(10);
+
+								}
+							}
+							.age{
+								&::after{
+									content: '歳';
+									@include fs(10);
+								}
+							}
+							.city{
+
+							}
+						}
+						.info__area{
+							display: grid;
+							grid-template-columns: 3fr 7fr;
+							font-weight: bold;
+							>div{
+								border-bottom: 1px $mc dotted;
+								padding: 4px 8px;
+							}
+							.title{
+								font-weight: normal;
+								@include fs(10);
+							}
+						}
+					}
+					.right{
+						.lciq-point{
+							background: unset;
+							color: $lciq;
+							display: flex;
+							justify-content: space-between;
+							align-items: baseline;
+							@include fs(30);
+							font-weight: bold;
+							&::before{
+								content: 'LCIQ';
+								@include fs(12);
+								font-family: $mincho;
+								color:black;
+								font-weight: normal;
+							}
+						}
+					}
+				}
+				p{
+					margin-top: 16px;
+					padding: 16px;
+					background-color: $lb;
+					@include fs(14);
+				}
+
+			}
+		}//box__wrap
+		.btn__area{
+			@include flex();
+			gap: 16px;
+			padding: 16px;
+			padding-top: 0;
+			margin-top: 16px;
+			button{
+				color: white;
+				@include flex();
+				gap: 8px;
+				padding: 8px;
+				font-weight: bold;
+			}
+			.like{
+			}
+			.message{
+				background-color: $pink;
+			}
+		}
+	}//box
+}

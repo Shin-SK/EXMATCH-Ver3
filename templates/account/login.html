@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}ログイン{% endblock %}
+
+{% block content %}
+<section class="login container">
+  <h1>ログイン</h1>
+
+  <form method="post" action="{% url 'account_login' %}">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="field">
+      {{ form.login.label_tag }}<br>
+      {{ form.login }}
+    </div>
+    <div class="field">
+      {{ form.password.label_tag }}<br>
+      {{ form.password }}
+    </div>
+
+    <button type="submit">ログイン</button>
+  </form>
+
+  <p><a href="{% url 'account_reset_password' %}">パスワードを忘れた方はこちら</a></p>
+  <p><a href="{% url 'account_signup' %}">新規登録</a></p>
+</section>
+{% endblock %}

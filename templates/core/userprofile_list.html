@@ -1,0 +1,55 @@
+<!-- templates/core/userprofile_list.html -->
+ {% extends "base.html" %}
+{% load static %}
+
+
+{% block title %}
+ユーザープロフィール検索
+{% endblock %}
+
+{% block content %}
+
+
+<div class="mainTitle">検索</div>
+
+
+{% include "core/partials/search_form.html" with filter=filter only %}
+
+
+{% include 'core/partials/parts-userprofile.html' with users=users only %}
+
+
+{% if unverified %}
+<script>
+  // “ログイン & LCIQ入力してね” アラート
+  document.querySelectorAll('.action-btn').forEach(b=>{
+    b.addEventListener('click', e=>{
+      e.preventDefault();
+      alert("機能を使うにはログインしてLCIQを入力してください！");
+    });
+  });
+</script>
+{% endif %}
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
+    } else {
+        console.log("Geolocation is not supported by this browser.");
+    }
+
+    function successCallback(position) {
+        // 取得成功時に hidden input に代入
+        document.getElementById('latInput').value = position.coords.latitude;
+        document.getElementById('lonInput').value = position.coords.longitude;
+        // 必要に応じて自動submitも可
+    }
+
+    function errorCallback(error) {
+        console.log("Error getting location:", error);
+    }
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,223 @@
+$mc: #004C71;
+$pink: #F07884;
+$green: #706C00;
+$lb: #EAF2F4;
+
+$lciq: #F6AB00;
+
+$brown: #bb9e52;
+$green: #80b567;
+$black: #0f0f0f;
+
+$gray: lighten($black, 40%);
+$lightgray: lighten($black, 90%);
+$gosic: system-ui;
+$mincho: "Times New Roman", "YuMincho", "Hiragino Mincho ProN", "Yu Mincho", "MS PMincho", serif;
+$cinzel: 'Cinzel', serif;
+$tegaki: 'Satisfy', cursive;
+@use "sass:math"; /* 除算math.divを使うのに必要な記述 */
+@mixin fs($fs_min) {
+$width_small: 320;
+$width_large: 1300;
+$fs_max: ($fs_min+2);
+$preferred_vw_base: math.div(($fs_max - $fs_min), ($width_large - $width_small));
+$preferred_vw: ($preferred_vw_base * 100) * 1vw;
+$preferred_rem: ($width_small * -1 * $preferred_vw_base + $fs_min) * .1rem;
+font-size: clamp($fs_min * .1rem, $preferred_rem + $preferred_vw, $fs_max * .1rem);
+}
+$sp: 768px;//576pxだと小さすぎるのでいっそタブレットと同じにしちゃう
+$md: 768px;
+@mixin sp {
+  @media screen and (max-width: ($sp)) {
+    @content;
+  }
+}
+@mixin md {
+    @media screen and (max-width: ($md)) {
+      @content;
+    }
+}
+@mixin pc {
+    @media screen and (min-width: ($md)) {
+      @content;
+    }
+}
+$time: 0.5s;
+@mixin transition{
+    transition: $time;
+    -webkit-transition: $time; /* Chrome、Safari用 */
+    -moz-transition: $time; /* Firefox用 */
+    -o-transition: $time; /* Opera用 */
+}
+
+@mixin fa($unicode) {
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  content: "#{$unicode}";
+}
+
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined");
+
+@mixin gi($name) {
+  font-family: "Material Symbols Outlined";
+  content: "#{$name}";
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+  height: fit-content;
+}
+
+
+@mixin flex{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.flex-center{
+  @include flex();
+}
+
+html {font-size: 62.5%;}
+
+body{
+    @include fs(14);
+    font-family: $gosic;
+    a{
+        color: $black;
+        :hover{
+            @include transition();
+            opacity: 0.5;
+        }
+    }
+    img{
+        max-width: 100%;;
+        height: auto;
+    }
+    .mincho{
+      font-family: $mincho;
+      @include fs(30);
+  }
+  section{
+    margin-bottom: 40px;
+  }//section
+}
+
+
+
+@mixin shadow{
+  box-shadow: 0px 0px 15px -5px #777777;
+}
+
+/* 非表示状態 */
+.inactive {
+  display: none;
+  opacity: 0;
+}
+
+/* 表示状態 */
+.active {
+  display: block;
+  opacity: 1;
+}
+
+
+
+
+@import url(https://use.typekit.net/lpz2crc.css);
+// font-family: "mina", serif;
+// font-weight: 400;
+// font-style: normal;
+
+
+
+@mixin dotBg{
+    background-color: $lb;
+    background-image:
+    radial-gradient(white 30%, transparent 30%);
+    background-size: 20px 20px;
+}
+
+html{
+    /*IE(Internet Explorer)・Microsoft Edgeへの対応*/
+    -ms-overflow-style: none;
+    /*Firefoxへの対応*/
+    scrollbar-width: none;
+    /*Google Chrome、Safariへの対応*/
+    &::-webkit-scrollbar{
+        display: none;
+    } 
+}
+
+
+a{
+    text-decoration: none;
+}
+
+a.a-button{
+  width: 50%;
+  background-color: $mc;
+  @include flex();
+  color: white;
+  border-radius: 100px;
+  padding: 8px;
+  @include sp{
+      width: 100%;
+  }
+}
+
+
+button{
+  background-color: $mc;
+  border: unset;
+  box-shadow: unset;
+  border-radius: 100px;
+  width: 100%;
+  transition: background-color 0.3s ease; 
+  &:hover {
+      background-color:lighten($mc, 10%);
+  }
+  a{
+      width: 100%;
+      color: white;
+      text-decoration: none;
+      padding: 8px;
+      @include flex();
+  }
+}
+
+
+[data-color="blue"]{
+  transition: background-color 0.3s ease, color 0.3s ease, border 0.3s ease;
+  &:hover{
+      background-color: $mc !important;
+      border: unset !important;
+      color: white !important;
+      opacity: 1;
+      * {
+          color: inherit !important;
+      }
+      &::before,
+      &::after {
+          color: inherit !important; // 疑似要素にも継承を明示
+      }
+  }
+}
+
+[data-color="pink"]{
+  transition: background-color 0.3s ease, color 0.3s ease, border 0.3s ease;
+  &:hover{
+      background-color: $pink !important;
+      border: unset !important;
+      color: white !important;
+      opacity: 1;
+      * {
+          color: inherit !important;
+      }
+      &::before,
+      &::after {
+          color: inherit !important; // 疑似要素にも継承を明示
+      }
+  }
+}
+
+
+

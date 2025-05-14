@@ -1,0 +1,45 @@
+<!-- templates/core/partials/parts-userprof-mini.html -->
+{% load static %}
+
+<div class="feed footprint">
+  <div class="box">
+    <div class="box__wrap">
+      <div class="profile image">
+        <a href="{% url 'user_profile_detail' user_id=user_obj.id %}">
+          {% if user_obj.userprofile.profile_image %}
+            <img src="{{ user_obj.userprofile.profile_image.url }}" alt="プロフィール画像">
+          {% else %}
+            <img src="{% static 'img/user-unset.webp' %}" alt="">
+          {% endif %}
+        </a>
+      </div>
+
+      <div class="area">
+        <div class="area__wrap">
+          <div class="left">
+            <div class="name__area">
+
+              {# ---- ① ここを fp.created_at → created に変更 ---- #}
+              {% if created %}
+                <span class="timestamp">{{ created|date:"Y/m/d H:i" }}</span>
+              {% endif %}
+
+              <span class="name">{{ user_obj.userprofile.nickname }}</span>
+              <span class="age">{{ user_obj.userprofile.custom_values.age }}</span>
+              <span class="city">{{ user_obj.userprofile.custom_values.adress }}</span>
+            </div>
+
+            <div class="info__area">
+              <div class="title">職業</div>
+              <div class="job">{{ user_obj.userprofile.custom_values.job }}</div>
+              <div class="title">休日</div>
+              <div class="off">{{ user_obj.userprofile.custom_values.off }}</div>
+              <div class="title">マッチ後</div>
+              <div class="afterMatch">{{ user_obj.userprofile.custom_values.aftermatch }}</div>
+            </div>
+          </div>
+        </div>
+      </div><!-- area -->
+    </div><!-- box__wrap -->
+  </div><!-- box -->
+</div>

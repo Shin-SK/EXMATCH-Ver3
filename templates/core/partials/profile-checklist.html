@@ -1,0 +1,37 @@
+{% load static %}
+
+<div class="profile-checklist">
+	{% if not lciq_done %}
+	<div class="lciq-caution">
+		<a href="{% url 'profile_edit' %}">
+			<img src="{% static 'img/lciq-logo.svg' %}" alt="">
+			<div class="wrap">
+				<div class="head">LCIQ®診断がまだ完了していません</div>
+				<p>診断をするとボカシが取れ、いいねやメッセージが送れます</p>
+			</div>
+		</a>
+	</div>
+	{% endif %}
+	<ul>
+		{% if missing_total %}
+		<li class="profile-check">
+			<a href="{% url 'profile_edit' %}">
+				<div class="head">プロフィールを完成させるとマッチ率が上がります！</div>
+				<p>あと {{ missing_total }} 項目！本当の出会いまであと少し！</p>
+			</a>
+		</li>
+		{% endif %}
+		<li>
+			<a href="">
+				<div class="head">スタンダード会員ではすべての機能が使えるようになります</div>
+				<p>わずらわしいポイントやメッセージ制限はありません</p>
+			</a>
+		</li>
+		<li>
+			<a href="">
+				<div class="head">プラスプロフィールで、本当に合う人と出会おう</div>
+				<p>出会ってから「違った」と言いにくいことは、出会う前に知っておこう</p>
+			</a>
+		</li>
+	</ul>
+</div>

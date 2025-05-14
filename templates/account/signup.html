@@ -1,0 +1,76 @@
+{# templates/account/signup.html #}
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}新規登録{% endblock %}
+
+{% block content %}
+<h1 class="text-xl font-bold mb-6">新規登録</h1>
+
+<form method="post" class="space-y-6 max-w-lg mx-auto" novalidate>
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    <!-- メールアドレス -->
+    <div class="form-group">
+        <label for="{{ form.email.id_for_label }}" class="block font-semibold mb-1">メールアドレス</label>
+        {{ form.email }}
+        {{ form.email.errors }}
+    </div>
+
+    <!-- ニックネーム -->
+    <div class="form-group">
+        <label for="{{ form.nickname.id_for_label }}" class="block font-semibold mb-1">ニックネーム</label>
+        {{ form.nickname }}
+        {{ form.nickname.errors }}
+    </div>
+
+    <!-- 性別 -->
+    <div class="form-group">
+        <label for="{{ form.gender.id_for_label }}" class="block font-semibold mb-1">性別</label>
+        {{ form.gender }}
+        {{ form.gender.errors }}
+    </div>
+
+    <!-- 恋愛対象 -->
+    <div class="form-group">
+        <label for="{{ form.sexual_object_pref.id_for_label }}" class="block font-semibold mb-1">恋愛対象</label>
+        {{ form.sexual_object_pref }}
+        {{ form.sexual_object_pref.errors }}
+    </div>
+
+    <!-- 居住地 -->
+    <div class="form-group">
+        <label for="{{ form.main_area.id_for_label }}" class="block font-semibold mb-1">居住地</label>
+        {{ form.main_area }}
+        {{ form.main_area.errors }}
+    </div>
+
+    <!-- パスワード -->
+    <div class="form-group">
+        <label for="{{ form.password1.id_for_label }}" class="block font-semibold mb-1">パスワード</label>
+        {{ form.password1 }}
+        {{ form.password1.errors }}
+        <p class="text-sm text-gray-500 mt-1">
+            8文字以上、数字のみ不可などの条件を満たしてください。
+        </p>
+    </div>
+
+    <!-- パスワード確認 -->
+    <div class="form-group">
+        <label for="{{ form.password2.id_for_label }}" class="block font-semibold mb-1">パスワード（確認）</label>
+        {{ form.password2 }}
+        {{ form.password2.errors }}
+    </div>
+
+    <button type="submit" class="btn btn-primary w-full">
+        登録する
+    </button>
+</form>
+
+<p class="mt-6 text-center text-sm">
+    既にアカウントをお持ちの場合は
+    <a href="{% url 'account_login' %}" class="text-blue-600 underline">こちら</a>
+    からログインできます。
+</p>
+{% endblock %}

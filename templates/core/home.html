@@ -1,0 +1,843 @@
+{% extends "base.html" %}
+{%block base_class%}{% endblock %}
+{% block main_container %}container-fluid{% endblock %}
+{% block footer_class %}d-none{% endblock %}
+{% load static %}
+
+{% block title %}トップページ{% endblock %}
+
+{% block content %}
+<div class="home">
+
+
+    <section class="kv">
+        <div class="kv__line">
+            <div class="migi"></div>
+            <div class="hidari"></div>
+        </div>
+        <div class="kv__wrap">
+            <div class="box">
+                <div class="t1">いまここで出会う。</div>
+                <div class="logo"><img src="{% static 'img/logo.svg' %}" alt=""></div>
+                <button><a href="{% url 'account_signup' %}">さっそくはじめる</a></button>
+                <div class="maru">
+                    <a class="oik" href="#oaite" data-color="blue">
+                        お相手<br>検索
+                    </a>
+                    <!-- <a class="idk" href="#imadoko" data-color="pink">
+                        いまドコ<br>検索
+                    </a> -->
+                </div>
+            </div>
+            <div class="image">
+                <img src="{% static 'img/kv.webp' %}" alt="">
+            </div> 
+        </div>
+    </section>
+    <section class="midashi container" id="midashi">
+        <div class="h1">
+            本気だけど、手軽に出会いたい。<br>
+            そんな願いをかなえました。
+        </div>
+        <p class="d-none d-sm-block">
+            総合婚活サービスEXMarry®が運営するマッチングサービスです。<br>
+            恋愛偏差値®を使うことで相手との相性がすぐにわかります。<br>
+            本気で、手軽に。<br>
+            相性のいい相手としか出会うことができないサービスです。
+        </p>
+
+        <p class="d-sm-none d-block">
+            総合婚活サービスEXMarry®が運営する<br>
+            マッチングサービスです。<br>
+            恋愛偏差値®を使うことで<br>
+            相手との相性がすぐにわかります。<br>
+            本気で、手軽に。<br>
+            相性のいい相手としか<br>
+            出会うことができないサービスです。
+        </p>
+        <div class="banner--single">
+            <a class="swiper-slide" href="https://exmarry.jp/12pack/" target="_blank"><img src="{% static 'img/banner1.webp' %}" alt=""></a>
+        </div>
+
+        <!-- スライダーが必要になったら使う -->
+        <!-- <div class="banner swiper">
+            <div class="banner__wrap swiper-wrapper">
+                <a class="swiper-slide" href=""><img src="{% static 'img/banner1.webp' %}" alt=""></a>
+                <a class="swiper-slide" href=""><img src="{% static 'img/banner2.webp' %}" alt=""></a>
+                <a class="swiper-slide" href=""><img src="{% static 'img/banner3.webp' %}" alt=""></a>
+                <a class="swiper-slide" href=""><img src="{% static 'img/banner1.webp' %}" alt=""></a>
+                <a class="swiper-slide" href=""><img src="{% static 'img/banner2.webp' %}" alt=""></a>
+                <a class="swiper-slide" href=""><img src="{% static 'img/banner3.webp' %}" alt=""></a>
+            </div>
+            <div class="swiper-pagination"></div>
+        </div> -->
+
+    </section>
+
+    <section class="feature container" id="feature">
+        <div class="feature__wrap">
+            <div class="container">
+                <div class="feature__area">
+                    <div class="mainTitle">2つの特徴</div>
+                    <div class="area">
+                        <div class="box">
+                            <div class="point">
+                                <img src="{% static 'img/p1.webp' %}" alt="">
+                                <div class="text">恋愛偏差値®で<br>相性がわかる</div>
+                            </div>
+                            <img class="point-img" src="{% static 'img/ft1.webp' %}" alt="">
+                            <p>LCIQ®による恋愛偏差値®を掲載。お相手との相性が一発でわかります。自分の偏差値も知れるいい機会なのかも。</p>
+                        </div>
+                        <!-- <div class="box">
+                            <div class="point">
+                                <img src="{% static 'img/p2.webp' %}" alt="">
+                                <div class="text">GPS機能</div>
+                            </div>
+                            <img src="{% static 'img/ft2.webp' %}" alt="">
+                            <p>今どこにいるかがわかるGPS機能を搭載。もちろんセキュリティ対策はバッチリ。今出会いたい、その瞬間を逃しません。</p>
+                        </div> -->
+                        <div class="box">
+                            <div class="point">
+                                <img src="{% static 'img/p2.webp' %}" alt="">
+                                <div class="text">オトナの<br>プロフィール</div>
+                            </div>
+                            <img class="point-img" src="{% static 'img/ft3.webp' %}" alt="">
+                            <p>オプションで性感覚や性指向を記入する欄があります。もちろん入力は自由。より踏み込んだコミュニケーションでの失敗を防げます。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="oaite" id="oaite">
+        <div class="container">
+            <div class="mainTitle">お相手検索</div>
+            <p>真剣な出会いを求めている方はたくさんいらっしゃいます。<br>さあ、あなたも！</p>
+            <div class="btn__area">
+                <button class="female" data-color="pink" data-toggle="female">女性</button>
+                <button class="male" data-color="blue" data-toggle="male">男性</button>
+            </div>
+            <!-- 女性 -->
+            <div class="oaite__loop swiper" id="female">
+              <div class="oaite__wrap swiper-wrapper">
+                {% for p in female_profiles %}
+                  <div class="box swiper-slide">
+                    <a href="{% url 'user_profile_detail' p.user.id %}">
+                      <div class="image">
+                        <img src="{% if p.profile_image %}{{ p.profile_image.url }}{% else %}{% static 'img/user-unset.webp' %}{% endif %}" alt="">
+                        <div class="info">
+                          <div class="name">{{ p.nickname|default:p.user.username }}</div>
+                          <div class="age">{{ p.age|default:'--' }}</div>
+                          <div class="lciq">{{ p.lciq|default:'--' }}</div>
+                        </div>
+                      </div>
+                    </a>
+                  </div>
+                {% empty %}
+                  <p class="text-center">まだユーザーがいません</p>
+                {% endfor %}
+              </div>
+            </div>
+            
+            <!-- 男性 -->
+            <div class="oaite__loop swiper" id="male">
+              <div class="oaite__wrap swiper-wrapper">
+                {% for p in male_profiles %}
+                  <div class="box swiper-slide">
+                    <a href="{% url 'user_profile_detail' p.user.id %}">
+                      <div class="image">
+                        <img src="{% if p.profile_image %}{{ p.profile_image.url }}{% else %}{% static 'img/user-unset.webp' %}{% endif %}" alt="">
+                        <div class="info">
+                          <div class="name">{{ p.nickname|default:p.user.username }}</div>
+                          <div class="age">{{ p.age|default:'--' }}</div>
+                          <div class="lciq">{{ p.lciq|default:'--' }}</div>
+                        </div>
+                      </div>
+                    </a>
+                  </div>
+                {% empty %}
+                  <p class="text-center">まだユーザーがいません</p>
+                {% endfor %}
+              </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- 厳密なイマどこ検索は技術上不可能なはず。ということで見せ方で変えるのかどうするのかわからないけどとりあえず保留。
+        メインエリアに対してそれをブラしてgooglemapに載せる？とかそういうやり方しか思い浮かばない。現在地情報を取得できないから。
+     <section class="imadoko" id="imadoko">
+        <div class="container click__wrap">
+            <div class="mainTitle">いまドコ検索</div>
+            <p>現在地から出会いを見つける。<br>今出会いたい、ここで出会いたいがかないます！</p>
+            
+            <div class="btn__area" data-toggle="click">
+                <button class="imadoko" data-color="pink">いまドコ</button>
+            </div>
+            <div class="map" id="contents" style="display: none;">
+                <div class="map__area">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3241.7701644594345!2d139.69906087655377!3d35.65803387259467!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x60188b563b00109f%3A0x337328def1e2ab26!2z5riL6LC36aeF!5e0!3m2!1sja!2sjp!4v1733829897743!5m2!1sja!2sjp" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            </div>
+        </div>
+    </section> -->
+
+
+
+    <section class="cv">
+        <div class="cv__wrap container">
+            <div class="catch">出会いは、すぐそこに。</div>
+            <button>
+                <a href="{% url 'account_signup' %}">
+                    さあはじめよう
+                </a>
+            </button>
+        </div>
+    </section>
+
+    <section class="merit" id="merit">
+        <div class="container">
+            <div class="mainTitle">エクスマッチの特徴</div>
+            <div class="merit__wrap">
+                <div class="box">
+                    <div class="image"><img src="{% static 'img/merit1.webp' %}" alt=""></div>
+                    <div class="text">
+                        <div class="title">LCIQ®診断で相性を徹底検証</div>
+                        <p>
+                            LCIQ®診断ではあなたの恋愛偏差値を算出。直感的に答えた50問からあなたの恋愛傾向を診断します。<br>
+                            LCIQ®診断があることで、必然的にクオリティの高い出会いが待っています。
+                        </p>
+                    </div>
+                </div><!-- box -->
+                <div class="box">
+                    <div class="image"><img src="{% static 'img/merit2.webp' %}" alt=""></div>
+                    <div class="text">
+                        <div class="title">相性がいい人からいいねがくる</div>
+                        <p>
+                            LCIQ®診断は必須です。そしてそのLCIQ®診断の点数に応じて相性を独自に調整。確実に相性がいい人からしかいいねが来ません。
+                        </p>
+                    </div>
+                </div><!-- box -->
+                <div class="box">
+                    <div class="image"><img src="{% static 'img/merit3.webp' %}" alt=""></div>
+                    <div class="text">
+                        <div class="title">自分を変えられる</div>
+                        <p>
+                            LCIQ®診断の恋愛偏差値が低いからといっても大丈夫。トライサポートを使えば、あなたの恋愛偏差値はぐんぐん上がっていきます。<br>
+                            トライサポートで恋愛力を磨いたら、再びLCIQ®診断を受けてください。<br>
+                            診断は何度受けても構いません。成長したあなたに、素敵な出会いが待っています。<br>
+                            <a href="https://trysupport.jp/" target="_blank">トライサポート</a>
+                        </p>
+                    </div>
+                </div><!-- box -->
+            </div>
+        </div>
+    </section>
+
+    <section class="cv">
+        <div class="cv__wrap container">
+            <div class="catch">出会いは、すぐそこに。</div>
+            <button>
+                <a href="{% url 'account_signup' %}">
+                    さあはじめよう
+                </a>
+            </button>
+        </div>
+    </section>
+
+    <section class="price" id="price">
+        <div class="container">
+            <div class="mainTitle">ご利用料金</div>
+            <div class="subtitle">
+                一般的な結婚相談所での料金は、成婚まで平均して約30万円前後*。<br>
+                エクスマッチのスタンダードプランが高いと思うか、安いと感じるか。<br>
+                それはあなた次第です。
+                <span>*当社調べの中央値。初期費用(約104,500円)、月会費(約21,450円)、成婚料(約220,000円)で計算。</span>
+            </div>
+
+            <div class="price__ver3">
+
+                <div class="catch">
+                    <p>エクスマッチは全機能をどのプランでも使えます</p>
+                    <span>※フリープランを除く</span>
+                </div>
+                <div class="base-area">
+                    <div class="box free">
+                        <div class="head">フリー<span>FREE</span></div>
+                        <div class="wrap">
+                            <div class="disc">初めて婚活マッチングを利用する方に<br>ピッタリのお試しプラン</div>
+                            <div class="inner">
+                                <div class="left">
+                                    <div class="numb-month">0</div>
+                                </div>
+                                <div class="right">
+                                    <ul class="check">
+                                        <li>価値観診断</li>
+                                        <li>価値観マッチ ( 価値観による紹介 )</li>
+                                        <li>お相手のプロフィールを見る</li>
+                                        <li>お相手に「いいね！」をする</li>
+                                        <li>「いいね！」をくれた方とマッチングする ( 無制限 )</li>
+                                        <li>非表示機能</li>
+                                        <li>初回メッセージ１通のみ</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box default">
+                        <div class="head">1ヶ月プラン</div>
+                        <div class="wrap">
+                            <div class="numb numb-month">4,500</div>
+                            <ul class="check">
+                                <li>すべての機能が無制限で使えます</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="pack-area">
+                    <div class="box">
+                        <div class="head">
+                            <div class="inner">3ヶ月パック</div>
+                            <div class="getugaku numb-month">3,850</div>
+                        </div>
+                        <div class="amount">
+                            <div class="numb-month">11,550</div>
+                        </div>
+                        <div class="agel">
+                            <div class="sarani">
+                                <div class="wrap">
+                                    さらに！
+                                </div>
+                            </div>
+                            <div class="present">
+                                <div class="img">
+                                    <img src="{% static 'img/a-gel.png' %}" alt="">
+                                </div>
+                                <div class="text">
+                                    <span>4,620円分</span>プレゼント
+                                </div>
+                            </div>
+                            <div class="about">
+                                <a href="">A-GELポイントとは？</a>
+                            </div>
+                        </div>
+                        <div class="camp">
+                            <div class="head">オープニングキャンペーン</div>
+                            <p><span>1ヶ月分無料</span></p>
+                        </div>
+                    </div>
+                    <div class="box">
+                        <div class="head">
+                            <div class="inner">6ヶ月パック</div>
+                            <div class="getugaku numb-month">3,150</div>
+                        </div>
+                        <div class="amount">
+                            <div class="numb-month">18,900</div>
+                        </div>
+                        <div class="agel">
+                            <div class="sarani">
+                                <div class="wrap">
+                                    さらに！
+                                </div>
+                            </div>
+                            <div class="present">
+                                <div class="img">
+                                    <img src="{% static 'img/a-gel.png' %}" alt="">
+                                </div>
+                                <div class="text">
+                                    <span>7,560円分</span>プレゼント
+                                </div>
+                            </div>
+                            <div class="about">
+                                <a href="">A-GELポイントとは？</a>
+                            </div>
+                        </div>
+                        <div class="camp">
+                            <div class="head">オープニングキャンペーン</div>
+                            <p><span>2ヶ月分無料</span></p>
+                        </div>
+                    </div>
+                    <div class="box">
+                        <div class="head">
+                            <div class="inner">12ヶ月パック</div>
+                            <div class="getugaku numb-month">2,450</div>
+                        </div>
+                        <div class="amount">
+                            <div class="numb-month">29,400</div>
+                        </div>
+                        <div class="agel">
+                            <div class="sarani">
+                                <div class="wrap">
+                                    さらに！
+                                </div>
+                            </div>
+                            <div class="present">
+                                <div class="img">
+                                    <img src="{% static 'img/a-gel.png' %}" alt="">
+                                </div>
+                                <div class="text">
+                                    <span>11,760円分</span>プレゼント
+                                </div>
+                            </div>
+                            <div class="about">
+                                <a href="">A-GELポイントとは？</a>
+                            </div>
+                        </div>
+                        <div class="camp">
+                            <div class="head">オープニングキャンペーン</div>
+                            <p><span>3ヶ月分無料</span></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="option-area">
+                    <div class="mainTitle">オプション</div>
+                    <div class="subtitle">ご要望にお答えして<br>
+                        深い部分までわかる追加オプションを導入しました
+                    </div>
+
+                    <div class="contents">
+                        <ul class="check">
+                            <li>性指向などのプラスプロフィールが見れる</li>
+                        </ul>
+                        <div class="price">
+                            <div class="numb-month">1,500</div>
+                        </div>
+                    </div>
+                    <div class="camp">
+                        <div class="head">期間限定キャンペーン<span>50%OFF</span></div>
+                        <div class="numb">750</div>
+                    </div>
+                    <div class="about container">
+                        <div class="toggle">プラスプロフィールとは？</div>
+                        <div class="toggle-contents">
+                            <div class="img">
+                                <img src="{% static 'img/ft3.webp' %}" alt="">
+                            </div>
+                            <p>
+                                離婚原因のひとつにセックスレスが挙げられます。話しておけばよかった、といったことがないように、出会う前から正直にお話いただくことで成婚率がぐんと上がります。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <!-- ver2 -->
+            <!-- <div class="price__special">
+                <div class="main">
+                    <div class="toggle" id="toggleContainerStandard">
+                        <button data-plan="normal">通常価格</button>
+                        <button data-plan="3months" class="active">3ヶ月パック<span>1ヶ月分</span></button>
+                        <button data-plan="6months">6ヶ月パック<span>2ヶ月分</span></button>
+                        <button data-plan="12months">12ヶ月パック<span>3ヶ月分</span></button>
+                    </div>
+
+                    <div class="price__special__wrap">
+                        <div class="box free">
+                            <div class="numb">0</div>
+                            <div class="plan">フリー<span>FREE</span></div>
+                            <div class="disc">初めて婚活マッチングを利用する方に<br>ピッタリのお試しプラン</div>
+                            <button><a href="">無料ではじめる</a></button>
+                            <ul>
+                                <li>価値観診断</li>
+                                <li>価値観マッチ ( 価値観による紹介 )</li>
+                                <li>お相手のプロフィールを見る</li>
+                                <li>お相手に「いいね！」をする</li>
+                                <li>「いいね！」をくれた方とマッチングする ( 無制限 )</li>
+                                <li>非表示機能</li>
+                                <li>初回メッセージ１通のみ</li>
+                            </ul>
+                        </div>
+                        <div class="box standard">
+                            <div class="numb" id="numbPriceStandard">3850</div>
+                            <div class="plan">スタンダード<span>STANDARD</span></div>
+                            <div class="disc">すべての基本的な機能が利用できる<br>オールインクルーシブプラン</div>
+                            <button><a href="">いますぐはじめる</a></button>
+                            <ul>
+                                <li>お相手とのメッセージのやりとり(無制限)※本人・年齢確認必須</li>
+                                <li>「いいね！」できる回数が60回に回復（有料会員登録直後のみ）</li>
+                                <li>「いいね！」を送れる回数が、毎月60回に増量</li>
+                                <li>あなたを検索結果の上位に表示</li>
+                                <li>相手が今もらっている、「いいね！」数がわかる</li>
+                                <li>一部並び替え機能(「いいね！」の多い順、新着会 員順、ログイン順)</li>
+                                <li>足あとが5件以上見られる</li>
+                            </ul>
+                            <div class="amount">
+                                <span class="wrap">合計</span>
+                                <span class="inner" id="amountPriceStandard">11500</span>
+                            </div>
+                            <div class="agel" id="agelBoxStandard">
+                                <div class="sarani">
+                                    <div class="wrap">
+                                        さらに！
+                                    </div>
+                                </div>
+                                <div class="present">
+                                    <div class="img">
+                                        <img src="{% static 'img/a-gel.png' %}" alt="">
+                                    </div>
+                                    <div class="text">
+                                        <div class="wrap">
+                                            <div class="inner">
+                                                <span id="presentPriceStandard">4,620</span>円分
+                                            </div>
+                                            プレゼント
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="advansed">
+                    <div class="title">追加オプション</div>
+                    <p>本気で出会ったとしても、その後続かなかったら。<br>包み隠さず知れるオプションです</p>
+
+                    <div class="toggle" id="toggleContainerAdvanced">
+                        <button data-plan="normal">通常価格</button>
+                        <button data-plan="3months" class="active">3ヶ月パック</button>
+                        <button data-plan="6months">6ヶ月パック<span>10%</span></button>
+                        <button data-plan="12months">12ヶ月パック<span>20%</span></button>
+                    </div>
+
+                    <div class="price__special__wrap">
+                        <div class="box advansed">
+                            <div class="numb" id="numbPriceAdvanced">3000</div>
+                            <div class="plan">アドバンスド<span>advansed</span></div>
+                            <div class="disc">深い部分の相性がわかる<br>追加オプション</div>
+                            <button><a href="">ホンキではじめる</a></button>
+                            <ul>
+                                <li>スタンダードプランのすべての機能が使える</li>
+                                <li>性癖のプロフィールが見れる</li>
+                            </ul>
+                            <div class="amount">
+                                <span class="wrap">合計</span>
+                                <span class="inner" id="amountPriceAdvanced">1500</span>
+                            </div>
+                            <div class="agel" id="agelBoxAdvanced">
+                                <div class="sarani">
+                                    <div class="wrap">
+                                        さらに！
+                                    </div>
+                                </div>
+                                <div class="present">
+                                    <div class="img">
+                                        <img src="{% static 'img/a-gel.png' %}" alt="">
+                                    </div>
+                                    <div class="text">
+                                        <div class="wrap">
+                                            <div class="inner">
+                                                <span id="presentPriceAdvanced">480</span>円分
+                                            </div>
+                                            プレゼント
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+
+            <!-- 一度提案用に消す -->
+            <!-- <div class="price__wrap d-none">
+                <div class="box free">
+                    <div class="numb">0</div>
+                    <div class="plan">フリー<span>FREE</span></div>
+                    <div class="disc">初めて婚活マッチングを利用する方に<br>ピッタリのお試しプラン</div>
+                    <button><a href="">無料ではじめる</a></button>
+                    <ul>
+                        <li>価値観診断</li>
+                        <li>価値観マッチ ( 価値観による紹介 )</li>
+                        <li>お相手のプロフィールを見る</li>
+                        <li>お相手に「いいね！」をする</li>
+                        <li>「いいね！」をくれた方とマッチングする ( 無制限 )</li>
+                        <li>非表示機能</li>
+                        <li>初回メッセージ１通のみ</li>
+                    </ul>
+                </div>
+                <div class="box standard">
+                    <div class="numb">4,500<span>¥4,950(税込)</span></div>
+                    <div class="plan">スタンダード<span>STANDARD</span></div>
+                    <div class="disc">すべての基本的な機能が利用できる<br>オールインクルーシブプラン</div>
+                    <button><a href="">いますぐはじめる</a></button>
+                    <ul>
+                        <li>お相手とのメッセージのやりとり(無制限)※本人・年齢確認必須</li>
+                        <li>「いいね！」できる回数が60回に回復（有料会員登録直後のみ）</li>
+                        <li>「いいね！」を送れる回数が、毎月60回に増量</li>
+                        <li>あなたを検索結果の上位に表示</li>
+                        <li>相手が今もらっている、「いいね！」数がわかる</li>
+                        <li>一部並び替え機能(「いいね！」の多い順、新着会 員順、ログイン順)</li>
+                        <li>足あとが5件以上見られる</li>
+                    </ul>
+                </div>
+                <div class="box advanced">
+                    <div class="numb">6,000<span>¥6,600(税込)</span></div>
+                    <div class="plan">アドバンス<span>ADVANCED</span></div>
+                    <div class="disc">深い部分の相性がわかる<br>追加オプション</div>
+                    <button><a href="">ホンキではじめる</a></button>
+                    <ul>
+                        <li>スタンダードプランのすべての機能が使える</li>
+                        <li>性癖のプロフィールが見れる</li>
+                    </ul>
+                </div>
+            </div> -->
+        </div><!-- container -->
+    </section>
+
+    <section class="cv">
+        <div class="cv__wrap container">
+            <div class="catch">出会いは、すぐそこに。</div>
+            <button>
+                <a href="{% url 'account_signup' %}">
+                    さあはじめよう
+                </a>
+            </button>
+        </div>
+    </section>
+
+    <section class="security" id="security">
+        <div class="container">
+            <div class="mainTitle">
+                セキュリティ
+            </div>
+            <div class="subtitle">
+                GPSを使っているからこそ、セキュリティは万全。<br>安心してご利用ください。
+            </div>
+            <div class="security__wrap">
+                <div class="box">
+                    <img src="{% static 'img/sc1.webp' %}" alt="">
+                    <span>プライバシー<br>守ります</span>
+                </div>
+                <div class="box">
+                    <img src="{% static 'img/sc2.webp' %}" alt="">
+                    <span>悪質ユーザー<br>取り締まり</span>
+                </div>
+                <div class="box">
+                    <img src="{% static 'img/sc3.webp' %}" alt="">
+                    <span>万全の<br>サポート体制</span>
+                </div>
+                <div class="box">
+                    <img src="{% static 'img/sc4.webp' %}" alt="">
+                    <span>高額請求<br>なし</span>
+                </div>
+            </div>
+        </div><!-- container -->
+    </section>
+
+    <section class="faq" id="faq">
+        <div class="container">
+            <div class="mainTitle">FAQ</div>
+            <div class="subtitle">よくある質問をまとめました。<br>ぜひ参照してください。</div>
+
+            <div class="faq__wrap">
+                <div class="box">
+                    <div class="q"><div class="title">無料で利用できますか？</div></div>
+                    <div class="a">
+                        <div class="title" data-toggle="click">はい、利用できます。</div>
+                        <p id="contents" style="display: none;">
+                            サンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキスト
+                        </p>
+                    </div>
+                </div>
+                <div class="box">
+                    <div class="q"><div class="title">無料で利用できますか？</div></div>
+                    <div class="a">
+                        <div class="title" data-toggle="click">はい、利用できます。</div>
+                        <p id="contents" style="display: none;">
+                            サンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキスト
+                        </p>
+                    </div>
+                </div>
+                <div class="box">
+                    <div class="q"><div class="title">無料で利用できますか？</div></div>
+                    <div class="a">
+                        <div class="title" data-toggle="click">はい、利用できます。</div>
+                        <p id="contents" style="display: none;">
+                            サンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキスト
+                        </p>
+                    </div>
+                </div>
+                <div class="box">
+                    <div class="q"><div class="title">無料で利用できますか？</div></div>
+                    <div class="a">
+                        <div class="title" data-toggle="click">はい、利用できます。</div>
+                        <p id="contents" style="display: none;">
+                            サンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキスト
+                        </p>
+                    </div>
+                </div>
+                <div class="box">
+                    <div class="q"><div class="title">無料で利用できますか？</div></div>
+                    <div class="a">
+                        <div class="title" data-toggle="click">はい、利用できます。</div>
+                        <p id="contents" style="display: none;">
+                            サンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキスト
+                        </p>
+                    </div>
+                </div>
+                <div class="box">
+                    <div class="q"><div class="title">無料で利用できますか？</div></div>
+                    <div class="a">
+                        <div class="title" data-toggle="click">はい、利用できます。</div>
+                        <p id="contents" style="display: none;">
+                            サンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキスト
+                        </p>
+                    </div>
+                </div>
+                <div class="box">
+                    <div class="q"><div class="title">無料で利用できますか？</div></div>
+                    <div class="a">
+                        <div class="title" data-toggle="click">はい、利用できます。</div>
+                        <p id="contents" style="display: none;">
+                            サンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキストサンプルテキスト
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+       </div>
+    </section>
+
+    <section class="cv">
+        <div class="cv__wrap container">
+            <div class="catch">出会いは、すぐそこに。</div>
+            <button>
+                <a href="{% url 'account_signup' %}">
+                    さあはじめよう
+                </a>
+            </button>
+        </div>
+    </section>
+
+    <section class="last">
+        <!-- <div class="mockup">
+            <img src="{% static 'img/mockup.webp' %}" alt="">
+        </div> -->
+    </section>
+
+
+    <footer class="footer-home">
+        <div class="sns">
+            <a class="youtube" href="" target="_blank"><img src="{% static 'img/sns-youtube.webp' %}" alt=""></a>
+            <a class="tiktok" href="" target="_blank"><img src="{% static 'img/sns-tiktok.webp' %}" alt=""></a>
+        </div>
+        <div class="footer-home__wrap">
+            <div class="logo"><a href="/"><img src="{% static 'img/logo.svg' %}" alt="Logo"></a></div>
+            <ul>
+                <li><a href="/">会社概要</a></li>
+                <li><a href="/">利用規約</a></li>
+                <li><a href="/">安心・安全の取り組みとガイド</a></li>
+                <li><a href="/">コミュニティガイドライン</a></li>
+                <li><a href="/">プライバシーポリシー</a></li>
+                <li><a href="/">クッキーポリシー</a></li>
+                <li><a href="/">クッキー設定</a></li>
+                <li><a href="/">特定商取引法に基づく表示</a></li>
+                <li><a href="/">ヘルプ</a></li>
+                <li><a href="/">法人･自治体向けサービス</a></li>
+                <li><a href="/">採用サイト</a></li>
+                <li><a href="/">記事提供元一覧</a></li>
+            </ul>
+        </div>
+        <div class="cr"><a href="/">&copy; 2024 EXMATCH</a></div>
+    </div>
+
+    </footer>
+
+</div><!-- //home -->
+
+
+
+
+    <!-- <script>
+        /* ------------------ Standard用 ------------------ */
+        const standardContainer = document.getElementById('toggleContainerStandard');
+        const standardPrices = {
+          normal:     { numb: 4500, amount: 4500,  present: 0,    showAgel: false },
+          '3months':  { numb: 3850, amount: 11550, present: 4620, showAgel: true  },
+          '6months':  { numb: 3150, amount: 18900, present: 7560, showAgel: true  },
+          '12months': { numb: 2450, amount: 29400, present:11760, showAgel: true  },
+        };
+      
+        standardContainer.addEventListener('click', e => {
+          if (e.target.tagName !== 'BUTTON') return;
+      
+          // 1. 全てのボタンからactiveを外す
+          standardContainer.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+          // 2. クリックされたボタンだけactiveを付与
+          e.target.classList.add('active');
+      
+          // data-plan属性を取得して対応する価格を適用
+          const plan = e.target.dataset.plan;
+          changeStandardPrice(plan);
+        });
+      
+        function changeStandardPrice(plan) {
+          const data = standardPrices[plan];
+          document.getElementById('numbPriceStandard').textContent    = data.numb.toLocaleString();
+          document.getElementById('amountPriceStandard').textContent  = data.amount.toLocaleString();
+          document.getElementById('presentPriceStandard').textContent = data.present.toLocaleString();
+      
+          const agelBox = document.getElementById('agelBoxStandard');
+          if (data.showAgel) {
+            agelBox.classList.remove('hidden');
+          } else {
+            agelBox.classList.add('hidden');
+          }
+        }
+      
+      
+        /* ------------------ Advanced用 ------------------ */
+        const advancedContainer = document.getElementById('toggleContainerAdvanced');
+        const advancedPrices = {
+          normal:     { numb: 1500, amount: 1500,  present: 0,    showAgel: false },
+          '3months':  { numb: 1500, amount: 4500,  present: 0,    showAgel: false },
+          '6months':  { numb: 1350, amount: 8100,  present: 480,  showAgel: true  },
+          '12months': { numb: 1200, amount: 14400, present: 480,  showAgel: true  },
+        };
+      
+        advancedContainer.addEventListener('click', e => {
+          if (e.target.tagName !== 'BUTTON') return;
+      
+          // 1. 全てのボタンからactiveを外す
+          advancedContainer.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+          // 2. クリックされたボタンだけactiveを付与
+          e.target.classList.add('active');
+      
+          const plan = e.target.dataset.plan;
+          changeAdvancedPrice(plan);
+        });
+      
+        function changeAdvancedPrice(plan) {
+          const data = advancedPrices[plan];
+          document.getElementById('numbPriceAdvanced').textContent    = data.numb.toLocaleString();
+          document.getElementById('amountPriceAdvanced').textContent  = data.amount.toLocaleString();
+          document.getElementById('presentPriceAdvanced').textContent = data.present.toLocaleString();
+      
+          const agelBox = document.getElementById('agelBoxAdvanced');
+          if (data.showAgel) {
+            agelBox.classList.remove('hidden');
+          } else {
+            agelBox.classList.add('hidden');
+          }
+        }
+      </script> -->
+
+
+      <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          const toggles = document.querySelectorAll('.toggle');
+          toggles.forEach((toggle) => {
+            toggle.addEventListener('click', () => {
+              const content = toggle.nextElementSibling;
+              // toggle-contentsにopenクラスを付け外し
+              content.classList.toggle('open');
+              // toggle自身にもopenクラスを付け外し
+              toggle.classList.toggle('open');
+            });
+          });
+        });
+        </script>
+      
+{% endblock %}

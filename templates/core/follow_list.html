@@ -1,0 +1,17 @@
+<!-- templates/core/follow_list.html -->
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}いいねリスト{% endblock %}
+
+{% block content %}
+<h1>いいねリスト</h1>
+
+{% for like in my_follows %}
+  {% include "core/partials/parts-userprof-mini.html" with user_obj=like.to_user %}
+{% empty %}
+  <p>まだ「いいね」していません</p>
+{% endfor %}
+
+<p><a href="{% url 'home' %}">Home</a></p>
+{% endblock %}

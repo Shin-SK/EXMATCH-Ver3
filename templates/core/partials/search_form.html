@@ -1,0 +1,67 @@
+<!-- 例: templates/core/userprofile_list.html -->
+<form method="get" class="form">
+
+  <div class="form__wrap">
+      <div class="filter">
+          <!-- (1) 現在地検索のセクション -->
+          <div class="filter__wrap">
+                <div class="item radius">
+                    <label for="radius">位置情報検索</label>
+                    {{ filter.form.radius }}
+                    <!-- lat/lon は hidden or JSで埋める -->
+                    <input type="hidden" name="lat" id="latInput" value="{{ request.GET.lat }}">
+                    <input type="hidden" name="lon" id="lonInput" value="{{ request.GET.lon }}">
+                </div>
+                  <!-- 必要ならセクションごとに小ボタンを置いても良い -->
+                  <!-- <button type="submit">この条件だけで検索</button> -->
+
+                <div class="button-area">
+                  <button type="submit">検索</button>
+                  <button type="button" onclick="window.location.href='{% url 'userprofile_list' %}'">
+                    リセット
+                  </button>
+                </div>
+            </div>
+
+            <!-- (2) プロフィール検索のセクション -->
+            <h2 data-toggle="profile">プロフィール検索</h2>
+            <div class="filter__wrap profile" data-content="profile" style="display: none;">
+
+                <div class="item">
+                    <label for="blood_type">血液型</label>
+                    {{ filter.form.blood_type }}
+                </div>
+
+                <div class="item button-area">
+                    <button type="submit">検索</button>
+                    <button type="button" onclick="window.location.href='{% url 'userprofile_list' %}'">
+                    リセット
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- (3) カスタムフィールド検索のセクション -->
+            <h2 data-toggle="detail">詳しく検索</h2>
+            <div class="filter__wrap detail" data-content="detail" style="display: none;">
+                <!-- ここでは "動的フィールド" だけループで出す例 -->
+                {% for field in filter.form %}
+                  {% if field.name != 'blood_type' and field.name != 'sexual_pref' and field.name != 'radius' %}
+
+                    <div class="item">
+                      {{ field.label_tag }}
+                      {{ field }}
+                    </div>
+                  {% endif %}
+                {% endfor %}
+            <div class="button-area">
+              <button type="submit">検索</button>
+              <button type="button" onclick="window.location.href='{% url 'userprofile_list' %}'">
+                リセット
+              </button>
+            </div>
+          </div>
+      </div>
+</div>
+
+</form>

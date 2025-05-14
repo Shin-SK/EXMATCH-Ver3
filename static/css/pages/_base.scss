@@ -1,0 +1,376 @@
+@use "../global/global" as *;
+
+.base{
+    padding-bottom: 80px;
+    // .container{
+    //     max-width: 768px;
+    // }
+    .current{
+        opacity: 1 !important;
+    }
+
+    .mainTitle, h1{
+        @include fs(40);
+        @include flex();
+        margin-bottom: 40px;
+        font-weight: bold;
+        width: 100%;
+        @include md{
+            @include fs(30);
+        }
+    }
+
+    &.guest-user .profile img{
+        filter: blur(5px);
+    }
+
+    .header{
+        #navigation {
+            opacity: 1;
+            visibility: unset;
+        }
+        .nav{
+            &__wrap{
+                position: relative;
+                justify-content: center;
+                align-items: center;
+                .logo{
+                    position: absolute;
+                    left: 15px;
+                    top: 0;
+                    bottom: 0;
+                    margin: auto 0;
+                    height: fit-content;
+                    img{
+                        max-height: 30px;
+                    }
+                }
+                .menu{
+                    width: 100%;
+                    ul{
+                        @include flex();
+                        max-width: 500px;
+                        justify-content: space-around;
+                        width: 100%;
+                        li{
+                            a{
+                                opacity: 0.3; //current
+                                color: $mc;
+                                @include flex();
+                                flex-direction: column;
+                                gap: 4px;
+                                @include fs(10);
+                                transition: opacity 0.3s ease;
+                                &:hover{
+                                    opacity: 1;
+                                }
+                            }
+                        }
+                        .search{
+                            &::before{
+                                font: var(--fa-font-solid);
+                                content: '\f002';
+                                @include fs(25);
+                            }
+                        }
+                        .imadoko{
+                            &::before{
+                                font: var(--fa-font-solid);
+                                content: '\f3c5';
+                                @include fs(25);
+                            }
+                        }
+                        .apply{
+                            &::before{
+                                font: var(--fa-font-solid);
+                                content: '\f5ad';
+                                @include fs(25);
+                            }
+                        }
+                        .message{
+                            &::before{
+                                font: var(--fa-font-solid);
+                                content: '\f086';
+                                @include fs(25);
+                            }
+                        }
+                        .mypage{
+                            &::before{
+                                font: var(--fa-font-solid);
+                                content: '\f2bd';
+                                @include fs(25);
+                            }
+                        }
+                    }
+                }
+            }
+            &__sp{
+                justify-content: space-between;
+                align-items: center;
+                .logo{
+                    z-index: 99999;
+                    img{
+                        height: 35px;
+                    }
+                }
+            }//__sp
+            .nav-inner{
+                @include flex();
+                flex-direction: column;
+                justify-content: space-between;
+                height: 100%;
+                ul{
+                    width: 100%;
+                    padding-top: 60px;
+                    li{
+                        border-bottom: 1px $mc dotted;
+                        &:first-child{
+                            border-top: 1px $mc dotted;
+                        }
+                        a{
+                            position: relative;
+                            padding-left: 40px;
+                            color: $mc;
+                            &::before{
+                                position: absolute;
+                                left: 8px;
+                                top: 0;
+                                bottom: 0;
+                                margin: auto 0;
+                                height: fit-content;
+                            }
+                            &::after{
+                                font: var(--fa-font-solid);
+                                content: '\f105';
+                                @include fs(16);
+                                color: $mc;
+                            }
+                        }
+                        .search{
+                            &::before{
+                                font: var(--fa-font-solid);
+                                content: '\f002';
+                                @include fs(20);
+                            }
+                        }
+                        .imadoko{
+                            &::before{
+                                font: var(--fa-font-solid);
+                                content: '\f3c5';
+                                @include fs(20);
+                            }
+                        }
+                        .apply{
+                            &::before{
+                                font: var(--fa-font-solid);
+                                content: '\f5ad';
+                                @include fs(20);
+                            }
+                        }
+                        .message{
+                            &::before{
+                                font: var(--fa-font-solid);
+                                content: '\f086';
+                                @include fs(18);
+                            }
+                        }
+                        .mypage{
+                            &::before{
+                                font: var(--fa-font-solid);
+                                content: '\f2bd';
+                                @include fs(20);
+                            }
+                        }
+                    }
+                }
+                .login{
+                    padding: 8px 16px;
+                    border-radius: 100px;
+                    background-color: $pink;
+                    color: white;
+                    margin-bottom: 100px;
+                    width: 90%;
+                    span{
+                        @include flex();
+                        gap: 8px;
+                        color: white;
+                        &::before{
+                            font: var(--fa-font-solid);
+                            content: '\f090';
+                            color: white;
+                            @include fs(12);
+                        }
+                    }
+                }
+            }
+        }//nav
+    }
+
+    main{
+        padding-top: 120px;
+        @include md{
+        padding-top: 80px;
+        }
+    }
+
+    .price{
+        &__wrap{
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 40px;
+            margin-top: 40px;
+            overflow-x: auto;
+            padding: 16px;
+            .box{
+                @include flex();
+                flex-direction: column;
+                gap: 16px;
+                padding: 80px 16px;
+                box-shadow: 0px 0px 15px -10px #777777;
+                justify-content: flex-start;
+                min-width: 300px;
+                .numb{
+                    @include fs(60);
+                    font-weight: bold;
+                    height: 100px;
+                    &::before{
+                        content: '¥';
+                        @include fs(30);
+                        margin-right: 8px;
+                    }
+                    span{
+                        display: block;
+                        text-align: center;
+                        @include fs(10);
+                        width: 100%;
+                        font-weight: normal;
+                    }
+                }
+                .plan{
+                    @include fs(25);
+                    font-weight: bold;
+                    text-align: center;
+                    span{
+                        display: block;
+                        text-align: center;
+                        @include fs(10);
+                    }
+                }
+                .disc{
+                    text-align: center;
+                    @include fs(12);
+                }
+                button{
+                    background-color: $mc;
+                    transition: background-color 0.3s ease;
+                    &:hover{
+                        background-color: lighten($mc, 10%);
+                    }
+                    a{
+                        color: white;
+                        display: block;
+                        font-weight: bold;
+                        padding: 8px;
+                        width: 100%;
+                        text-align: center;
+                    }
+                }
+                ul{
+                    li{
+                        @include fs(12);
+                        margin-bottom: 4px;
+                        &::before{
+                            font: var(--fa-font-solid);
+                            content: '\f00c';
+                            color: $mc;
+                            margin-right: 4px;
+                        }
+                    }
+                }
+            }//box
+            .free{
+                button{
+                    background-color: $green;
+                    &:hover{
+                        background-color: lighten($green, 10%);
+                    }
+                }
+                ul{
+                    li{
+                        &::before{
+                            color: $green;
+                        }
+                    }
+                }
+            }
+            .advanced{
+                button{
+                    background-color: $pink;
+                    &:hover{
+                        background-color: lighten($pink, 10%);
+                    }
+                }
+                ul{
+                    li{
+                        &::before{
+                            color: $pink;
+                        }
+                    }
+                }
+            }
+        }
+    }//price
+
+    // .footer{
+    //     @include md{
+    //         padding-top: 40px;
+    //     }
+    //     .contents{
+    //         background-color: $lb;
+    //     }
+    //     &__wrap{
+    //         margin-top: 40px;
+    //         display: grid;
+    //         grid-template-columns: 1fr 3fr;
+    //         gap: 40px;
+    //         align-items: center;
+    //         padding-top: 40px;
+    //         @include md{
+    //             grid-template-columns: 1fr;
+    //             gap: 16px;
+    //         }
+    //         .logo{
+    //             img{
+    //                 max-width: 200px;
+    //                 @include md{
+    //                     display: block;
+    //                     margin: 0 auto;
+    //                 }
+    //             }
+    //         }
+    //         ul{
+    //             display: grid;
+    //             grid-auto-flow: column;
+    //             grid-template-rows: repeat(4, auto);
+    //             gap: 4px;
+    //             @include md{
+    //                 grid-auto-flow: row;
+    //                 justify-items: center; /* 中央揃えを維持 */
+    //             }
+    //             li{
+    //                 a{
+    //                     @include fs(12);
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     .cr{
+    //         text-align: center;
+    //         padding: 40px 0px;
+    //         @include md{
+                
+    //         }
+    //     }
+    // }
+}
+

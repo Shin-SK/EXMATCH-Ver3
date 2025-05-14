@@ -1,0 +1,17 @@
+// [1] グローバル読み込み
+@use "global/global" as *; 
+@use "global/reset";
+
+// [2] パーツやページSCSS読み込み
+@use "parts/header";
+@use "parts/footer";
+@use "pages/home";
+@use "pages/price";
+@use "pages/base";
+@use "pages/form";
+@use "pages/search";
+@use "pages/mypage";
+@use "pages/registration";
+@use "pages/edit";
+@use "pages/feed";
+@use "pages/auth";

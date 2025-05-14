@@ -1,0 +1,711 @@
+@use "../global/global" as *;
+
+.price{
+    &__wrap{
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 40px;
+        margin-top: 40px;
+        overflow-x: auto;
+        padding: 16px;
+        .box{
+            @include flex();
+            flex-direction: column;
+            gap: 16px;
+            padding: 80px 16px;
+            box-shadow: 0px 0px 15px -10px #777777;
+            justify-content: flex-start;
+            min-width: 300px;
+            .numb{
+                @include fs(60);
+                font-weight: bold;
+                height: 100px;
+                &::before{
+                    content: '¥';
+                    @include fs(30);
+                    margin-right: 8px;
+                }
+                span{
+                    display: block;
+                    text-align: center;
+                    @include fs(10);
+                    width: 100%;
+                    font-weight: normal;
+                }
+            }
+            .plan{
+                @include fs(25);
+                font-weight: bold;
+                text-align: center;
+                span{
+                    display: block;
+                    text-align: center;
+                    @include fs(10);
+                }
+            }
+            .disc{
+                text-align: center;
+                @include fs(12);
+            }
+            button{
+                background-color: $mc;
+                transition: background-color 0.3s ease;
+                &:hover{
+                    background-color: lighten($mc, 10%);
+                }
+                a{
+                    color: white;
+                    display: block;
+                    font-weight: bold;
+                    padding: 8px;
+                    width: 100%;
+                    text-align: center;
+                }
+            }
+            ul{
+                li{
+                    @include fs(12);
+                    margin-bottom: 4px;
+                    &::before{
+                        font: var(--fa-font-solid);
+                        content: '\f00c';
+                        color: $mc;
+                        margin-right: 4px;
+                    }
+                }
+            }
+        }//box
+        .free{
+            button{
+                background-color: $green;
+                &:hover{
+                    background-color: lighten($green, 10%);
+                }
+            }
+            ul{
+                li{
+                    &::before{
+                        color: $green;
+                    }
+                }
+            }
+        }
+        .advanced{
+            button{
+                background-color: $pink;
+                &:hover{
+                    background-color: lighten($pink, 10%);
+                }
+            }
+            ul{
+                li{
+                    &::before{
+                        color: $pink;
+                    }
+                }
+            }
+        }
+    }
+    &__special{
+		.toggle{
+			margin-top: 80px;
+			display: grid;
+			grid-template-columns: repeat(4, 1fr);
+			gap:40px;
+			@include md{
+				grid-template-columns: repeat(2,1fr);
+				gap:40px 24px ;
+			}
+			button{
+				color: $mc;
+				background-color: white;
+				border: $mc 1px solid;
+				border-radius: 5px;
+				position: relative;
+				font-weight: bold;
+				&.active{
+					background-color: $mc;
+					color: white;
+					border: transparent 1px solid;
+				}
+				&::after{
+					content: '無料';
+					position: absolute;
+					background-color: $pink;
+					width: 50px;
+					height: 50px;
+					@include flex();
+					border-radius: 100%;
+					color: white;
+					font-weight: bold;
+					right: -30px;
+					top: -30px;
+					@include md{
+						right: -8px;
+					}
+				}
+				&:first-of-type::after{
+					content: '';
+					width: unset;
+					height: unset;
+					background-color: unset;
+				}
+				span{
+					position: absolute;
+					top: -45px;
+					right: 25px;
+					color: $pink;
+					font-weight: bold;
+					&::first-letter{
+						@include fs(40);
+					}
+					@include md{
+						right: 45px;
+					}
+				}
+			}
+		}
+		&__wrap{
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 40px;
+			margin-top: 40px;
+			overflow-x: auto;
+			padding: 16px;
+			@include md{
+				grid-template-columns: 1fr;
+			}
+			.box{
+				@include flex();
+				flex-direction: column;
+				gap: 16px;
+				padding: 80px 16px;
+				box-shadow: 0px 0px 15px -10px #777777;
+				justify-content: flex-start;
+				min-width: 500px;
+				@include md{
+					min-width: auto;
+				}
+				.numb{
+					@include fs(60);
+					font-weight: bold;
+					height: auto;
+					&::before{
+						content: '¥';
+						@include fs(30);
+						margin-right: 8px;
+					}
+					span{
+						display: block;
+						text-align: center;
+						@include fs(10);
+						width: 100%;
+						font-weight: normal;
+					}
+				}
+				.plan{
+					@include fs(25);
+					font-weight: bold;
+					text-align: center;
+					span{
+						display: block;
+						text-align: center;
+						@include fs(10);
+					}
+				}
+				.disc{
+					text-align: center;
+					@include fs(12);
+				}
+				button{
+					background-color: $mc;
+					transition: background-color 0.3s ease;
+					&:hover{
+						background-color: lighten($mc, 10%);
+					}
+					a{
+						color: white;
+						display: block;
+						font-weight: bold;
+						padding: 8px;
+						width: 100%;
+						text-align: center;
+					}
+				}
+				ul{
+					li{
+						@include fs(12);
+						margin-bottom: 4px;
+						&::before{
+							font: var(--fa-font-solid);
+							content: '\f00c';
+							color: $mc;
+							margin-right: 4px;
+						}
+					}
+				}
+				.amount{
+					@include flex();
+					gap: 16px;
+					.wrap{
+						background-color: $mc;
+						padding: 4px 16px;
+						color: white;
+						border-radius: 5px;
+					}
+					.inner{
+						@include fs(40);
+						font-weight: bold;
+						color: $mc;
+						&::before{
+							content: '¥';
+							@include fs(20);
+							margin-right: 8px;
+						}
+					}
+				}//amoutn
+				.agel{
+					.sarani{
+						@include flex();
+						font-weight: bold;
+						.wrap{
+							position: relative;
+							&::before{
+								content: '';
+								background-image: url(../img/sarani.svg);
+								background-repeat: no-repeat;
+								position: absolute;
+								top: -6px;
+								left: -10px;
+								width: 15px;
+								height: 15px;
+							}
+						}
+					}
+					.present{
+						@include flex();
+						gap: 16px;
+						.img{
+							img{
+								width: 150px;
+								height: auto;
+								@include md{
+									width: 100px;
+								}
+							}
+						}
+						.text{
+							@include fs(20);
+							background: linear-gradient(transparent 70%, $pink 60%);
+							@include md{
+								background: unset;
+							}
+							.wrap{
+								@include flex();
+								@include md{
+									display: block;
+								}
+								.inner{
+									@include md{
+										background: linear-gradient(transparent 70%, $pink 60%);
+									}
+									span{
+										@include fs(40);
+									}
+								}
+							}
+
+						}
+					}
+				}
+			}//box
+			
+			.free{
+				button{
+					background-color: $green;
+					&:hover{
+						background-color: lighten($green, 10%);
+					}
+				}
+				ul{
+					li{
+						&::before{
+							color: $green;
+						}
+					}
+				}
+			}
+			.hidden{
+				display: none;
+			}
+		}//wrap
+		.advansed{
+			padding-top: 40px;
+			.title{
+				font-weight: bold;
+				@include fs(20);
+				text-align: center;
+			}
+			p{
+				text-align: center;
+			}
+			.toggle{
+				margin-top: 40px;
+				span{
+					@include fs(40);
+					&::first-letter{
+						all: unset;
+					}
+				}
+				button::after{
+					content: 'OFF';
+				}
+			}
+			.price__special__wrap{
+				display: grid;
+				grid-template-columns: 1fr;
+			}
+			.box{
+				button{
+					background-color: $pink;
+					&:hover{
+						background-color: lighten($pink, 10%);
+					}
+				}
+				ul{
+					li{
+						&::before{
+							color: $pink;
+						}
+					}
+				}
+			}
+		}
+	}//special
+	&__ver3{
+		.catch{
+			margin: 40px auto;
+			text-align: center;
+			@include fs(20);
+			font-weight: bold;
+			p{
+				text-align: center;
+			}
+			span{
+				@include fs(14);
+			}
+		}
+		.numb, .numb-month {
+			font-weight: bold;
+			@include fs(40);
+			letter-spacing: 0px;
+			&::before{
+				content: '¥';
+				font-size: 0.8em;
+			}
+		}
+		.numb-month{
+			&::after{
+				content: '/月';
+				font-size: 0.5em;
+			}
+		}
+		ul.check{
+			li{
+				@include fs(12);
+				margin-bottom: 4px;
+				&::before{
+					font: var(--fa-font-solid);
+					content: '\f00c';
+					margin-right: 4px;
+				}
+			}
+		}
+		.base-area{
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 16px;
+			@include md{
+				grid-template-columns: 1fr;
+			}
+			.box{
+				display: flex;
+				flex-direction: column;
+				.head{
+					background-color: $mc;
+					@include flex();
+					width: 100%;
+					padding: 8px;
+					color: white;
+				}
+				.disc{
+					text-align: center;
+					width: 100%;
+				}
+				.wrap{
+					@include flex();
+					border: 1px $mc solid;
+					flex-direction: column;
+					gap: 16px;
+					padding: 16px;
+					flex: 1;
+					.inner{
+						@include flex();
+						gap: 16px;
+						@include md{
+							flex-direction: column;
+						}
+						.left{
+							@include flex();
+							flex-direction: column;
+							gap: 16px;
+	
+						}
+						.right{
+							li::before{
+								color: $mc;
+							}
+						}
+					}
+
+				}
+			}
+		}
+		.pack-area{
+			display: grid;
+			grid-template-columns: 1fr 1fr 1fr;
+			gap: 16px;
+			margin-top: 40px;
+			overflow-x: auto;
+			.box{
+				display: flex;
+				flex-direction: column;
+				gap: 40px;
+				box-shadow: 0px 0px 15px -10px #777777;
+				padding: 16px 0px;
+				@include md{
+				    width: 90vw;
+					max-width: 350px;
+				}
+				.head{
+					.inner{
+						text-align: center;
+						font-weight: bold;
+					}
+					.getugaku{
+						@include fs(40);
+						text-align: center;
+						padding: 8px;
+						background-color: $green;
+						color: white;
+					}
+				}
+				.amount{
+					@include flex();
+					align-items: baseline;
+					&::before{
+						content: '合計';
+						padding: 4px 16px;
+						background-color: $green;
+						@include fs(10);
+						color: white;
+						margin-right: 16px;
+					}
+					.numb-month{
+						@include fs(20);
+					}
+				}
+				.agel{
+					.sarani{
+						@include flex();
+						font-weight: bold;
+						.wrap{
+							position: relative;
+							&::before{
+								content: '';
+								background-image: url(../img/sarani.svg);
+								background-repeat: no-repeat;
+								position: absolute;
+								top: -6px;
+								left: -10px;
+								width: 15px;
+								height: 15px;
+							}
+						}
+					}
+					.present{
+						@include flex();
+						gap: 16px;
+						flex: 1;
+						.img{
+							img{
+								width: 100px;
+								height: auto;
+								@include md{
+									width: 100px;
+								}
+							}
+						}
+						.text{
+							background: linear-gradient(transparent 70%, $pink 60%);
+							@include fs(20);
+							font-weight: bold;
+							@include md{
+								background: unset;
+							}
+							span{
+								@include md{
+									display: block;
+									background: linear-gradient(transparent 70%, $pink 60%);
+								}
+							}
+						}
+					}//present
+					.about{
+						text-align: center;
+						margin-top: 16px;
+					}
+				}
+				.camp{
+					.head{
+						font-weight: bold;
+						background-image: url("../img/price_ashirai-1.svg");
+						background-repeat: no-repeat;
+						background-image: contain;
+						background-position: bottom;
+						padding-bottom: 16px;
+						margin-bottom: 16px;
+						text-align: center;
+						@include fs(20);
+						margin: auto 16px;
+					}
+					p{
+						@include flex();
+						align-items: baseline;
+						gap: 16px;
+						color: $pink;
+						&::before,&::after{
+							content: '';
+							background-image: url("../img/price_ashirai-2.svg");
+							background-repeat: no-repeat;
+							background-image: contain;
+							background-position: bottom;
+							width: 20px;
+							height: 20px;
+						}
+						&::before{
+							transform: scaleX(-1);
+						}
+						span{
+							@include flex();
+							@include fs(40);
+							font-weight: bold;
+							&::before{
+								content: '+';
+							}
+							@include md{
+								@include fs(30);
+							}
+						}
+					}
+				}
+			}
+		}
+		.option-area{
+			margin-top: 40px;
+			.contents{
+				display: flex;
+				flex-direction: column;
+				gap: 24px;
+				margin-top: 40px;
+				.check{
+					display: block;
+					li{
+						background-color: $pink;
+						color: white;
+						font-weight: bold;
+						padding: 8px 40px;
+						@include fs(20);
+						@include md{
+							padding: 8px;
+						}
+						&::before{
+							color: white;
+						}
+					}
+				}
+				.price{
+					@include flex();
+					flex-direction: column;
+					&::after{
+						@include fa("\f078");
+						@include fs(30);
+					}
+				}
+			}
+			.camp{
+				max-width: 500px;
+				margin: auto;
+				.head{
+					font-weight: bold;
+					background-image: url("../img/price_ashirai-1.svg");
+					background-repeat: no-repeat;
+					background-image: contain;
+					background-position: bottom;
+					padding-bottom: 16px;
+					margin-bottom: 16px;
+					text-align: center;
+					@include fs(20);
+					margin: auto 16px;
+					span{
+						@include fs(40);
+						color: $pink;
+						font-weight: bold;
+					}
+				}
+				.numb{
+					text-align: center;
+				}
+			}
+			.about{
+				margin-top: 24px;
+				.toggle{
+					text-align: center;
+					cursor: pointer;
+					@include flex();
+					gap: 16px;
+					&::after {
+					@include fa("\f054");
+					transition: transform 0.3s;  // 回転アニメーション
+					transform: rotate(0deg);
+					}
+					&.open::after {
+					transform: rotate(90deg);
+					}
+				}
+				.toggle-contents{
+					@include flex();
+					gap: 16px;
+					max-width: 500px;
+					margin: auto;
+					margin-top: 24px;
+					@include md{
+						flex-direction: column;
+					}
+					img{
+						max-width: 200px;
+					}
+				}
+			}
+			.toggle-contents {
+				max-height: 0;
+				overflow: hidden;            /* はみ出しを隠す */
+				transition: max-height 1.0s ease-in-out;
+			  }
+			  
+			  .toggle-contents.open {
+				max-height: 500px;          /* 中身が収まる程度に大きめにしておく */
+			  }
+		}
+	}
+}//price

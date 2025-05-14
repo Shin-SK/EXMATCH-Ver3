@@ -1,0 +1,24 @@
+{# templates/account/email_verification_sent.html #}
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}メールアドレス確認メールを送信しました{% endblock %}
+
+{% block content %}
+<h1 class="text-xl font-bold mb-6">メール確認のお願い</h1>
+
+<p class="mb-4">
+    ご登録のメールアドレス宛に確認メールを送信しました。<br>
+    受信ボックス（および迷惑メールフォルダ）をご確認のうえ、
+    メール内の <strong>確認リンク</strong> をクリックしてください。
+</p>
+
+<p class="mb-8">
+    メールが届かない場合は、アドレスの入力ミスや
+    受信設定をご確認のうえ、再送信をお試しください。
+</p>
+
+<a href="{% url 'account_email' %}" class="btn btn-primary">
+    メールを再送信する
+</a>
+{% endblock %}

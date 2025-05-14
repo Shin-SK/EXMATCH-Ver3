@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Matches</title>
+</head>
+<body>
+    <h1>Match List</h1>
+    <ul>
+        {% for match in matches %}
+            <li>{{ match.from_user.username }} → {{ match.to_user.username }} ({{ match.status }})</li>
+        {% endfor %}
+    </ul>
+    <p><a href="{% url 'home' %}">Homeへ戻る</a></p>
+</body>
+</html>

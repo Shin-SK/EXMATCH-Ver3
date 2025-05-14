@@ -1,0 +1,16 @@
+{# widgets/radio.html #}
+<div class="my-radio-group">
+  {% for group, options, index in widget.optgroups %}
+    <div class="my-radio-option-group">
+      {% for option in options %}
+        <label class="my-radio-label">
+          <input type="radio" name="{{ option.name }}"
+                 value="{{ option.value }}"
+                 {% if option.value == option.selected_values.0 %} checked{% endif %}
+                 id="{{ option.id }}"{% include "django/forms/widgets/attrs.html" %}>
+          {{ option.label }}
+        </label>
+      {% endfor %}
+    </div>
+  {% endfor %}
+</div>

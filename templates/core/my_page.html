@@ -1,0 +1,192 @@
+<!-- templates/core/my_page.html -->
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block title %}
+マイページ
+{% endblock %}
+
+{% block content %}
+
+<div id="mypage" class="mypage">
+
+
+	<div class="mainTitle">マイページ</div>
+
+	{% include 'core/partials/profile-checklist.html' %}
+
+	<section class="profile">
+		<div class="image">
+			{% if profile.profile_image %}
+			<img src="{{ profile.profile_image.url }}" alt="プロフィール画像">
+		{% else %}
+		
+			<img src="{% static 'img/user-unset.webp' %}" alt="">
+		{% endif %}
+		</div>
+		<div class="base-profile">
+			<div class="text">
+				<div class="name"> {{ profile.nickname }}</div>
+				<button><a href="{% url 'profile_edit' %}">プロフィールを編集する</a></button>
+			</div>
+			
+			<div class="area">
+				<div class="box grid grid-cols-2">
+					<div class="head">求める相手</div>
+					<div class="text">{{ profile.get_sexual_object_pref_display }}</div>
+				</div>
+				<div class="box grid grid-cols-2">
+					<div class="head">血液型</div>
+					<div class="text">{{ profile.get_blood_type_display }}</div>
+				</div>
+				<div class="box grid grid-cols-2">
+					<div class="head">メインエリア</div>
+					<div class="text">{{ profile.main_area }}</div>
+				</div>
+				<div class="box">
+					<div class="head">自己紹介</div>
+					<div class="text">{{ profile.bio }}</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="score">
+		<div class="score__wrap">
+			<div class="box lciq">
+				<div class="title">LCIQスコア</div>
+				<div class="numb">
+					{{ lciq_value }}
+				</div>
+				<button class="yellow"><a href="/">再診断</a></button>
+				<a class="point" href="/">スコアをあげるには？<i class="fas fa-angle-right"></i></a>
+			</div>
+			<div class="box like">
+				<div class="title"><i class="fas fa-heart"></i>いいね</div>
+				<div class="numb">{{ like_count }}</div>
+				<button><a href="#followed">確認する</a></button>
+			</div>
+			<div class="box prof">
+				<div class="title">プロフ充実度</div>
+				<div class="numb">{{ completeness_percent }}</div>
+				<button><a href="/">編集する</a></button>
+				<div class="point">{{ answered_count }} / {{ total_fields }} 項目回答済み</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="matched">
+		<div class="head-title">マッチしたユーザー</div>
+		<div class="area">
+			{% include 'core/partials/parts-userprofile.html' with users=matched_users only %}
+		</div>
+	</section>
+
+
+	<section class="followed" id="followed">
+		<div class="head-title">いいねしてくれたユーザー</div>
+		<div class="area">
+			{% for like in likes_received_top %}
+			  {% include "core/partials/parts-userprof-mini.html" with user_obj=like.from_user created=like.created_at %}
+			  <p class="more text-center">
+				<a href="{% url 'likes_received_list' %}">一覧を見る<i class="fas fa-angle-right"></i></a>
+			  </p>
+			{% empty %}
+			<div class="epmty flex-center">
+				<a class="a-button" href="{% url 'user_list' %}">出会いはすぐそこに</a>
+			</div>
+			{% endfor %}
+		  </div>
+	  
+
+	  </section>
+
+
+
+	<section class="add-profile">
+		<div class="toggleTitle" data-toggle="ap-area">あなたのプロフィール<i class="fas fa-chevron-right"></i></div>
+		<div class="wrap" data-content="ap-area" style="display: none;">
+			<div class="area">
+				{% for pfv in profile_field_values %}
+				<div class="box grid grid-cols-[150px_1fr]">
+					<div class="head">{{ pfv.field.field_label }}</div>
+					{% if pfv.field.field_type == 'checkbox' %}
+						{% for item in pfv.split_list %}
+						<div class="item checkbox">{{ item }}</div>
+						{% endfor %}
+					{% elif pfv.field.field_type == 'radio' %}
+						<div class="item raido">{{ pfv.value }}</div>
+					{% elif pfv.field.field_type == 'text' %}
+						<div class="item text">{{ pfv.value }}</div>
+					{% else %}
+						<div class="item">{{ pfv.value }}</div>
+					{% endif %}
+				</div>
+				{% endfor %}
+			</div>
+		</div>
+
+	</section>
+
+	<section class="user-info">
+		<div class="toggleTitle" data-toggle="ui-area">ユーザ情報<i class="fas fa-chevron-right"></i></div>
+		<div class="area" data-content="ui-area" style="display: none;">
+			<div class="box grid grid-cols-[150px_1fr]">
+				<div class="head">プラン</div>
+				<div class="text">
+					{% if user.userprofile.is_standard_plan %}
+					スタンダードプラン
+					{% elif user.userprofile.is_free_plan %}
+					フリープラン
+					{% endif %}
+				</div>
+			</div>
+			{% if user.userprofile.is_standard_plan %}
+			<div class="box grid grid-cols-[150px_1fr]">
+				<div class="head">プラン有効期限</div>
+				<div class="text">{{ user.userprofile.plan_expiry }}</div>
+			</div>
+			{% endif %}
+
+			<div class="box grid grid-cols-[150px_1fr]">
+				<div class="head">プラスプロフィール</div>
+				<div class="text">
+					{% if user.userprofile.has_option %}
+					オプション購入済み
+					{% else %}
+					オプション未購入
+					{% endif %}
+				</div>
+			</div>
+		
+			{% if user.userprofile.has_option %}
+			<div class="box grid grid-cols-[150px_1fr]">
+				<div class="head">オプション有効期限</div>
+				<div class="text">
+					{{ profile.option_expiry }}
+				</div>
+			</div>
+			{% endif %}
+		</div>
+	</section>
+
+	<section class="menu">
+		<ul>
+			<li><a href="{% url 'footprint_list' %}"><i class="fas fa-shoe-prints"></i>あしあと</a></li>
+			<li><a href="{% url 'follow_list' %}"><i class="fas fa-heart"></i>いいね</a></li>
+			<li><a href="{% url 'chat_index' %}"><i class="fas fa-comments"></i>メッセージ</a></li>
+			<li><a href="{% url 'checkout_form' %}"><i class="fas fa-yen-sign"></i>プラン購入</a></li>
+			<li><a href="{% url 'profile_edit' %}"><i class="far fa-envelope"></i>お問い合わせ</a></li>
+			<!-- <li><a href="/"><i class="fa-solid fa-location-dot"></i>いまドコ検索</a></li> -->
+			<!-- <li><a href="/"><i class="fas fa-info-circle"></i>キャンペーン</a></li> -->
+			<!-- <li><a href="/"><i class="fas fa-pen-nib"></i>会員情報</a></li> -->
+		</ul>
+	</section>
+
+
+
+
+</div><!-- mypage -->
+
+{% endblock %}

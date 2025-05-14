@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="max-w-xl mx-auto mt-12 p-8 bg-white rounded shadow">
+  <h1 class="text-2xl font-bold mb-6">{% trans "プロフィール登録" %}</h1>
+
+  <form method="post" enctype="multipart/form-data" class="space-y-4">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {{ form.as_p }}
+    <button type="submit"
+            class="w-full py-3 rounded bg-pink-600 text-white font-semibold hover:bg-pink-700">
+      {% trans "保存してマイページへ進む" %}
+    </button>
+  </form>
+</div>
+{% endblock %}

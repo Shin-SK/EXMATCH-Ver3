@@ -1,0 +1,29 @@
+<!-- exmatch/templates/core/chat_index.html -->
+{% extends "base.html" %}
+{% load static %}
+{% load misc %}
+
+{% block title %}
+Chat room
+{% endblock %}
+
+{% block content %}
+<h1>チャットできる相手一覧</h1>
+<ul>
+  {% for u in matched_users %}
+    <li>
+      {{ u.username }}
+      <a href="{% url 'chat_room' u.id %}">
+        チャットへ
+        {% with unread=unread_by_user|get_item:u.id %}
+          {% if unread %}
+            <span class="badge">{{ unread }}</span>
+          {% endif %}
+        {% endwith %}
+      </a>
+    </li>
+  {% endfor %}
+</ul>
+<p><a href="{% url 'home' %}">ホームに戻る</a></p>
+
+{% endblock %}
