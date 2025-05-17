@@ -94,7 +94,7 @@ def my_page(request):
     matched_records = Match.objects.filter(
         Q(from_user=request.user, status='matched') |
         Q(to_user=request.user, status='matched')
-    ).order_by('-created_at')  # ←ここがポイント
+    ).order_by('-created_at')
 
     # 実際の「相手ユーザー」を集める
     matched_users_list = []
@@ -115,7 +115,7 @@ def my_page(request):
     )
 
     likes_received_top = likes_received_qs[:5]   # ← 上位5件だけ
-    
+    liked_users = [lk.from_user for lk in likes_received_qs]
 
     return render(request, 'core/my_page.html', {
         'profile': profile,
@@ -127,8 +127,9 @@ def my_page(request):
         'lciq_value': lciq_value,
         'matched_users': matched_users_list,
         'likes_received_top': likes_received_top,
+        'liked_users': liked_users,
         "missing_total": missing_total,
-        "lciq_done": lciq_done,    
+        "lciq_done": lciq_done,
     })
 
 @login_required

@@ -4,13 +4,22 @@
 {% block title %}いいねしてくれたユーザー一覧{% endblock %}
 
 {% block content %}
-<h1>いいねしてくれたユーザー</h1>
 
-{% for like in likes_received %}
-  {% include "core/partials/parts-userprof-mini.html" with user_obj=like.from_user created=like.created_at %}
-{% empty %}
-  <p>まだ「いいね」されていません</p>
-{% endfor %}
+<div class="like-recieved mini-list">
 
-<p><a href="{% url 'my_page' %}">← マイページに戻る</a></p>
+	<div class="head-set">
+		<h2>LIKE RECIEVED</h2>
+		<h3>いいねしてくれたひと</h3>
+	</div>
+
+	<div class="feed feed-mini">
+	{% for like in likes_received %}
+		{% include "core/partials/parts-userprof-mini.html" with user_obj=like.from_user created=like.created_at %}
+	{% empty %}
+		<p>まだ「いいね」されていません</p>
+	{% endfor %}
+	</div>
+	<!-- <p><a href="{% url 'my_page' %}">← マイページに戻る</a></p> -->
+
+</div>
 {% endblock %}

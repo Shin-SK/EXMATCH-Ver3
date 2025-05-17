@@ -7,22 +7,26 @@ from .utils import haversine_distance
 from .widgets import CustomRadio
 
 class DynamicProfileFilter(django_filters.FilterSet):
-    radius = NumberFilter(
+
+    RADIUS_CHOICES = [
+        ('1',  '1 km'),
+        ('5',  '5 km'),
+        ('10', '10 km'),
+        ('30', '30 km'),
+        ('100','100 km'),  # or '0' / '' = 制限なし
+    ]
+
+    # ▼ NumberFilter → ChoiceFilter に変更
+    radius = django_filters.ChoiceFilter(
+        choices=RADIUS_CHOICES,
+        widget=forms.RadioSelect,
+        label='距離 (半径)',
         method='filter_by_distance',
-        label='距離(半径km)',
-        widget=forms.TextInput  # ★ここを変更
-    )
-    # ↓ FilterSet 直下で明示的に定義してウィジェットを指定
-    blood_type = ChoiceFilter(
-        # choices はモデルの choices を参照
-        choices=UserProfile._meta.get_field('blood_type').choices,
-        widget=forms.RadioSelect,  # ← Djangoの標準ラジオウィジェットに戻す
-        label='血液型'
     )
 
     class Meta:
-        model = UserProfile
-        fields = ['radius', 'blood_type']
+        model  = UserProfile
+        fields = ['radius']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -118,23 +122,35 @@ class DynamicProfileFilter(django_filters.FilterSet):
     # 既存: 距離で絞り込み
     # ---------------------------
     def filter_by_distance(self, queryset, name, value):
-        lat_str = self.request.GET.get('lat')
-        lon_str = self.request.GET.get('lon')
-        if not lat_str or not lon_str or not value:
+        # ------- ① 受け取った値を即ログ ----------
+        lat_str = self.request.GET.get("lat")
+        lon_str = self.request.GET.get("lon")
+        print("★params:", lat_str, lon_str, value)   # ← ここ
+
+        if not (lat_str and lon_str and value):
+            print("★skip: lat/lon/value 無し")
             return queryset
 
         try:
             user_lat = float(lat_str)
             user_lon = float(lon_str)
-            radius_km = float(value)
+            radius_km = float(value)                 # Choice の value を km として解釈
         except ValueError:
+            print("★skip: value 変換失敗 ->", value)
             return queryset
 
-        within_ids = []
+        within = []
         for prof in queryset:
             if prof.latitude and prof.longitude:
-                dist = haversine_distance(user_lat, user_lon, prof.latitude, prof.longitude)
-                if dist <= radius_km:
-                    within_ids.append(prof.id)
+                dist = haversine_distance(
+                    user_lat, user_lon, prof.latitude, prof.longitude
+                )
+                # ------- ② レコード毎の距離と判定 ----------
+                print(f"★{prof.id=} {prof.nickname=} {dist=:.2f} km {radius_km=}")
 
-        return queryset.filter(id__in=within_ids)
+                if dist <= radius_km:
+                    within.append(prof.id)
+
+        print("★hit ids:", within)
+        return queryset.filter(id__in=within)
+

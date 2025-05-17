@@ -8,18 +8,24 @@
 {% endblock %}
 
 {% block content %}
-<h1>あしあと</h1>
 
+<div class="footprint mini-list">
 
-{% for fp in footprints %}
-	{% include "core/partials/parts-userprof-mini.html" with user_obj=fp.from_user created=fp.created_at %}
-{% empty %}
-  <p>足あとがありません</p>
-{% endfor %}
+	<div class="head-set">
+		<h2>VISITOR</h2>
+		<h3>あしあと</h3>
+	</div>
+	<div class="feed feed-mini">
+		{% for fp in footprints %}
+			{% include "core/partials/parts-userprof-mini.html" with user_obj=fp.from_user created=fp.created_at %}
+		{% empty %}
+		<p>足あとがありません</p>
+		{% endfor %}
+	</div>
 
+	<!-- <p><a href="{% url 'home' %}">Home</a></p> -->
 
-<p><a href="{% url 'home' %}">Home</a></p>
-
+</div>
 
 {% endblock %}
 

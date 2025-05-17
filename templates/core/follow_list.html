@@ -5,13 +5,18 @@
 {% block title %}いいねリスト{% endblock %}
 
 {% block content %}
-<h1>いいねリスト</h1>
-
-{% for like in my_follows %}
-  {% include "core/partials/parts-userprof-mini.html" with user_obj=like.to_user %}
-{% empty %}
-  <p>まだ「いいね」していません</p>
-{% endfor %}
-
-<p><a href="{% url 'home' %}">Home</a></p>
+<div class="mini-list follow-list">
+	<div class="head-set">
+		<h2>LIKED</h2>
+		<h3>いいねした人</h3>
+	</div>
+		<div class="feed feed-mini">
+		{% for like in my_follows %}
+			{% include "core/partials/parts-userprof-mini.html" with user_obj=like.to_user %}
+		{% empty %}
+			<p>まだ「いいね」していません</p>
+		{% endfor %}
+		</div>
+	<!-- <p><a href="{% url 'home' %}">Home</a></p> -->
+</div>
 {% endblock %}

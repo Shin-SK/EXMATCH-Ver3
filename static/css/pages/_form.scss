@@ -2,6 +2,7 @@
 
 $formBg: #f2f2f2;
 .form{
+    margin-bottom: 80px;
     &__wrap{
         .area{
             margin-bottom: 24px;
@@ -165,7 +166,7 @@ $formBg: #f2f2f2;
         @include flex();
         gap: 40px;
         button{
-            padding: 8px;
+            padding: 4px;
             color: white;
         }
     }
@@ -174,12 +175,104 @@ $formBg: #f2f2f2;
         text-align: center;
         border-bottom: 1px $mc solid;
         padding-bottom: 8px;
-        margin-bottom: 16px;
+        @include flex();
+        gap: 8px;
+        cursor: pointer;
     }
     .radius{
-        margin-bottom: 40px;
+        margin: 80px auto 40px;
+        .head{
+            label{
+                font-weight: bold;
+                text-align: center;
+                padding-bottom: 8px;
+                @include flex();
+                gap: 8px;
+            }
+        }
+        .field{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            background-color: $lb;
+            padding: 40px 0px;
+            > div:first-child {
+                    display: none;   /* 先頭 (= 空ラベル) を消す */
+            }
+            label{
+                @include flex();
+                padding: 8px 24px;
+                transition: background .2s, color .2s;
+                cursor: pointer;
+                position: relative;
+                background-color: white;
+                &:has(> input:checked) {
+                    background: $mc;      /* 好きな色へ */
+                    color: #fff;
+                    border-color: $mc;
+                }
+                input{
+                    position: absolute;
+                    opacity: 0;
+                }
+            }
+        }
+
     }
     .profile, .detail{
         margin-bottom: 40px;
     }
+}   
+
+.items{
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 40px 16px;
+    background-color: $lb;
+    margin-bottom: 40px;
+    .item{
+        .head{
+            font-weight: bold;
+            padding-bottom: 8px;
+        }
+        .field{
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            > div:first-child {
+                    display: none;   /* 先頭 (= 空ラベル) を消す */
+            }
+            label:has(input[type="radio"]),label:has(input[type="checkbox"]){
+                    @include flex();
+                    padding: 4px 24px;
+                    background-color: white;
+                    transition: background .2s, color .2s;
+                    cursor: pointer;
+                    position: relative;
+                input[type="radio"],input[type="checkbox"]{
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    opacity: 0;
+                }
+                &:has(> input:checked) {
+                    background: $mc;      /* 好きな色へ */
+                    color: #fff;
+                    border-color: $mc;
+                }
+            }
+        }
+        input[type="text"]{
+            border: unset;
+            background-color: white;
+        }
+    }
+}
+
+.epmty{
+    height: 50vh;
+    @include flex();
 }

@@ -1,6 +1,7 @@
 @charset "UTF-8";
 /* 除算math.divを使うのに必要な記述 */
 @import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined");
+@import url("https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap");
 @import url(https://use.typekit.net/lpz2crc.css);
 .flex-center {
   display: flex;
@@ -132,6 +133,10 @@ button a {
 }
 [data-color=pink]:hover::before, [data-color=pink]:hover::after {
   color: inherit !important;
+}
+
+.container {
+  max-width: 768px !important;
 }
 
 html, body, div, span, applet, object, iframe,
@@ -327,15 +332,16 @@ body {
   bottom: 0;
   left: 0;
   width: 100%;
+  border-top: 1px lightgray solid;
+  background-color: white;
 }
 .footer__wrap {
   display: flex;
   justify-content: center;
   align-items: center;
-  justify-content: space-around;
-  padding: 16px;
-  background-color: white;
-  border-top: 1px lightgray solid;
+  justify-content: space-between;
+  padding-top: 16px;
+  padding-bottom: 16px;
 }
 
 .container-home {
@@ -1905,7 +1911,7 @@ body {
 .base .current {
   opacity: 1 !important;
 }
-.base .mainTitle, .base h1 {
+.base .mainTitle {
   font-size: clamp(4rem, 3.9346938776rem + 0.2040816327vw, 4.2rem);
   display: flex;
   justify-content: center;
@@ -1913,11 +1919,30 @@ body {
   margin-bottom: 40px;
   font-weight: bold;
   width: 100%;
+  font-family: "Patrick Hand", cursive;
+  font-weight: 400;
+  font-style: normal;
 }
 @media screen and (max-width: 768px) {
-  .base .mainTitle, .base h1 {
+  .base .mainTitle {
     font-size: clamp(3rem, 2.9346938776rem + 0.2040816327vw, 3.2rem);
   }
+}
+.base .head-set {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 8px;
+}
+.base .head-set h2 {
+  font-family: "Patrick Hand", cursive;
+  font-weight: 400;
+  font-style: normal;
+  font-size: clamp(4rem, 3.9346938776rem + 0.2040816327vw, 4.2rem);
+}
+.base .head-set h3 {
+  font-weight: bold;
 }
 .base.guest-user .profile img {
   filter: blur(5px);
@@ -2087,13 +2112,23 @@ body {
   color: white;
   font-size: clamp(1.2rem, 1.1346938776rem + 0.2040816327vw, 1.4rem);
 }
-.base main {
-  padding-top: 120px;
+.base .main-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  background-color: white;
 }
-@media screen and (max-width: 768px) {
-  .base main {
-    padding-top: 80px;
-  }
+.base .main-header__wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0px;
+  width: 100%;
+}
+.base .main-header__wrap .logo img {
+  width: 100%;
+  max-height: 30px;
 }
 .base .price__wrap {
   display: grid;
@@ -2189,6 +2224,9 @@ body {
   color: #F07884;
 }
 
+.form {
+  margin-bottom: 80px;
+}
 .form__wrap .area {
   margin-bottom: 24px;
 }
@@ -2341,7 +2379,7 @@ body {
   gap: 40px;
 }
 .filter .button-area button {
-  padding: 8px;
+  padding: 4px;
   color: white;
 }
 .filter h2 {
@@ -2349,13 +2387,110 @@ body {
   text-align: center;
   border-bottom: 1px #004C71 solid;
   padding-bottom: 8px;
-  margin-bottom: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
 }
 .filter .radius {
-  margin-bottom: 40px;
+  margin: 80px auto 40px;
+}
+.filter .radius .head label {
+  font-weight: bold;
+  text-align: center;
+  padding-bottom: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+.filter .radius .field {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  background-color: #EAF2F4;
+  padding: 40px 0px;
+}
+.filter .radius .field > div:first-child {
+  display: none; /* 先頭 (= 空ラベル) を消す */
+}
+.filter .radius .field label {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 24px;
+  transition: background 0.2s, color 0.2s;
+  cursor: pointer;
+  position: relative;
+  background-color: white;
+}
+.filter .radius .field label:has(> input:checked) {
+  background: #004C71; /* 好きな色へ */
+  color: #fff;
+  border-color: #004C71;
+}
+.filter .radius .field label input {
+  position: absolute;
+  opacity: 0;
 }
 .filter .profile, .filter .detail {
   margin-bottom: 40px;
+}
+
+.items {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 40px 16px;
+  background-color: #EAF2F4;
+  margin-bottom: 40px;
+}
+.items .item .head {
+  font-weight: bold;
+  padding-bottom: 8px;
+}
+.items .item .field {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.items .item .field > div:first-child {
+  display: none; /* 先頭 (= 空ラベル) を消す */
+}
+.items .item .field label:has(input[type=radio]), .items .item .field label:has(input[type=checkbox]) {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4px 24px;
+  background-color: white;
+  transition: background 0.2s, color 0.2s;
+  cursor: pointer;
+  position: relative;
+}
+.items .item .field label:has(input[type=radio]) input[type=radio], .items .item .field label:has(input[type=radio]) input[type=checkbox], .items .item .field label:has(input[type=checkbox]) input[type=radio], .items .item .field label:has(input[type=checkbox]) input[type=checkbox] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+}
+.items .item .field label:has(input[type=radio]):has(> input:checked), .items .item .field label:has(input[type=checkbox]):has(> input:checked) {
+  background: #004C71; /* 好きな色へ */
+  color: #fff;
+  border-color: #004C71;
+}
+.items .item input[type=text] {
+  border: unset;
+  background-color: white;
+}
+
+.epmty {
+  height: 50vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .search .advice ul li {
@@ -2481,9 +2616,6 @@ body {
   font-size: clamp(1.2rem, 1.1346938776rem + 0.2040816327vw, 1.4rem);
 }
 
-.mypage .mainTitle {
-  margin-bottom: 0;
-}
 .mypage .toggleTitle {
   font-weight: bold;
   display: flex;
@@ -2523,7 +2655,8 @@ body {
 }
 @media screen and (max-width: 768px) {
   .mypage .profile .image {
-    margin: 40px;
+    margin: 0px;
+    margin-bottom: 16px;
   }
 }
 .mypage .profile .image img {
@@ -2669,9 +2802,13 @@ body {
   color: #004C71;
   display: block;
   padding: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  justify-content: flex-start;
 }
-.mypage .menu ul li a i {
-  margin-right: 8px;
+.mypage .menu ul li a span {
+  margin-right: 4px;
 }
 .mypage .menu ul li a:hover {
   transition: 0.5s;
@@ -2679,6 +2816,7 @@ body {
   -moz-transition: 0.5s; /* Firefox用 */
   -o-transition: 0.5s; /* Opera用 */
   opacity: 0.5;
+  text-decoration: unset;
 }
 .mypage .head-title {
   font-size: clamp(2rem, 1.9346938776rem + 0.2040816327vw, 2.2rem);
@@ -2688,7 +2826,7 @@ body {
   align-items: center;
   margin: auto;
   gap: 16px;
-  margin-bottom: 40px;
+  margin-bottom: 16px;
 }
 .mypage .base-profile {
   display: flex;
@@ -2753,10 +2891,17 @@ body {
 .profile-checklist .lciq-caution a {
   color: white;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   width: 100%;
   gap: 16px;
+}
+@media screen and (max-width: 768px) {
+  .profile-checklist .lciq-caution a {
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 8px;
+  }
 }
 .profile-checklist .lciq-caution a img {
   height: 30px;
@@ -2770,18 +2915,12 @@ body {
 .profile-checklist ul li {
   padding: 8px 16px;
   background-color: #EAF2F4;
+  position: relative;
 }
 .profile-checklist ul li:nth-child(even) {
   background-color: white;
 }
-.profile-checklist ul li a {
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  width: 100%;
-  position: relative;
-}
-.profile-checklist ul li a::after {
+.profile-checklist ul li::after {
   font-family: "Material Symbols Outlined";
   content: "chevron_right";
   font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
@@ -2791,8 +2930,19 @@ body {
   top: 0;
   bottom: 0;
   margin: auto 0;
-  right: 16px;
+  right: 8px;
   font-size: clamp(2rem, 1.9346938776rem + 0.2040816327vw, 2.2rem);
+}
+.profile-checklist ul li a {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  width: 100%;
+}
+@media screen and (max-width: 768px) {
+  .profile-checklist ul li a {
+    padding-right: 16px;
+  }
 }
 .profile-checklist ul li a .head {
   font-weight: bold;
@@ -2959,10 +3109,191 @@ body {
   background-color: #F07884;
 }
 
+.feed-mini {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+@media screen and (max-width: 768px) {
+  .feed-mini {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+.feed-mini .area {
+  background-color: white;
+  border-radius: 16px;
+  padding: 4px;
+  width: 100%;
+  gap: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.feed-mini .area .profile-feed-mini a img {
+  aspect-ratio: 4/3;
+  -o-object-fit: cover;
+     object-fit: cover;
+  width: 100%;
+  border-radius: 16px;
+}
+.feed-mini .area .info .field {
+  color: #004C71;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: -moz-fit-content;
+  width: fit-content;
+  font-size: clamp(1rem, 0.9346938776rem + 0.2040816327vw, 1.2rem);
+}
+.feed-mini .area .info .field span {
+  font-size: clamp(1rem, 0.9346938776rem + 0.2040816327vw, 1.2rem);
+}
+.feed-mini .area .name-area {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.feed-mini .area .name-area a {
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+}
+.feed-mini .area .name-area a .name::after {
+  content: "さん";
+  font-size: clamp(1rem, 0.9346938776rem + 0.2040816327vw, 1.2rem);
+}
+.feed-mini .area button {
+  color: white;
+  padding: 8px;
+}
+
 .unverified img.user-thumb {
   filter: blur(8px);
 }
 .unverified .action-btn {
   pointer-events: none;
   opacity: 0.4;
+}
+
+.profile-detail .avator img {
+  aspect-ratio: 16/9;
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+.profile-detail .profile {
+  background-color: white;
+  border-radius: 16px;
+  margin-top: -40px;
+  z-index: 2;
+  position: relative;
+  padding: 16px;
+}
+.profile-detail .profile .profile__main {
+  margin: 40px auto;
+}
+.profile-detail .profile .profile__main .head {
+  font-size: clamp(3rem, 2.9346938776rem + 0.2040816327vw, 3.2rem);
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-start;
+  margin-bottom: 16px;
+}
+.profile-detail .profile .profile__main .head .wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-items: flex-end;
+}
+.profile-detail .profile .profile__main .head .wrap span {
+  font-size: clamp(1.4rem, 1.3346938776rem + 0.2040816327vw, 1.6rem);
+  margin-left: 4px;
+  margin-bottom: 2px;
+}
+.profile-detail .profile .profile__main .bio {
+  background-color: #EAF2F4;
+  padding: 40px 8px;
+}
+.profile-detail .profile .area .title {
+  font-family: "Patrick Hand", cursive;
+  font-weight: 400;
+  font-style: normal;
+  font-size: clamp(3rem, 2.9346938776rem + 0.2040816327vw, 3.2rem);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+  color: #004C71;
+}
+.profile-detail .profile .area .title::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background-color: #004C71;
+}
+.profile-detail .profile .area .fields .field {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  align-items: center;
+  padding: 8px;
+}
+.profile-detail .profile .area .fields .field:nth-of-type(odd) {
+  background-color: #EAF2F4;
+}
+.profile-detail .profile .area .fields .field .head {
+  font-weight: bold;
+}
+.profile-detail .profile .profile__plus {
+  margin-top: 40px;
+}
+.profile-detail .profile .profile__plus .fields .field:nth-of-type(odd) {
+  background-color: #fce2e4;
+}
+.profile-detail .profile .profile__plus .title {
+  color: #F07884;
+}
+.profile-detail .profile .profile__plus .title::after {
+  background-color: #F07884;
+}
+.profile-detail .actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin: 40px auto;
+}
+.profile-detail .actions .btn {
+  border-radius: 100px;
+  color: white;
+  font-size: clamp(1.4rem, 1.3346938776rem + 0.2040816327vw, 1.6rem);
+  flex: 1;
+  padding: 8px;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.profile-detail .actions .btn.like {
+  background-color: #F07884;
+}
+.profile-detail .actions .btn.message {
+  background-color: #004C71;
+}
+
+.mini-list h1 {
+  font-size: clamp(3rem, 2.9346938776rem + 0.2040816327vw, 3.2rem);
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 16px;
 }/*# sourceMappingURL=custom.css.map */

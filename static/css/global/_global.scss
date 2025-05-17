@@ -11,6 +11,7 @@ $black: #0f0f0f;
 
 $gray: lighten($black, 40%);
 $lightgray: lighten($black, 90%);
+$lightpink: lighten($pink, 23%);
 $gosic: system-ui;
 $mincho: "Times New Roman", "YuMincho", "Hiragino Mincho ProN", "Yu Mincho", "MS PMincho", serif;
 $cinzel: 'Cinzel', serif;
@@ -65,6 +66,13 @@ $time: 0.5s;
   height: fit-content;
 }
 
+@import url("https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap");
+
+@mixin logoFont{
+  font-family: "Patrick Hand", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
 
 @mixin flex{
     display: flex;
@@ -73,6 +81,12 @@ $time: 0.5s;
 }
 
 .flex-center{
+  @include flex();
+}
+
+@mixin h1{
+  @include fs(30);
+  font-weight: bold;
   @include flex();
 }
 
@@ -219,5 +233,9 @@ button{
   }
 }
 
+
+.container{
+  max-width: 768px !important;
+}
 
 

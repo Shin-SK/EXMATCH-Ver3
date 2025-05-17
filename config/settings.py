@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'django_contact_form',
+    'widget_tweaks',
 
     'core.apps.CoreConfig',
     'payments.apps.PaymentsConfig',

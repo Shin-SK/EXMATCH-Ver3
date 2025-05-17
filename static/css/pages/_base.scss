@@ -9,14 +9,28 @@
         opacity: 1 !important;
     }
 
-    .mainTitle, h1{
+    .mainTitle{
         @include fs(40);
         @include flex();
         margin-bottom: 40px;
         font-weight: bold;
         width: 100%;
+        @include logoFont;
         @include md{
             @include fs(30);
+        }
+    }
+
+    .head-set{
+        @include flex();
+        flex-direction: column;
+        gap: 8px;
+        h2{
+            @include logoFont;
+            @include fs(40);
+        }
+        h3{
+            font-weight: bold;
         }
     }
 
@@ -206,11 +220,36 @@
         }//nav
     }
 
-    main{
-        padding-top: 120px;
-        @include md{
-        padding-top: 80px;
+    $main-header-height: 50px;
+    .main-header{
+        @include flex();
+        width: 100%;
+        background-color: white;
+
+        // position: fixed;
+        // z-index: 99999;
+        // top: 0;
+        // left: 0;
+        // right: 0; 固定じゃなくていいのではなかろうか
+        // border-bottom: 1px lightgray solid;
+        &__wrap{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            // height: $main-header-height;
+            padding: 8px 0px;
+            width: 100%;
+            .logo{
+                img{
+                    width: 100%;
+                    max-height: 30px; 
+                }
+            }
         }
+    }
+
+    main{
+        // padding-top: $main-header-height + 40px;
     }
 
     .price{

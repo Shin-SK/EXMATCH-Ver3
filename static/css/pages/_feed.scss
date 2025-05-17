@@ -123,3 +123,65 @@
 		}
 	}//box
 }
+
+.feed-mini{
+	display: grid;
+	grid-template-columns:repeat(4,1fr);
+	gap :1rem;
+	align-items: start;
+	@include md{
+		grid-template-columns: repeat(2,1fr);
+	}
+	.area{
+		background-color: white;
+		border-radius: 16px;
+		padding: 4px;
+		width: 100%;
+		gap: 4px;
+		@include flex();
+		flex-direction: column;
+		.profile-feed-mini{
+			a{
+				img{
+					aspect-ratio: 4/3;
+					object-fit: cover;
+					width: 100%;
+					border-radius: 16px;
+				}
+			}
+		}
+		.info{
+			.field{
+				color: $mc;
+				@include flex();
+				width: fit-content;
+				@include fs(10);
+				span{
+					@include fs(10);
+				}
+			}
+		}
+
+		.name-area{
+			@include flex();
+			a{
+				font-weight: bold;
+				@include flex();
+				justify-content: flex-start;
+				gap: 8px;
+				.name{
+					&::after{
+						content: 'さん';
+						@include fs(10);
+
+					}
+				}
+			}
+						
+		}
+		button{
+			color: white;
+			padding: 8px;
+		}
+	}
+}

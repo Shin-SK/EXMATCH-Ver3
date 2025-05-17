@@ -4,48 +4,63 @@
 {% block title %}{{ profile.nickname }}{% endblock %}
 
 {% block content %}
-<section class="profile-detail container">
+<section class="profile-detail">
 
-  <!-- アイコンと自己紹介はお好みで -->
-  <div class="header">
-    {% if profile.profile_image %}
-      <img class="avatar" src="{{ profile.profile_image.url }}" alt="">
-    {% else %}
-      <img class="avatar" src="{% static 'img/user-unset.webp' %}" alt="">
-    {% endif %}
-    <h2>{{ profile.nickname }}</h2>
-    <p>{{ profile.bio }}</p>
-  </div>
+	<!-- アイコンと自己紹介はお好みで -->
+	<div class="avator">
+		{% if profile.profile_image %}
+			<img src="{{ profile.profile_image.url }}" alt="">
+		{% else %}
+			<img src="{% static 'img/user-unset.webp' %}" alt="">
+		{% endif %}
+	</div>
+	<div class="profile">
+		<div class="profile__main">
+			<div class="head field">
+				{{ profile.nickname }} /
+				<div class="wrap">{{ profile.age }}<span>歳</span></div>
+			</div>
+			<div class="bio field">{{ profile.bio }}</div>
+		</div>
 
-  <ul class="normal">
-    <h2>ノーマルプロフィール</h2>
-    {% for label, v in normal_pairs %}
-      <li><strong>{{ label }}：</strong> {{ v }}</li>
-    {% endfor %}
-  </ul>
+		<div class="profile__nomal area">
+			<div class="title">PROFILE</div>
+			<div class="fields">
+				{% for label, v in normal_pairs %}
+				<div class="field">
+					<div class="head">{{ label }}</div>
+					<div class="value">{{ v }}</div>
+				</div>
+				{% endfor %}
+			</div>
+		</div>
+
+		<div class="profile__plus area">
+			<div class="title">PLUS PROFILE</div>
+				<div class="fields">
+				{% if request.user.userprofile.has_option %}
+					{% for label, v in plus_pairs %}
+					<div class="field">
+						<div class="head">{{ label }}</div>
+						<div class="value">{{ v }}</div>
+					</div>
+					{% endfor %}
+				{% endif %}
+			</div>
+		</div>
+	</div>
 
 
-  <ul class="plus">
-    <h2>プラスプロフィール</h2>
-    {% if request.user.userprofile.has_option %}
-      {% for label, v in plus_pairs %}
-        <li><strong>{{ label }}：</strong> {{ v }}</li>
-      {% empty %}
-        <li>未設定</li>
-      {% endfor %}
-    {% endif %}
-  </ul>
 
+	<div class="actions">
+		{% if not is_liked %}
+			<a class="btn like" href="{% url 'follow_user' user_id=profile.user.id %}"><span class="material-symbols-outlined">favorite</span>いいね</a>
+		{% endif %}
+		{% if is_matched %}
+			<a class="btn message" href="{% url 'chat_room' user_id=profile.user.id %}">メッセージ</a>
+		{% endif %}
+	</div>
 
-  <div class="actions">
-    {% if not is_liked %}
-      <a class="btn like" href="{% url 'follow_user' user_id=profile.user.id %}">いいね</a>
-    {% endif %}
-    {% if is_matched %}
-      <a class="btn message" href="{% url 'chat_room' user_id=profile.user.id %}">メッセージ</a>
-    {% endif %}
-  </div>
-
-  <p><a href="{% url 'user_list' %}">← 戻る</a></p>
+	<!-- <p><a href="{% url 'user_list' %}">← 戻る</a></p> -->
 </section>
 {% endblock %}

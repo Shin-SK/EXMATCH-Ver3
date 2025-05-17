@@ -1,0 +1,110 @@
+@use "../global/global" as *;
+
+.profile-detail{
+	.avator{
+		img{
+			aspect-ratio: 16/9;
+			object-fit: cover;
+		}
+	}
+	.profile{
+		background-color: white;
+		border-radius: 16px;
+		margin-top: -40px;//ネガティマージンで重ねる
+		z-index: 2;
+    	position: relative;
+		padding: 16px;
+		.profile__main{
+			margin: 40px auto;
+			.head{
+				@include fs(30);
+				font-weight: bold;
+				@include flex();
+				gap: 8px;
+				justify-content: flex-start;
+				margin-bottom: 16px;
+				.wrap{
+					@include flex();
+					align-items: flex-end;
+					span{
+						@include fs(14);
+						margin-left: 4px;
+						margin-bottom: 2px;
+					}
+				}
+
+			}
+			.bio{
+				background-color: $lb;
+				padding: 40px 8px;
+			}
+		}
+		.area{
+			.title{
+				@include logoFont;
+				@include fs(30);
+				@include flex();
+				justify-content: flex-start;
+				gap: 16px;
+				margin-bottom: 16px;
+				color: $mc;
+				&::after{
+					content: '';
+					flex: 1;
+					height: 1px;
+					background-color: $mc;
+				}
+			}
+			.fields{
+				.field{
+					display: grid;
+					grid-template-columns: 80px 1fr;
+					align-items: center;
+					padding: 8px;
+					&:nth-of-type(odd){
+						background-color: $lb;
+					}
+					.head{
+						font-weight: bold;
+					}
+				}
+			}//fields
+		}
+		.profile__plus{
+			margin-top: 40px;
+			.fields{
+				.field{
+					&:nth-of-type(odd){
+						background-color: $lightpink;
+					}
+				}
+			}
+			.title{
+				color: $pink;
+				&::after{
+					background-color: $pink;
+				}
+			}
+		}//plus
+	}
+	.actions{
+		@include flex();
+		gap: 16px;
+		margin: 40px auto;
+		.btn{
+			border-radius: 100px;
+			color: white;
+			@include fs(14);
+			flex: 1;
+			padding: 8px;
+			font-weight: bold;
+			@include flex();
+			&.like{
+				background-color: $pink;
+			}
+			&.message{
+				background-color: $mc;
+			}
+		}
+	}
+}
