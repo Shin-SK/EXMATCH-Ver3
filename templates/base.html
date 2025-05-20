@@ -37,6 +37,7 @@
 </head>
 <body class="{% if unverified %}unverified{% endif %} {%block base_class%}base{% endblock %} {% if not lciq_done %}lciq-unset{% endif %}">
 
+  {% if request.resolver_match.url_name != "home" %}
 <header class="main-header container">
     <div class="main-header__wrap">
       <div class="logo">
@@ -49,6 +50,7 @@
       </div>
     </div>
 </header>
+{% endif %}
 
 <main class="{% block main_container %}container{% endblock %} m-auto">
     {% block content %}
