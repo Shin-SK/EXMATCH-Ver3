@@ -13,8 +13,10 @@ django-filter==25.1
 django-model-utils==5.0.0
 django-private-chat2==1.0.2
 django-widget-tweaks==1.5.0
+gunicorn==23.0.0
 idna==3.10
 msgpack==1.1.0
+packaging==25.0
 pillow==11.2.1
 python-dotenv==1.1.0
 redis==5.2.1
