@@ -11,6 +11,7 @@ load_dotenv(BASE_DIR / ".env")
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  
 MEDIA_URL = '/media/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-l!yk$4c0m_*3c_j2lc*zijw(0bcf@3io%gkop&%852)^=_j3p4'
