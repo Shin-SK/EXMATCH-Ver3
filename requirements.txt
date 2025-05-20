@@ -4,6 +4,7 @@ certifi==2025.1.31
 channels==4.2.2
 channels_redis==4.2.1
 charset-normalizer==3.4.1
+dj-database-url==2.3.0
 Django==5.2
 django-allauth==65.7.0
 django-browser-reload==1.18.0
@@ -18,6 +19,7 @@ idna==3.10
 msgpack==1.1.0
 packaging==25.0
 pillow==11.2.1
+psycopg==3.2.9
 python-dotenv==1.1.0
 redis==5.2.1
 requests==2.32.3

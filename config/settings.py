@@ -3,11 +3,27 @@ from pathlib import Path
 from dotenv import load_dotenv
 import os
 import environ, os
+import dj_database_url
 
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")   
+
+# ───────── デフォルト = SQLite（ローカル） ─────────
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+    }
+}
+
+# ───────── Heroku など DATABASE_URL が定義されている環境では Postgres ─────────
+if "DATABASE_URL" in os.environ:
+    DATABASES["default"] = dj_database_url.config(
+        conn_max_age=600,
+        ssl_require=True,  # Heroku 用
+    )
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  
 MEDIA_URL = '/media/'
@@ -84,13 +100,6 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
 
 
 # Password validation
