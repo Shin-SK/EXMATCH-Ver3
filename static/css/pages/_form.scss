@@ -242,7 +242,7 @@ $formBg: #f2f2f2;
             display: flex;
             gap: 16px;
             flex-wrap: wrap;
-            > div:first-child {
+            > div:has(input[type="radio"]):first-child {
                     display: none;   /* 先頭 (= 空ラベル) を消す */
             }
             label:has(input[type="radio"]),label:has(input[type="checkbox"]){

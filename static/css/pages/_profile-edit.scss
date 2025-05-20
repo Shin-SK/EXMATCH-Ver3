@@ -1,0 +1,90 @@
+@use "../global/global" as *;
+
+.profile-edit{
+	.form{
+		&__wrap{
+			h2{
+				margin: 40px auto 8px;
+				font-weight: bold;
+				text-align: center;
+				padding: 8px;
+			}
+			.items{
+				border-radius: 16px;
+				input[type="text"]{
+					padding: 8px;
+				}
+				textarea{
+					border: unset;
+					padding: 8px;
+					width: 100%;
+				}
+				.item{
+					&.profile-image{
+						.field{
+							display: grid;
+							grid-template-columns: 1fr auto 1fr;
+							gap: 16px;
+							align-items: stretch;
+							.image{
+								img{
+									width: 100%;
+									aspect-ratio: 1/1;
+									object-fit: cover;
+								}
+							}
+							.arrow{
+								@include flex();
+							}
+							.file{
+								height: 100%;
+								.filepond--root{
+									width: 100% !important;
+									height: 100% !important;
+									@include flex();
+									.filepond--drop-label{
+										background-color: white;
+										bottom: 0;
+										margin: auto;
+									}
+								}
+								.filepond--drip{
+									opacity: 1;
+									background-color: white;
+								}								
+							}
+						}
+					}
+				}
+				&.lciq{
+					.item{
+						.field{
+							display: block;
+							margin-bottom: 24px;
+							&:last-of-type{
+								margin-bottom: unset;
+							}
+							.filepond--drip{
+								opacity: 1;
+								background-color: white;
+							}
+							input[type="number"]{
+								width: 100%;
+								padding: 8px;
+								border: unset;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	.lciq-text{
+		text-align: center;
+		margin-bottom: 40px;
+	}
+	button[type="submit"]{
+		color: white;
+		padding: 8px;
+	}
+}

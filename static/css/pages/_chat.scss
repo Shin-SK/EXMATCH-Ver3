@@ -1,0 +1,132 @@
+@use "../global/global" as *;
+
+.chat-index{
+	.fields{
+		display: flex;
+		flex-direction: column;
+		margin-top: 40px;
+		.field{
+			padding: 16px;
+			&:nth-of-type(odd){
+				background-color:$lb;
+			}
+			.item{
+				a{
+					width: 100%;
+					display: flex;
+					align-items: center;
+					gap: 16px;
+					img{
+						width: 40px;
+						aspect-ratio: 1/1;
+						border-radius: 100%;
+						object-fit: cover;
+					}
+				}
+				.wrap{
+					.name{
+
+					}
+					.last{
+						@include fs(12);
+						color: gray;
+						margin-top: 4px;
+					}
+				}
+			}
+		}
+	}
+}
+
+.chat-room{
+	position: relative;
+	h1{
+		@include fs(20);
+		font-weight: bold;
+		text-align: center;
+		position: fixed;
+		top: 0;
+		right: 0;
+		left: 0;
+		margin: auto;
+		background-color: white;
+		padding: 16px;
+		border-bottom: 1px gray solid;
+		width: 100%;
+		z-index: 999;
+	}
+	ul{
+		padding:40px 16px;
+		background-color: white;
+		li{
+			margin-bottom: 16px;
+			display: flex;
+			align-items: center;
+			&.me{
+				justify-content: flex-end;
+				.bubble{
+					$clr:$lightgray;
+					max-width:70%;
+					padding:16px 8px;
+					background:$clr;
+					position:relative;
+					border-radius:14px 2px 14px 14px;
+					margin-right: 8px;
+					&::before{               // ← 右向きの三角
+						content:"";
+						position:absolute;
+						right:-16px;
+						top:0px;
+						border:8px solid transparent;
+						border-left-color:$clr;         // 左だけ塗る
+					}
+				}
+			}
+			&.you{
+				justify-content: flex-start;
+				.bubble{
+					$clr: $lb;               // 吹き出し色
+					max-width:70%;
+					padding:16px 8px;
+					background:$clr;
+					position:relative;
+					border-radius: 2px 14px 14px 14px;
+					margin-left: 8px;
+					&::before{               // ← 左向きの三角
+						content:"";
+						position:absolute;
+						left: -16px;
+						top:00px;
+						border:8px solid transparent;
+						border-right-color:$clr;        // 右だけ塗る
+					}
+				}
+				img.avatar{
+					width: 32px;
+					aspect-ratio: 1/1;
+					object-fit: cover;
+					border-radius: 100%;
+				}
+			}
+		}
+	}
+	.send-form{
+		padding-top: 40px;
+		textarea{
+			width: 100%;
+			padding: 8px;
+			border : 1px gray solid;
+			height: 150px;
+			margin-bottom: 40px;
+		}
+		button{
+			color: white;
+			padding: 8px;
+		}
+	}
+	.back-index{
+		display: block;
+		margin-top: 16px;
+		text-align: center;
+	}
+}

@@ -10,7 +10,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django_filters.views import FilterView
 from django.utils import timezone
 from django.apps import apps
-from django.db.models import CharField, TextField, FloatField, DateTimeField, Exists, OuterRef
+from django.db.models import CharField, TextField, FloatField, DateTimeField, Exists, OuterRef, Subquery
 from django.contrib.contenttypes.models import ContentType
 
 from .filters import DynamicProfileFilter
@@ -18,7 +18,6 @@ from .forms import ProfileEditForm, DynamicProfileFieldForm
 from .models import UserProfile, Match, Message, Footprint, ProfileFieldValue, ProfileField
 from notifications.models import Notification
 from core.utils import get_matched_users
-
 
 @login_required
 def my_page(request):
@@ -47,7 +46,7 @@ def my_page(request):
     # --- 入力がんばれアラート ---
 
     #必須項目
-    REQUIRED_FIXED = ["nickname", "gender", "main_area", "sexual_object_pref", "lciq", "date_of_birth"]
+    REQUIRED_FIXED = ["nickname", "gender", "main_area", "sexual_object_pref", "lciq_score", "date_of_birth"]
 
     # 固定：空欄を数える
     missing_fixed_cnt = sum(
@@ -82,7 +81,7 @@ def my_page(request):
     lciq_done = profile.has_lciq() 
 
     # --- lciqポイント取得 --- #
-    lciq_val_obj = profile_field_values.filter(field__field_key='lciq').first()
+    lciq_val_obj = profile_field_values.filter(field__field_key='lciq_score').first()
 
     # ないなら '0'、あればその .value
     if lciq_val_obj:
@@ -410,14 +409,35 @@ def is_matched(userA, userB):
         Q(from_user=userB, to_user=userA, status='matched')
     ).exists()
 
-
 @login_required
 def chat_index(request):
     me = request.user
-    matched_users = get_matched_users(me)
 
+    # list → idリスト
+    matched_user_ids = [u.id for u in get_matched_users(me)]
+
+    # id で絞った QuerySet に変換（profile画像もまとめて取得）
+    matched_qs = (
+        get_user_model().objects
+        .filter(id__in=matched_user_ids)
+        .select_related('userprofile')
+    )
+
+    # 最新メッセージ 1 件だけをサブクエリで取得
+    latest_qs = (
+        Message.objects
+        .filter(
+            Q(sender=me, receiver=OuterRef('pk')) |
+            Q(sender=OuterRef('pk'), receiver=me)
+        )
+        .order_by('-id')
+        .values('text')[:1]
+    )
+
+    users_with_last = matched_qs.annotate(last_msg=Subquery(latest_qs))
+
+    # ── 未読数ロジックはそのまま ───────────────────
     msg_ct = ContentType.objects.get_for_model(Message)
-
     unread_map = (
         Notification.objects.filter(user=me, content_type=msg_ct, is_read=False)
         .values('object_id')
@@ -436,10 +456,9 @@ def chat_index(request):
         unread_by_user[uid] = unread_by_user.get(uid, 0) + cnt
 
     return render(request, "core/chat_index.html", {
-        "matched_users": matched_users,
+        "matched_users": users_with_last,
         "unread_by_user": unread_by_user,
     })
-
 
 
 class UserProfileListView(LoginRequiredMixin, FilterView):
@@ -510,6 +529,9 @@ def chat_api(request, user_id):
     data = [{
         "id": m.id,
         "sender": m.sender.username,
+        "avatar":  (m.sender.userprofile.profile_image.url
+                    if m.sender.userprofile.profile_image
+                    else static("img/user-unset.webp")),
         "text": m.text,
         "created": m.created_at.strftime("%H:%M"),
     } for m in qs]

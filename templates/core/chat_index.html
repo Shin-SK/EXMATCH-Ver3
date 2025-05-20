@@ -8,22 +8,37 @@ Chat room
 {% endblock %}
 
 {% block content %}
-<h1>チャットできる相手一覧</h1>
-<ul>
-  {% for u in matched_users %}
-    <li>
-      {{ u.username }}
-      <a href="{% url 'chat_room' u.id %}">
-        チャットへ
-        {% with unread=unread_by_user|get_item:u.id %}
-          {% if unread %}
-            <span class="badge">{{ unread }}</span>
-          {% endif %}
-        {% endwith %}
-      </a>
-    </li>
-  {% endfor %}
-</ul>
-<p><a href="{% url 'home' %}">ホームに戻る</a></p>
+<div class="chat chat-index">
 
+	<div class="head-set">
+		<h2>MYPAGE</h2>
+		<h3>マイページ</h3>
+	</div>
+
+  <div class="fields">
+    {% for u in matched_users %}
+      <div class="field">
+        <div class="item">
+        <a href="{% url 'chat_room' u.id %}">
+          {% if u.userprofile.profile_image %}
+            <img src="{{ u.userprofile.profile_image.url }}" alt="{{ u.username }}のアイコン">
+          {% else %}
+            <img src="{% static 'img/user-unset.webp' %}" alt="">
+          {% endif %}
+          <div class="wrap">
+            <p class="name">{{ u.username }}</p>
+            <p class="last">{{ u.last_msg|default:"(最初のメッセージを送ろう)" }}</p>
+          </div>
+
+        </a>
+          {% with unread=unread_by_user|get_item:u.id %}
+            {% if unread %}
+              <span class="badge">{{ unread }}</span>
+            {% endif %}
+          {% endwith %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
 {% endblock %}

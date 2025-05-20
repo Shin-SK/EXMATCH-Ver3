@@ -6,6 +6,7 @@ from .models import (
     ProfileField,
     ProfileFieldValue,
 )
+from django.forms import FileInput, RadioSelect
 
 
 class ProfileEditForm(forms.ModelForm):
@@ -19,8 +20,27 @@ class ProfileEditForm(forms.ModelForm):
             'sexual_object_pref',
             'blood_type',
             'main_area',
+            'lciq_score',
+            'lciq_image',
             # 必要に応じて他の項目も
         ]
+        labels = {
+            "bio": "自己紹介",
+            "blood_type": "血液型",
+            "gender": "性別",
+            "sexual_object_pref": "恋愛対象",
+            "main_area": "メインエリア",
+            "lciq_score": "LCIQスコア",
+            "lciq_image": "LCIQ診断スクショ",
+        }
+
+        widgets = {
+            "profile_image": FileInput(attrs={"class": "filepond"}),
+            "blood_type":forms.RadioSelect,
+            "gender":forms.RadioSelect,
+            "sexual_object_pref":forms.RadioSelect,
+            "lciq_image": FileInput(attrs={"class": "filepond"}),
+        }
 
 
 class RegisterRequiredForm(forms.ModelForm):
@@ -135,12 +155,21 @@ class DynamicProfileFieldForm(forms.Form):
 class CustomSignupForm(SignupForm):
     nickname = forms.CharField(label='ニックネーム', max_length=100)
     GENDER_CHOICES = (('male', '男性'), ('female', '女性'))
-    gender = forms.ChoiceField(label='性別', choices=GENDER_CHOICES)
+    gender = forms.ChoiceField(
+        label='性別',
+        choices=GENDER_CHOICES,
+        widget=forms.RadioSelect
+    )
+
     SEXUAL_OBJECT_CHOICES = (
         ('male', '男性'),
         ('female', '女性'),
     )
-    sexual_object_pref = forms.ChoiceField(label='恋愛対象', choices=SEXUAL_OBJECT_CHOICES)
+    sexual_object_pref = forms.ChoiceField(
+        label='恋愛対象',
+        choices=SEXUAL_OBJECT_CHOICES,
+         widget=forms.RadioSelect
+    )
     main_area = forms.CharField  (label='居住地', max_length=30)
 
     def save(self, request):

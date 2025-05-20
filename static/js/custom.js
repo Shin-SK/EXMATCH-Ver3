@@ -143,3 +143,5 @@ setupPreview('formGroupFacePhoto', 'previewFace', 'clearButtonFace');
 setupPreview('formGroupPhoto1', 'previewPhoto1', 'clearButtonPhoto1');
 setupPreview('formGroupPhoto2', 'previewPhoto2', 'clearButtonPhoto2');
 setupPreview('formGroupPhoto3', 'previewPhoto3', 'clearButtonPhoto3');
+
+

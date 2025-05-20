@@ -8,36 +8,62 @@ Chat with {{ target_user.username }}
 
 {% block content %}
 
-<h1>{{ target_user.username }} さんとのチャット</h1>
+<div class="chat chat-room container">
 
-<ul id="messages" data-lastid="{% firstof messages.last.id 0 %}">
-  {# ② 既存履歴をサーバで描画したい場合はここを残す #}
-  {% for m in messages %}
-    <li><strong>{{ m.sender.username }}:</strong> {{ m.text }}</li>
-  {% endfor %}
-</ul>
+  <h1>{{ target_user.username }} さんとのチャット</h1>
 
-<form id="chatForm">
-  {% csrf_token %}
-  <input id="msgInput" type="text" autocomplete="off" required>
-  <button>送信</button>
-</form>
+  <ul id="messages" data-lastid="{% firstof messages.last.id 0 %}">
+      {% for m in messages %}
+      <li class="{% if m.sender == request.user %}me{% else %}you{% endif %}">
+        {% if m.sender != request.user %}
+          <img class="avatar"
+              src="{% if m.sender.userprofile.profile_image %}
+                      {{ m.sender.userprofile.profile_image.url }}
+                    {% else %}
+                      {% static 'img/user-unset.webp' %}
+                    {% endif %}"
+              alt="">
+        {% endif %}
+        <div class="bubble">{{ m.text }}</div>
+      </li>
+      {% endfor %}
+  </ul>
 
-<p><a href="{% url 'matched_list' %}">マッチ一覧へ戻る</a></p>
+  <form id="chatForm" class="send-form">
+    {% csrf_token %}
+  <textarea id="msgInput" rows="2" placeholder="メッセージを入力…" required></textarea>
+    <button>送信</button>
+  </form>
 
+  <p class="back-index"><a href="{% url 'chat_index' %}">マッチ一覧へ戻る</a></p>
+  
+</div>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const list   = document.getElementById('messages');
   let lastId   = Number(list.dataset.lastid) || 0;
   const API    = "{% url 'chat_api' user_id=target_user.id %}";
+  const CURRENT = "{{ request.user.username|escapejs }}";   // ← 自分の名前をJSへ
+const MY_AVATAR = "{% if request.user.userprofile.profile_image %}
+                     {{ request.user.userprofile.profile_image.url }}
+                   {% else %}
+                     {% static 'img/user-unset.webp' %}
+                   {% endif %}";
 
-  function append(m){
-    const li = document.createElement('li');
-    li.innerHTML = `<strong>${m.sender}:</strong> ${m.text}`;
-    list.appendChild(li);
-    li.scrollIntoView();
-    lastId = m.id;
-  }
+function append(m){
+  const isMe = (m.sender === CURRENT);
+  const li   = document.createElement('li');
+  li.className = isMe ? 'me' : 'you';
+
+  const avatar = isMe ? MY_AVATAR : m.avatar;
+  li.innerHTML =
+    (isMe ? '' : `<img class="avatar" src="${avatar}" alt="">`) +
+    `<div class="bubble">${m.text}</div>`;
+
+  list.appendChild(li);
+  li.scrollIntoView();
+  lastId = m.id;
+}
 
   function poll(){
     fetch(`${API}?after=${lastId}`)

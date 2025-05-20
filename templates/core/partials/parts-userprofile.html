@@ -40,9 +40,13 @@
                       </div>
                   </div>
                   <div class="right">
-                      <div class="lciq-point">{{ user_obj.userprofile.custom_values.lciqPoint }}</div>
+                      <div class="lciq-point">{{ user_obj.userprofile.lciq_score }}</div>
                       <div class="image">
-                          <img src="{% static 'img/lciq-sample.webp' %}" alt="">
+                        {% if user_obj.userprofile and user_obj.userprofile.lciq_image %}
+                          <img src="{{ user_obj.userprofile.lciq_image.url }}" alt="プロフィール画像">
+                        {% else %}
+                          <img src="{% static 'img/noimage.jpg' %}" alt="">
+                        {% endif %}
                       </div>
                   </div>
               </div>

@@ -13,6 +13,7 @@ urlpatterns = [
     path("api/notifications/", include("notifications.urls")),
     path("contact/", ContactFormView.as_view(
             form_class=ContactFormWithSubject), name="contact"),
+    path("__reload__/", include("django_browser_reload.urls")),
     ]
 
 

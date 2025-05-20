@@ -7,22 +7,34 @@
 <section class="login container">
   <h1>ログイン</h1>
 
-  <form method="post" action="{% url 'account_login' %}">
+  <form method="post" action="{% url 'account_login' %}" class="form">
     {% csrf_token %}
     {{ form.non_field_errors }}
-    <div class="field">
-      {{ form.login.label_tag }}<br>
-      {{ form.login }}
-    </div>
-    <div class="field">
-      {{ form.password.label_tag }}<br>
-      {{ form.password }}
-    </div>
 
-    <button type="submit">ログイン</button>
+    <div class="form__wrap">
+
+      <div class="field">
+        <label for="{{ form.login.id_for_label }}">メールアドレス</label>
+        {{ form.login }}
+        {{ form.login.errors }}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.password.id_for_label }}">パスワード</label>
+        {{ form.password }}
+        {{ form.password.errors }}
+      </div>
+
+      <button type="submit">ログイン</button>
+    </div>
   </form>
 
-  <p><a href="{% url 'account_reset_password' %}">パスワードを忘れた方はこちら</a></p>
-  <p><a href="{% url 'account_signup' %}">新規登録</a></p>
+  <p class="is-login">
+    パスワードを忘れた方は
+    <a href="{% url 'account_reset_password' %}">こちら</a>
+  </p>
+  <p class="is-login">
+    <a href="{% url 'account_signup' %}">新規登録</a>
+  </p>
 </section>
 {% endblock %}

@@ -63,7 +63,10 @@ class UserProfile(models.Model):
         choices=PLAN_CHOICES,
         default='free'
     )
-    lciq  = models.CharField(max_length=10, blank=True, null=True)
+    lciq_score  = models.PositiveSmallIntegerField("LCIQスコア",
+                     blank=True, null=True)
+    lciq_image  = models.ImageField("LCIQ診断スクショ",
+                     upload_to="lciq", blank=True, null=True)
     plan_expiry = models.DateTimeField(blank=True, null=True)
     option_expiry = models.DateTimeField(blank=True, null=True)
     date_of_birth    = models.DateField(blank=True, null=True)
@@ -97,7 +100,7 @@ class UserProfile(models.Model):
         （固定カラム lciq を使っている想定。動的フィールドの場合は
          profile.custom_values.get("lciq") で同じことが出来ます）
         """
-        return bool(self.lciq)
+        return bool(self.lciq_score)
 
     @property
     def custom_values(self):

@@ -1,40 +1,226 @@
 <!-- templates/payments/checkout_form.html -->
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>購入ページ</title>
-</head>
-<body>
-<h1>プラン購入</h1>
-<form method="POST" action="">
-  {% csrf_token %}
+{% extends "base.html" %}
+{% load static %}
+{% load misc %}
 
-  <div>
-    <label>プラン:</label><br>
-    <label>
-      <input type="radio" name="plan" value="standard_1m" checked> 1ヶ月
-    </label><br>
-    <label>
-      <input type="radio" name="plan" value="standard_3m"> 3ヶ月
-    </label><br>
-    <label>
-      <input type="radio" name="plan" value="standard_6m"> 6ヶ月
-    </label><br>
-    <label>
-      <input type="radio" name="plan" value="standard_12m"> 12ヶ月
-    </label><br>
-  </div>
+{% block title %}
+プラン購入
+{% endblock %}
 
-  <div>
-    <label>オプション（プラスプロフィール）:</label><br>
-    <label>
-      <input type="checkbox" name="option" value="plus_profile">
-      追加する
-    </label>
-  </div>
+{% block content %}
 
-  <button type="submit">購入に進む</button>
+<div class="upgrade-plan">
+
+	<div class="head-set">
+		<h2>PLAN</h2>
+		<h3>プラン購入</h3>
+	</div>
+
+	<div class="freeplan">
+		<div class="wrap">
+			<div class="price">
+				<div class="inner">0</div>
+			</div>
+			<ul>
+				<li>価値観診断</li>
+				<li>価値観マッチ ( 価値観による紹介 )</li>
+				<li>お相手のプロフィールを見る</li>
+				<li>お相手に「いいね！」をする</li>
+				<li>「いいね！」をくれた方とマッチングする ( 無制限 )</li>
+				<li>非表示機能</li>
+				<li>初回メッセージ１通のみ</li>
+			</ul>
+		</div>
+	</div>
+
+<form method="POST" action="" class="form">
+
+	<div class="standard">
+		<p>スタンダードプランでは<br>すべての機能がご利用いただけます</p>
+		<div class="option">
+			プラスプロフィール（性指向など）が表示できる<br>
+			<a href="#option">追加オプションはこちら</a>
+		</div>
+
+		<div class="standard__wrap">
+
+			<div class="box">
+				<div class="price">
+					<div class="head">3ヶ月パック</div>
+					<div class="inner">
+						<div class="wrap">
+							<div class="numb">
+								3,850<span>円/月</span>
+							</div>
+							<label>
+								<input type="radio" name="plan" value="standard_3m">購入
+							</label>
+						</div>
+					</div>
+					<div class="amount">
+						<span>合計</span>11,550円
+					</div>
+				</div>
+				<div class="special">
+					<div class="item agel">
+						<div class="img">
+							<img src="{% static 'img/a-gel.png' %}" alt="">
+						</div>
+						<div class="text">
+							<span>4,620円分</span>プレゼント
+						</div>
+					</div>
+					<div class="item opening">
+						<div class="head">オープニングキャンペーン</div>
+						<div class="text">1ヶ月分<br>プレゼント</div>
+					</div>
+				</div>
+
+			</div>
+			<div class="box">
+				<div class="price">
+					<div class="head">6ヶ月パック</div>
+					<div class="inner">
+						<div class="wrap">
+							<div class="numb">
+								3,150<span>円/月</span>
+							</div>
+							<label>
+								<input type="radio" name="plan" value="standard_3m">購入
+							</label>
+						</div>
+					</div>
+					<div class="amount">
+						<span>合計</span>18,900円
+					</div>
+				</div>
+				<div class="special">
+					<div class="item agel">
+						<div class="img">
+							<img src="{% static 'img/a-gel.png' %}" alt="">
+						</div>
+						<div class="text">
+							<span>7,560円分</span>プレゼント
+						</div>
+					</div>
+					<div class="item opening">
+						<div class="head">オープニングキャンペーン</div>
+						<div class="text">2ヶ月分<br>プレゼント</div>
+					</div>
+				</div>
+
+			</div>
+			<div class="box">
+				<div class="price">
+					<div class="head">12ヶ月パック</div>
+					<div class="inner">
+						<div class="wrap">
+							<div class="numb">
+								2,450<span>円/月</span>
+							</div>
+							<label>
+								<input type="radio" name="plan" value="standard_3m">購入
+							</label>
+						</div>
+					</div>
+					<div class="amount">
+						<span>合計</span>29,400円
+					</div>
+				</div>
+				<div class="special">
+					<div class="item agel">
+						<div class="img">
+							<img src="{% static 'img/a-gel.png' %}" alt="">
+						</div>
+						<div class="text">
+							<span>11,760円分</span>プレゼント
+						</div>
+					</div>
+					<div class="item opening">
+						<div class="head">オープニングキャンペーン</div>
+						<div class="text">3ヶ月分<br>プレゼント</div>
+					</div>
+				</div>
+
+			</div>
+
+
+		</div><!-- __wrap -->
+
+		<div class="single">
+			<div class="head">
+				1ヶ月パック
+			</div>
+			<div class="price">
+				<div class="numb">
+					4,500<span>円/月</span>
+				</div>
+				<label>
+					<input type="radio" name="plan" value="standard_3m">購入
+				</label>
+			</div>
+		</div>
+
+	</div>
+
+	<div class="option">
+		<div class="head-set">
+			<h2>PLUS PROFILE</h2>
+			<h3>ご要望にお答えして<br>
+			深い部分までわかる追加オプションを導入しました</h3>
+		</div>
+		<div class="wrap">
+			<div class="price special">
+				<div class="normal">
+					<div class="off">50%<br>OFF</div>
+					<div class="wrap">1,500<span>円/月</span></div>
+				</div>
+				<div class="sp">
+					<div class="triangle"><span class="material-symbols-outlined">stat_minus_3</span></div>
+					<div class="numb">750<span>円/月</span></div>
+				</div>
+			</div>
+			<ul>
+				<li>性指向がわかる</li>
+			</ul>
+		</div>
+		<div class="cart">
+			<div class="items">
+				<div class="item">
+					<label>
+						<input type="checkbox" name="option" value="plus_profile">
+						1ヶ月パック
+					</label>
+				</div>
+				<div class="item">
+					<label>
+						<input type="checkbox" name="option" value="plus_profile">
+						3ヶ月パック
+					</label>
+				</div>
+				<div class="item">
+					<label>
+						<input type="checkbox" name="option" value="plus_profile">
+						6ヶ月パック
+					</label>
+				</div>
+				<div class="item">
+					<label>
+						<input type="checkbox" name="option" value="plus_profile">
+						12ヶ月パック
+					</label>
+				</div>
+			</div>
+
+		</div>
+
+	</div>
+
+	<button type="submit">購入に進む<span class="material-symbols-outlined">open_in_new</span></button>
+
 </form>
-</body>
-</html>
+
+
+</div><!-- upgrade-plan -->
+
+{% endblock %}

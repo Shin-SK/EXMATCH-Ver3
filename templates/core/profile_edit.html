@@ -1,23 +1,135 @@
 <!-- templates/core/profile_edit.html -->
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>プロフィール編集</title>
-</head>
-<body>
-<h1>プロフィール編集</h1>
-<form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
+{% extends "base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}
+プロフィール編集
+{% endblock %}
+
+{% block content %}
+
+<!-- FilePond CSS/JS だけ読み込む -->
+<link rel="stylesheet" href="https://unpkg.com/filepond@^4/dist/filepond.css">
+<script src="https://unpkg.com/filepond@^4/dist/filepond.js"></script>
+<!-- CSS -->
+<link  rel="stylesheet"
+       href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css">
+<!-- JS（core の後で） -->
+<script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
+
+<div class="profile-edit">
+
+    <div class="head-set">
+		<h2>PROFILE EDIT</h2>
+		<h3>プロフィール編集</h3>
+	</div>
     
-    <h2>固定フィールド</h2>
-    {{ form_fixed.as_p }}
+    <form method="POST" enctype="multipart/form-data" class="form">
+        {% csrf_token %}
 
-    <h2>カスタムフィールド</h2>
-    {{ form_dynamic.as_p }}
+        <div class="form__wrap">
+            
+            <h2>LCIQ</h2>
+            <p class="lciq-text">
+            LCIQ診断がまだの人は<a href="https://exm.lciq.jp/">こちら</a>から！ <br>
+            診断後に画面をスクショして点数をメモして戻ってきてね！
+            </p>
 
-    <button type="submit">保存</button>
-</form>
-<p><a href="{% url 'my_page' %}">マイページへ戻る</a></p>
-</body>
-</html>
+            <div class="items lciq">
+                <div class="item">
+
+                    <div class="head">診断スクリーンショット</div>
+                    <div class="field">
+                        {{ form_fixed.lciq_image }}
+                    </div>
+
+                    <div class="head">LCIQスコア</div>
+                    <div class="field">
+                        {{ form_fixed.lciq_score }}
+                    </div>
+
+                </div>
+            </div>
+
+            <h2>必須項目</h2>
+            <div class="items">
+
+            <div class="item profile-image">
+                <div class="head">プロフィール画像</div>
+
+                <div class="field">
+                <div class="inner image">
+                    {% if form_fixed.instance.profile_image %}
+                    <img src="{{ form_fixed.instance.profile_image.url }}" alt="current">
+                    {% else %}
+                    <img src="{% static 'img/no-image.png' %}" alt="no image">
+                    {% endif %}
+                </div>
+
+                <div class="inner arrow">▶</div>
+
+                <div class="inner file">
+                    {{ form_fixed.profile_image }}
+                </div>
+                </div>
+            </div>
+
+            <div class="item bio">
+                <div class="head">自己紹介</div>
+
+                <div class="field">
+                {{ form_fixed.bio|add_class:"field" }}
+                </div>
+                <p class="note">※ 例：趣味や好きなことを書いてみよう！</p>
+            </div>
+
+            <div class="item main-area">
+                <div class="head">居住地</div>
+
+                <div class="field">
+                {{ form_fixed.main_area|add_class:"field" }}
+                </div>
+                <p class="note">※ マッチング時の検索に使います。市区町村程度で OK！</p>
+            </div>
+
+            </div>
+
+
+
+            <h2>マッチ率アップ！選択項目</h2>
+            <div class="items">
+            {% for field in form_dynamic.visible_fields %}
+                {% if field.name not in "dynamic_lciq_image dynamic_lciq_score" %}
+                <div class="item">
+                    <div class="head">{{ field.label }}</div>
+                    {{ field|add_class:"field" }}
+                </div>
+                {% endif %}
+            {% endfor %}
+            </div>
+
+
+        </div>
+
+        <button type="submit">保存</button>
+    </form>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // プラグインを登録
+  FilePond.registerPlugin(FilePondPluginImagePreview);
+
+  const input = document.querySelector('input.filepond');
+  if (!input) return;
+    FilePond.parse(document.body);
+  FilePond.create(input, {
+    storeAsFile: true,
+    labelIdle  : '画像をドラッグ＆ドロップ<br><span class="filepond--label-action">クリックして選択</span>'
+  });
+});
+</script>
+
+{% endblock %}

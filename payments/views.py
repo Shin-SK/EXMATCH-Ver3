@@ -122,7 +122,7 @@ def create_checkout_session(request):
             success_url="http://127.0.0.1:8000/payments/success/?session_id={CHECKOUT_SESSION_ID}",
             cancel_url="http://127.0.0.1:8000/payments/cancel/",
             payment_method_types=["card"],
-            mode="payment",
+            mode="subscription",
             line_items=line_items,
             client_reference_id=str(request.user.id),  # user.idを紐付け
 			metadata={

@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'django_contact_form',
     'widget_tweaks',
+    "django_browser_reload", 
 
     'core.apps.CoreConfig',
     'payments.apps.PaymentsConfig',
@@ -51,6 +52,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "allauth.account.middleware.AccountMiddleware",
+    "django_browser_reload.middleware.BrowserReloadMiddleware",
 ]
 
 ROOT_URLCONF = 'config.urls'

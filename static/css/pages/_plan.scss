@@ -1,0 +1,398 @@
+@use "../global/global" as *;
+
+.upgrade-plan{
+	background-color: $lightgray;
+	padding: 40px 16px;
+	.freeplan{
+		background-color: white;
+		margin: 40px auto;
+		.wrap{
+			@include flex();
+			.price{
+				@include flex();
+				aspect-ratio: 1/1;
+				min-height: 200px;
+				.inner{
+					@include fs(30);
+					font-weight: bold;
+
+				}
+			}
+		}
+	}
+	ul{
+		li{
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			&::before{
+			content: "check";
+			font-family: "Material Symbols Outlined";
+			font-variation-settings:
+				'FILL' 0,
+				'wght' 400,
+				'GRAD' 0,
+				'opsz' 24;
+			}
+		}
+	}
+	.standard{
+		margin-bottom: 80px;
+		p{
+			font-weight: bold;
+			text-align: center;
+			@include fs(18);
+		}
+		.option{
+			margin: 24px auto 40px;
+			text-align: center;
+		}
+		&__wrap{
+			display: grid;
+			grid-template-columns: repeat(3,1fr);
+			align-items: start;
+			overflow-x: scroll;
+			gap: 16px;
+			.box{
+				max-width: 100%;
+				background-color: white;
+				padding: 8px;
+				width: 300px;
+				.price{
+					.head{
+						@include flex();
+						font-weight: bold;
+						margin-top: 16px;
+					}
+					.inner{
+						@include flex();
+						min-height: 160px;
+						gap: 8px;
+						flex-direction: column;
+						.wrap{
+							width: 100%;
+							@include flex();
+							flex-direction: column;
+							gap: 8px;
+							.numb{
+								@include fs(40);
+								font-weight: bold;
+								span{
+									@include fs(12);
+								}
+							}
+							label{
+								position: relative;
+								width: 100%;
+								background-color: white;
+								border: 1px $mc solid;
+								border-radius: 100px;
+								color: $mc;
+								padding: 4px;
+								@include flex();
+								cursor: pointer;
+								@include fs(14);
+								transition: background .2s, color .2s;
+								input{
+									position: absolute;
+									opacity: 0;
+								}
+								&:has(> input:checked) {
+									background: $mc;      /* 好きな色へ */
+									color: #fff;
+								}
+							}
+						}
+
+					}
+					.amount{
+						@include flex();
+						gap: 8px;
+						margin-bottom: 16px;
+						span{
+							background-color: gray;
+							color: white;
+							@include flex();
+							padding: 0px 24px;
+						}
+					}
+				}
+				.special{
+					.item{
+						aspect-ratio: 16/9;
+						margin-bottom: 16px;
+						border-radius: 16px;
+						padding: 8px;
+						&:last-of-type{
+							margin-bottom: unset;
+						}
+					}
+					.agel{
+						@include flex();
+						gap: 8px;
+						background: #f5aeae;
+						background: linear-gradient(45deg, rgba(245, 174, 174, 1) 0%, rgba(255, 219, 168, 1) 100%);
+
+						img{
+							height: 62px;
+						}
+						.text{
+							font-weight: bold;
+							display: flex;
+							flex-direction: column;
+							span{
+								@include fs(30);
+								display: block;
+								width: 100%;
+							}
+						}
+					}//agel
+					.opening{
+						background: #dfdbff;
+						background: linear-gradient(90deg, rgba(223, 219, 255, 1) 0%, rgba(161, 239, 255, 1) 100%);
+						.head{
+							@include flex();
+							font-weight: bold;
+							color: $mc;
+							margin-top: 8px;
+							gap: 8px;
+							&::before, &::after{
+								content: '';
+								background-image: url(../img/fuki1.svg);
+								width: 20px;
+								height: 20px;
+								background-repeat: no-repeat;
+								background-position: center;
+								background-size: contain;
+							}
+							&::after{
+								transform: scaleX(-1);
+							}
+						}
+						.text{
+							font-weight: bold;
+							@include flex();
+							@include fs(30);
+							text-align: center;
+							height: 100%;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	.single{
+		background-color: white;
+		padding: 8px;
+		width: 100%;
+		margin: 16px auto;
+		border-radius: 16px;
+		.head{
+			font-weight: bold;
+			text-align: center
+		}
+		.price{
+			@include flex();
+			flex-direction: column;
+			gap: 16px;
+			.numb{
+				@include flex();
+				@include fs(20);
+				font-weight: bold;
+				span{
+					@include fs(10);
+				}
+			}
+			label{
+				position: relative;
+				background-color: white;
+				border: 1px $mc solid;
+				border-radius: 100px;
+				color: $mc;
+				padding: 4px 40px;
+				@include flex();
+				cursor: pointer;
+				@include fs(14);
+				transition: background .2s, color .2s;
+				input{
+					position: absolute;
+					opacity: 0;
+				}
+				&:has(> input:checked) {
+					background: $mc;      /* 好きな色へ */
+					color: #fff;
+				}
+			}
+		}
+	}//single
+
+	.option{
+		h3{
+			text-align: center;
+			font-weight: normal;
+		}
+		.wrap{
+			@include flex();
+			background-color: white;
+			margin: 40px auto;
+			.price{
+				padding: 8px;
+				aspect-ratio: 1/1;
+				min-height: 200px;
+				@include flex();
+				.normal{
+					.wrap{
+						@include fs(30);
+						font-weight: bold;
+						@include flex();
+						align-items: flex-end;
+						gap: 4px;
+						span{
+							@include fs(16);
+						}
+					}
+				}
+				.off{
+					display: none;
+				}
+				.sp{
+					display: none;
+				}
+				&.special{
+					$tri-gap: 8px;
+					@include flex();
+					flex-direction: column;
+					gap: $tri-gap;
+					.normal{
+						position: relative;
+						@include flex();
+						gap: 8px;
+						.off{
+							@include flex();
+							background-color: red;
+							color: white;
+							font-weight: bold;
+							border-radius: 100%;
+							aspect-ratio: 1/1;
+							padding: 8px;
+							text-align: center;
+						}
+						.wrap{
+							@include flex();
+							align-items: flex-end;
+							margin: auto;
+							position: relative;
+							&::before{
+								content: "";
+								height: 2px;
+								position: absolute;
+								width: 100%;
+								top: 50%;
+								background-color: red;
+							}
+						}
+					}
+					.sp{
+						@include flex();
+						flex-direction: column;
+						gap: $tri-gap;
+						.triangle{
+							span{
+								@include fs(20);
+							}
+						}
+						.numb{
+							@include fs(40);
+							font-weight: bold;
+							@include flex();
+							align-items: flex-end;
+							gap: 4px;
+							color: red;
+							span{
+								@include fs(16);
+								margin-bottom: 4px;
+							}							
+						}
+					}
+				}
+			}
+			ul{
+				li{
+					display: flex;
+					align-items: center;
+					gap: 8px;
+					&::before{
+					content: "check";
+					font-family: "Material Symbols Outlined";
+					font-variation-settings:
+						'FILL' 0,
+						'wght' 400,
+						'GRAD' 0,
+						'opsz' 24;
+					}
+				}
+			}
+		}
+
+	.cart{
+		.items{
+			display: grid;
+			grid-template-columns: repeat(4,1fr);
+			gap: 16px;
+			background-color: unset;
+			padding: unset;
+			@include sp{
+				grid-template-columns: repeat(2,1fr);
+			}
+			.item{
+				width: 100%;
+				label{
+					position: relative;
+					border-radius: 100px;
+					background-color: white;
+					width: 100%;
+					padding: 8px;
+					@include flex();
+					transition: background .2s, color .2s;
+					input{
+						position: absolute;
+						opacity: 0;
+					}
+					&:has(> input:checked) {
+						background: $mc;      /* 好きな色へ */
+						color: #fff;
+						border-color: $mc;
+					}
+				}
+			}
+		}
+	}
+	
+	}//option
+
+	button[type="submit"]{
+		color: white;
+		padding: 8px;
+		@include flex();
+		gap: 8px;
+		span{
+			@include fs(12);
+		}
+	}
+
+}//upgrade-plan
+
+
+.success{
+	@include flex();
+	height: 50vh;
+	width: 100%;
+	flex-direction: column;
+	gap: 16px;
+	h1{
+		font-weight: bold;
+		@include fs(20);
+		text-align: center;
+	}
+}

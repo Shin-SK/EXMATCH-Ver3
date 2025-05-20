@@ -1906,7 +1906,7 @@ body {
 }
 
 .base {
-  padding-bottom: 80px;
+  padding-bottom: 60px;
 }
 .base .current {
   opacity: 1 !important;
@@ -2457,7 +2457,7 @@ body {
   gap: 16px;
   flex-wrap: wrap;
 }
-.items .item .field > div:first-child {
+.items .item .field > div:has(input[type=radio]):first-child {
   display: none; /* 先頭 (= 空ラベル) を消す */
 }
 .items .item .field label:has(input[type=radio]), .items .item .field label:has(input[type=checkbox]) {
@@ -3296,4 +3296,689 @@ body {
   justify-content: center;
   align-items: center;
   margin: 16px;
+}
+
+.profile-edit .form__wrap h2 {
+  margin: 40px auto 8px;
+  font-weight: bold;
+  text-align: center;
+  padding: 8px;
+}
+.profile-edit .form__wrap .items {
+  border-radius: 16px;
+}
+.profile-edit .form__wrap .items input[type=text] {
+  padding: 8px;
+}
+.profile-edit .form__wrap .items textarea {
+  border: unset;
+  padding: 8px;
+  width: 100%;
+}
+.profile-edit .form__wrap .items .item.profile-image .field {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 16px;
+  align-items: stretch;
+}
+.profile-edit .form__wrap .items .item.profile-image .field .image img {
+  width: 100%;
+  aspect-ratio: 1/1;
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+.profile-edit .form__wrap .items .item.profile-image .field .arrow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.profile-edit .form__wrap .items .item.profile-image .field .file {
+  height: 100%;
+}
+.profile-edit .form__wrap .items .item.profile-image .field .file .filepond--root {
+  width: 100% !important;
+  height: 100% !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.profile-edit .form__wrap .items .item.profile-image .field .file .filepond--root .filepond--drop-label {
+  background-color: white;
+  bottom: 0;
+  margin: auto;
+}
+.profile-edit .form__wrap .items .item.profile-image .field .file .filepond--drip {
+  opacity: 1;
+  background-color: white;
+}
+.profile-edit .form__wrap .items.lciq .item .field {
+  display: block;
+  margin-bottom: 24px;
+}
+.profile-edit .form__wrap .items.lciq .item .field:last-of-type {
+  margin-bottom: unset;
+}
+.profile-edit .form__wrap .items.lciq .item .field .filepond--drip {
+  opacity: 1;
+  background-color: white;
+}
+.profile-edit .form__wrap .items.lciq .item .field input[type=number] {
+  width: 100%;
+  padding: 8px;
+  border: unset;
+}
+.profile-edit .lciq-text {
+  text-align: center;
+  margin-bottom: 40px;
+}
+.profile-edit button[type=submit] {
+  color: white;
+  padding: 8px;
+}
+
+.signup .form__wrap, .login .form__wrap {
+  margin: 80px auto;
+}
+.signup .form__wrap .field, .login .form__wrap .field {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  margin-bottom: 24px;
+}
+@media screen and (max-width: 768px) {
+  .signup .form__wrap .field, .login .form__wrap .field {
+    grid-template-columns: 1fr;
+  }
+}
+.signup .form__wrap .field label, .login .form__wrap .field label {
+  font-weight: bold;
+}
+.signup .form__wrap .field input[type=text], .signup .form__wrap .field input[type=email], .signup .form__wrap .field input[type=password], .login .form__wrap .field input[type=text], .login .form__wrap .field input[type=email], .login .form__wrap .field input[type=password] {
+  width: 100%;
+  border: unset;
+  background-color: whitesmoke;
+  padding: 8px;
+}
+.signup .form__wrap .field input[type=text]::-moz-placeholder, .signup .form__wrap .field input[type=email]::-moz-placeholder, .signup .form__wrap .field input[type=password]::-moz-placeholder, .login .form__wrap .field input[type=text]::-moz-placeholder, .login .form__wrap .field input[type=email]::-moz-placeholder, .login .form__wrap .field input[type=password]::-moz-placeholder {
+  color: gray;
+}
+.signup .form__wrap .field input[type=text]::placeholder, .signup .form__wrap .field input[type=email]::placeholder, .signup .form__wrap .field input[type=password]::placeholder, .login .form__wrap .field input[type=text]::placeholder, .login .form__wrap .field input[type=email]::placeholder, .login .form__wrap .field input[type=password]::placeholder {
+  color: gray;
+}
+.signup .form__wrap .field .inner > div, .login .form__wrap .field .inner > div {
+  display: flex;
+  gap: 16px;
+}
+.signup .form__wrap .field .inner label:has(input[type=radio]), .signup .form__wrap .field .inner label:has(input[type=checkbox]), .login .form__wrap .field .inner label:has(input[type=radio]), .login .form__wrap .field .inner label:has(input[type=checkbox]) {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4px 24px;
+  background-color: whitesmoke;
+  transition: background 0.2s, color 0.2s;
+  cursor: pointer;
+  position: relative;
+  font-weight: normal;
+}
+.signup .form__wrap .field .inner label:has(input[type=radio]) input[type=radio], .signup .form__wrap .field .inner label:has(input[type=radio]) input[type=checkbox], .signup .form__wrap .field .inner label:has(input[type=checkbox]) input[type=radio], .signup .form__wrap .field .inner label:has(input[type=checkbox]) input[type=checkbox], .login .form__wrap .field .inner label:has(input[type=radio]) input[type=radio], .login .form__wrap .field .inner label:has(input[type=radio]) input[type=checkbox], .login .form__wrap .field .inner label:has(input[type=checkbox]) input[type=radio], .login .form__wrap .field .inner label:has(input[type=checkbox]) input[type=checkbox] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+}
+.signup .form__wrap .field .inner label:has(input[type=radio]):has(> input:checked), .signup .form__wrap .field .inner label:has(input[type=checkbox]):has(> input:checked), .login .form__wrap .field .inner label:has(input[type=radio]):has(> input:checked), .login .form__wrap .field .inner label:has(input[type=checkbox]):has(> input:checked) {
+  background: #004C71; /* 好きな色へ */
+  color: #fff;
+  border-color: #004C71;
+}
+.signup .form__wrap .caution, .login .form__wrap .caution {
+  display: flex;
+  justify-content: flex-end;
+  font-size: clamp(1rem, 0.9346938776rem + 0.2040816327vw, 1.2rem);
+  margin-top: -20px;
+  margin-bottom: 16px;
+}
+.signup .is-login, .login .is-login {
+  text-align: center;
+}
+.signup button[type=submit], .login button[type=submit] {
+  color: white;
+  padding: 8px;
+}
+
+.chat-index .fields {
+  display: flex;
+  flex-direction: column;
+  margin-top: 40px;
+}
+.chat-index .fields .field {
+  padding: 16px;
+}
+.chat-index .fields .field:nth-of-type(odd) {
+  background-color: #EAF2F4;
+}
+.chat-index .fields .field .item a {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.chat-index .fields .field .item a img {
+  width: 40px;
+  aspect-ratio: 1/1;
+  border-radius: 100%;
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+.chat-index .fields .field .item .wrap .last {
+  font-size: clamp(1.2rem, 1.1346938776rem + 0.2040816327vw, 1.4rem);
+  color: gray;
+  margin-top: 4px;
+}
+
+.chat-room {
+  position: relative;
+}
+.chat-room h1 {
+  font-size: clamp(2rem, 1.9346938776rem + 0.2040816327vw, 2.2rem);
+  font-weight: bold;
+  text-align: center;
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  margin: auto;
+  background-color: white;
+  padding: 16px;
+  border-bottom: 1px gray solid;
+  width: 100%;
+  z-index: 999;
+}
+.chat-room ul {
+  padding: 40px 16px;
+  background-color: white;
+}
+.chat-room ul li {
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+}
+.chat-room ul li.me {
+  justify-content: flex-end;
+}
+.chat-room ul li.me .bubble {
+  max-width: 70%;
+  padding: 16px 8px;
+  background: whitesmoke;
+  position: relative;
+  border-radius: 14px 2px 14px 14px;
+  margin-right: 8px;
+}
+.chat-room ul li.me .bubble::before {
+  content: "";
+  position: absolute;
+  right: -16px;
+  top: 0px;
+  border: 8px solid transparent;
+  border-left-color: whitesmoke;
+}
+.chat-room ul li.you {
+  justify-content: flex-start;
+}
+.chat-room ul li.you .bubble {
+  max-width: 70%;
+  padding: 16px 8px;
+  background: #EAF2F4;
+  position: relative;
+  border-radius: 2px 14px 14px 14px;
+  margin-left: 8px;
+}
+.chat-room ul li.you .bubble::before {
+  content: "";
+  position: absolute;
+  left: -16px;
+  top: 0px;
+  border: 8px solid transparent;
+  border-right-color: #EAF2F4;
+}
+.chat-room ul li.you img.avatar {
+  width: 32px;
+  aspect-ratio: 1/1;
+  -o-object-fit: cover;
+     object-fit: cover;
+  border-radius: 100%;
+}
+.chat-room .send-form {
+  padding-top: 40px;
+}
+.chat-room .send-form textarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px gray solid;
+  height: 150px;
+  margin-bottom: 40px;
+}
+.chat-room .send-form button {
+  color: white;
+  padding: 8px;
+}
+.chat-room .back-index {
+  display: block;
+  margin-top: 16px;
+  text-align: center;
+}
+
+.upgrade-plan {
+  background-color: whitesmoke;
+  padding: 40px 16px;
+}
+.upgrade-plan .freeplan {
+  background-color: white;
+  margin: 40px auto;
+}
+.upgrade-plan .freeplan .wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.upgrade-plan .freeplan .wrap .price {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  aspect-ratio: 1/1;
+  min-height: 200px;
+}
+.upgrade-plan .freeplan .wrap .price .inner {
+  font-size: clamp(3rem, 2.9346938776rem + 0.2040816327vw, 3.2rem);
+  font-weight: bold;
+}
+.upgrade-plan ul li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.upgrade-plan ul li::before {
+  content: "check";
+  font-family: "Material Symbols Outlined";
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+}
+.upgrade-plan .standard {
+  margin-bottom: 80px;
+}
+.upgrade-plan .standard p {
+  font-weight: bold;
+  text-align: center;
+  font-size: clamp(1.8rem, 1.7346938776rem + 0.2040816327vw, 2rem);
+}
+.upgrade-plan .standard .option {
+  margin: 24px auto 40px;
+  text-align: center;
+}
+.upgrade-plan .standard__wrap {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: start;
+  overflow-x: scroll;
+  gap: 16px;
+}
+.upgrade-plan .standard__wrap .box {
+  max-width: 100%;
+  background-color: white;
+  padding: 8px;
+  width: 300px;
+}
+.upgrade-plan .standard__wrap .box .price .head {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  margin-top: 16px;
+}
+.upgrade-plan .standard__wrap .box .price .inner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 160px;
+  gap: 8px;
+  flex-direction: column;
+}
+.upgrade-plan .standard__wrap .box .price .inner .wrap {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 8px;
+}
+.upgrade-plan .standard__wrap .box .price .inner .wrap .numb {
+  font-size: clamp(4rem, 3.9346938776rem + 0.2040816327vw, 4.2rem);
+  font-weight: bold;
+}
+.upgrade-plan .standard__wrap .box .price .inner .wrap .numb span {
+  font-size: clamp(1.2rem, 1.1346938776rem + 0.2040816327vw, 1.4rem);
+}
+.upgrade-plan .standard__wrap .box .price .inner .wrap label {
+  position: relative;
+  width: 100%;
+  background-color: white;
+  border: 1px #004C71 solid;
+  border-radius: 100px;
+  color: #004C71;
+  padding: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: clamp(1.4rem, 1.3346938776rem + 0.2040816327vw, 1.6rem);
+  transition: background 0.2s, color 0.2s;
+}
+.upgrade-plan .standard__wrap .box .price .inner .wrap label input {
+  position: absolute;
+  opacity: 0;
+}
+.upgrade-plan .standard__wrap .box .price .inner .wrap label:has(> input:checked) {
+  background: #004C71; /* 好きな色へ */
+  color: #fff;
+}
+.upgrade-plan .standard__wrap .box .price .amount {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.upgrade-plan .standard__wrap .box .price .amount span {
+  background-color: gray;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0px 24px;
+}
+.upgrade-plan .standard__wrap .box .special .item {
+  aspect-ratio: 16/9;
+  margin-bottom: 16px;
+  border-radius: 16px;
+  padding: 8px;
+}
+.upgrade-plan .standard__wrap .box .special .item:last-of-type {
+  margin-bottom: unset;
+}
+.upgrade-plan .standard__wrap .box .special .agel {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  background: #f5aeae;
+  background: linear-gradient(45deg, rgb(245, 174, 174) 0%, rgb(255, 219, 168) 100%);
+}
+.upgrade-plan .standard__wrap .box .special .agel img {
+  height: 62px;
+}
+.upgrade-plan .standard__wrap .box .special .agel .text {
+  font-weight: bold;
+  display: flex;
+  flex-direction: column;
+}
+.upgrade-plan .standard__wrap .box .special .agel .text span {
+  font-size: clamp(3rem, 2.9346938776rem + 0.2040816327vw, 3.2rem);
+  display: block;
+  width: 100%;
+}
+.upgrade-plan .standard__wrap .box .special .opening {
+  background: #dfdbff;
+  background: linear-gradient(90deg, rgb(223, 219, 255) 0%, rgb(161, 239, 255) 100%);
+}
+.upgrade-plan .standard__wrap .box .special .opening .head {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  color: #004C71;
+  margin-top: 8px;
+  gap: 8px;
+}
+.upgrade-plan .standard__wrap .box .special .opening .head::before, .upgrade-plan .standard__wrap .box .special .opening .head::after {
+  content: "";
+  background-image: url(../img/fuki1.svg);
+  width: 20px;
+  height: 20px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+.upgrade-plan .standard__wrap .box .special .opening .head::after {
+  transform: scaleX(-1);
+}
+.upgrade-plan .standard__wrap .box .special .opening .text {
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: clamp(3rem, 2.9346938776rem + 0.2040816327vw, 3.2rem);
+  text-align: center;
+  height: 100%;
+}
+.upgrade-plan .single {
+  background-color: white;
+  padding: 8px;
+  width: 100%;
+  margin: 16px auto;
+  border-radius: 16px;
+}
+.upgrade-plan .single .head {
+  font-weight: bold;
+  text-align: center;
+}
+.upgrade-plan .single .price {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 16px;
+}
+.upgrade-plan .single .price .numb {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: clamp(2rem, 1.9346938776rem + 0.2040816327vw, 2.2rem);
+  font-weight: bold;
+}
+.upgrade-plan .single .price .numb span {
+  font-size: clamp(1rem, 0.9346938776rem + 0.2040816327vw, 1.2rem);
+}
+.upgrade-plan .single .price label {
+  position: relative;
+  background-color: white;
+  border: 1px #004C71 solid;
+  border-radius: 100px;
+  color: #004C71;
+  padding: 4px 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: clamp(1.4rem, 1.3346938776rem + 0.2040816327vw, 1.6rem);
+  transition: background 0.2s, color 0.2s;
+}
+.upgrade-plan .single .price label input {
+  position: absolute;
+  opacity: 0;
+}
+.upgrade-plan .single .price label:has(> input:checked) {
+  background: #004C71; /* 好きな色へ */
+  color: #fff;
+}
+.upgrade-plan .option h3 {
+  text-align: center;
+  font-weight: normal;
+}
+.upgrade-plan .option .wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+  margin: 40px auto;
+}
+.upgrade-plan .option .wrap .price {
+  padding: 8px;
+  aspect-ratio: 1/1;
+  min-height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.upgrade-plan .option .wrap .price .normal .wrap {
+  font-size: clamp(3rem, 2.9346938776rem + 0.2040816327vw, 3.2rem);
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-items: flex-end;
+  gap: 4px;
+}
+.upgrade-plan .option .wrap .price .normal .wrap span {
+  font-size: clamp(1.6rem, 1.5346938776rem + 0.2040816327vw, 1.8rem);
+}
+.upgrade-plan .option .wrap .price .off {
+  display: none;
+}
+.upgrade-plan .option .wrap .price .sp {
+  display: none;
+}
+.upgrade-plan .option .wrap .price.special {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 8px;
+}
+.upgrade-plan .option .wrap .price.special .normal {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+.upgrade-plan .option .wrap .price.special .normal .off {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: red;
+  color: white;
+  font-weight: bold;
+  border-radius: 100%;
+  aspect-ratio: 1/1;
+  padding: 8px;
+  text-align: center;
+}
+.upgrade-plan .option .wrap .price.special .normal .wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-items: flex-end;
+  margin: auto;
+  position: relative;
+}
+.upgrade-plan .option .wrap .price.special .normal .wrap::before {
+  content: "";
+  height: 2px;
+  position: absolute;
+  width: 100%;
+  top: 50%;
+  background-color: red;
+}
+.upgrade-plan .option .wrap .price.special .sp {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 8px;
+}
+.upgrade-plan .option .wrap .price.special .sp .triangle span {
+  font-size: clamp(2rem, 1.9346938776rem + 0.2040816327vw, 2.2rem);
+}
+.upgrade-plan .option .wrap .price.special .sp .numb {
+  font-size: clamp(4rem, 3.9346938776rem + 0.2040816327vw, 4.2rem);
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-items: flex-end;
+  gap: 4px;
+  color: red;
+}
+.upgrade-plan .option .wrap .price.special .sp .numb span {
+  font-size: clamp(1.6rem, 1.5346938776rem + 0.2040816327vw, 1.8rem);
+  margin-bottom: 4px;
+}
+.upgrade-plan .option .wrap ul li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.upgrade-plan .option .wrap ul li::before {
+  content: "check";
+  font-family: "Material Symbols Outlined";
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+}
+.upgrade-plan .option .cart .items {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  background-color: unset;
+  padding: unset;
+}
+@media screen and (max-width: 768px) {
+  .upgrade-plan .option .cart .items {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+.upgrade-plan .option .cart .items .item {
+  width: 100%;
+}
+.upgrade-plan .option .cart .items .item label {
+  position: relative;
+  border-radius: 100px;
+  background-color: white;
+  width: 100%;
+  padding: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background 0.2s, color 0.2s;
+}
+.upgrade-plan .option .cart .items .item label input {
+  position: absolute;
+  opacity: 0;
+}
+.upgrade-plan .option .cart .items .item label:has(> input:checked) {
+  background: #004C71; /* 好きな色へ */
+  color: #fff;
+  border-color: #004C71;
+}
+.upgrade-plan button[type=submit] {
+  color: white;
+  padding: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+.upgrade-plan button[type=submit] span {
+  font-size: clamp(1.2rem, 1.1346938776rem + 0.2040816327vw, 1.4rem);
+}
+
+.success {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50vh;
+  width: 100%;
+  flex-direction: column;
+  gap: 16px;
+}
+.success h1 {
+  font-weight: bold;
+  font-size: clamp(2rem, 1.9346938776rem + 0.2040816327vw, 2.2rem);
+  text-align: center;
 }/*# sourceMappingURL=custom.css.map */
