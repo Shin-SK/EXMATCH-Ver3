@@ -265,23 +265,23 @@
 					}
 				}//amoutn
 				.agel{
-					.sarani{
-						@include flex();
-						font-weight: bold;
-						.wrap{
-							position: relative;
-							&::before{
-								content: '';
-								background-image: url(../img/sarani.svg);
-								background-repeat: no-repeat;
-								position: absolute;
-								top: -6px;
-								left: -10px;
-								width: 15px;
-								height: 15px;
-							}
-						}
-					}
+					// .sarani{
+					// 	@include flex();
+					// 	font-weight: bold;
+					// 	.wrap{
+					// 		position: relative;
+					// 		&::before{
+					// 			content: '';
+					// 			background-image: url(../img/sarani.svg);
+					// 			background-repeat: no-repeat;
+					// 			position: absolute;
+					// 			top: -6px;
+					// 			left: -10px;
+					// 			width: 15px;
+					// 			height: 15px;
+					// 		}
+					// 	}
+					// }
 					.present{
 						@include flex();
 						gap: 16px;

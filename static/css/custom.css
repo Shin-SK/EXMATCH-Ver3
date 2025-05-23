@@ -1596,25 +1596,6 @@ body {
   font-size: clamp(2rem, 1.9346938776rem + 0.2040816327vw, 2.2rem);
   margin-right: 8px;
 }
-.price__special__wrap .box .agel .sarani {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-weight: bold;
-}
-.price__special__wrap .box .agel .sarani .wrap {
-  position: relative;
-}
-.price__special__wrap .box .agel .sarani .wrap::before {
-  content: "";
-  background-image: url(../img/sarani.svg);
-  background-repeat: no-repeat;
-  position: absolute;
-  top: -6px;
-  left: -10px;
-  width: 15px;
-  height: 15px;
-}
 .price__special__wrap .box .agel .present {
   display: flex;
   justify-content: center;
