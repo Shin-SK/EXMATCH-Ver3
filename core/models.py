@@ -3,6 +3,7 @@ from datetime import date
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from uuid import uuid4
 
 # ---- 固定のChoice定義 (既存のまま) ----
 BLOOD_TYPE_CHOICES = (
@@ -35,10 +36,13 @@ PLAN_CHOICES = (
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     bio = models.TextField(blank=True, null=True)
-    profile_image = models.ImageField(
-        upload_to='',   # アップロード先フォルダ
-        blank=True, null=True
-    )
+
+    def avatar_path(_, filename):
+        ext = filename.split('.')[-1]
+        return f"profiles/{uuid4().hex}.{ext}"
+
+    profile_image = models.ImageField(upload_to=avatar_path, blank=True, null=True)
+
     nickname = models.CharField(max_length=50, blank=True, null=True)
     blood_type = models.CharField(
         max_length=2,

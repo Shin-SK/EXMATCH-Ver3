@@ -6,10 +6,18 @@ import environ, os
 import dj_database_url
 
 
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")   
 
+
+DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+
+CLOUDINARY_STORAGE = {
+    "CLOUD_NAME": os.getenv("CLOUDINARY_CLOUD_NAME"),
+    "API_KEY":    os.getenv("CLOUDINARY_API_KEY"),
+    "API_SECRET": os.getenv("CLOUDINARY_API_SECRET"),
+    "MEDIA_ROOT": "media",
+}
 
 DATABASES = {
     "default": {
@@ -20,6 +28,11 @@ DATABASES = {
         "HOST": "localhost",
         "PORT": "",
     }
+}
+
+STORAGES = {
+    "default": {"BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
 }
 
 
@@ -58,7 +71,9 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'django_contact_form',
     'widget_tweaks',
-    "django_browser_reload", 
+    "django_browser_reload",
+    "cloudinary",
+    "cloudinary_storage",
 
     'core.apps.CoreConfig',
     'payments.apps.PaymentsConfig',
