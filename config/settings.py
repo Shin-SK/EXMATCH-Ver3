@@ -182,32 +182,19 @@ CHANNEL_LAYERS = {
 
 # ---------- メール設定 ----------
 
-#メール系
-# if DEBUG:
-#     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-# else:
-# EMAIL_BACKEND = os.getenv(
-#     "DJANGO_EMAIL_BACKEND",
-#     "django.core.mail.backends.console.EmailBackend"
-# )
-# EMAIL_BACKEND = os.getenv(
-#     "DJANGO_EMAIL_BACKEND",
-#     "django.core.mail.backends.console.EmailBackend"   # デフォルトは console
-# )
-# EMAIL_HOST = os.getenv("DJANGO_EMAIL_HOST", "")
-# EMAIL_PORT = int(os.getenv("DJANGO_EMAIL_PORT", "587"))
-# EMAIL_HOST_USER = os.getenv("DJANGO_EMAIL_HOST_USER", "")
-# EMAIL_HOST_PASSWORD = os.getenv("DJANGO_EMAIL_HOST_PASSWORD", "")
-# EMAIL_USE_TLS = os.getenv("DJANGO_EMAIL_USE_TLS", "True") == "True"
-# EMAIL_USE_SSL = os.getenv("DJANGO_EMAIL_USE_SSL", "False") == "True"
-# DEFAULT_FROM_EMAIL = os.getenv("DJANGO_DEFAULT_FROM_EMAIL", "webmaster@localhost")
+EMAIL_BACKEND = os.getenv(
+    "DJANGO_EMAIL_BACKEND",
+    "django.core.mail.backends.console.EmailBackend"  # デフォルトは console
+)
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'webmaster@localhost'
-CONTACT_FORM_RECIPIENTS = ['support@example.com']
-MANAGERS = [('Support', 'support@example.com')]
-TEMPLATES[0]["OPTIONS"]["context_processors"] += ["core.context_processors.blur_flag"]
+EMAIL_HOST = os.getenv("DJANGO_EMAIL_HOST", "")
+EMAIL_PORT = int(os.getenv("DJANGO_EMAIL_PORT", "587"))
+EMAIL_HOST_USER = os.getenv("DJANGO_EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.getenv("DJANGO_EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = os.getenv("DJANGO_EMAIL_USE_TLS", "True") == "True"
+EMAIL_USE_SSL = os.getenv("DJANGO_EMAIL_USE_SSL", "False") == "True"
 
+DEFAULT_FROM_EMAIL = os.getenv("DJANGO_DEFAULT_FROM_EMAIL", "webmaster@localhost")
 
 # == 認証周り ==
 AUTHENTICATION_BACKENDS = [
