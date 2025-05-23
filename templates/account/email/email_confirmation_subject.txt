@@ -1,2 +1,2 @@
 {% load i18n %}
-{% blocktrans with site_name=current_site.name %}[{{ site_name }}] メールアドレス確認{% endblocktrans %}
+{% blocktrans %}【EXMATCH】メールアドレス確認{% endblocktrans %}

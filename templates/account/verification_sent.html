@@ -6,20 +6,22 @@
 {% block title %}メール確認のお願い{% endblock %}
 
 {% block content %}
-<h1 class="text-xl font-bold mb-6">メールアドレスの確認</h1>
+<div class="email-sent">
+    <div class="wrap container">
+        <h1>メール確認のお願い</h1>
 
-<p class="mb-4">
-    ご登録のメールアドレス宛に <strong>確認メール</strong> を送信しました。
-    受信ボックス（迷惑メールフォルダも含む）をご確認のうえ、
-    メール内のリンクをクリックして登録を完了してください。
-</p>
+        <p>
+            ご登録のメールアドレス宛に確認メールを送信しました。<br>
+            受信ボックス（および迷惑メールフォルダ）をご確認のうえ、<br>
+            メール内の <strong>確認リンク</strong> をクリックしてください。<br>
+            メールが届かない場合は、アドレスの入力ミスや<br>
+            受信設定をご確認のうえ、再送信をお試しください。
+        </p>
 
-<p class="mb-8">
-    数分待ってもメールが届かない場合は、アドレスに誤りがないか、
-    受信設定をご確認のうえ、再送信をお試しください。
-</p>
-
-<a href="{% url 'account_email' %}" class="btn btn-primary">
-    確認メールを再送信する
-</a>
+    
+        <a href="{% url 'account_email' %}">
+            メールを再送信する
+        </a>
+    </div>
+</div>
 {% endblock %}

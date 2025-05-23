@@ -3407,4 +3407,43 @@ body {
   font-weight: bold;
   font-size: clamp(2rem, 1.9346938776rem + 0.2040816327vw, 2.2rem);
   text-align: center;
+}
+
+.email-confirm, .email-sent {
+  min-height: 50vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.email-confirm .wrap, .email-sent .wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 40px;
+}
+.email-confirm .wrap h1, .email-sent .wrap h1 {
+  font-size: clamp(2rem, 1.9346938776rem + 0.2040816327vw, 2.2rem);
+  font-weight: bold;
+  color: #004C71;
+}
+.email-confirm .wrap p, .email-sent .wrap p {
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 8px;
+}
+.email-confirm .wrap p span, .email-sent .wrap p span {
+  display: block;
+}
+.email-confirm .wrap button, .email-sent .wrap button {
+  color: white;
+  width: 200px;
+  border-radius: 100px;
+  padding: 4px;
+}
+.email-confirm .wrap a, .email-sent .wrap a {
+  border-bottom: 1px #004C71 solid;
 }/*# sourceMappingURL=custom.css.map */

@@ -206,6 +206,8 @@ AUTHENTICATION_BACKENDS = [
 # --- Sign-Up / 認証設定 -------------------------------
 LOGIN_REDIRECT_URL = "/mypage/"
 
+ACCOUNT_EMAIL_SUBJECT_PREFIX = "" 
+
 ACCOUNT_USERNAME_REQUIRED      = False
 ACCOUNT_EMAIL_REQUIRED         = True
 ACCOUNT_EMAIL_VERIFICATION     = "mandatory"

@@ -1,28 +1,31 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% block content %}
-<div class="max-w-lg mx-auto mt-16 p-8 bg-white rounded shadow">
-  {% if confirmation %}
-    <h1 class="text-2xl font-bold mb-6">{% trans "メールアドレス確認" %}</h1>
-    <p class="mb-8">
-      {{ confirmation.email_address.email }} をご登録メールアドレスとして認証します。
-      よろしければ <strong class="text-pink-600">「確認する」</strong> ボタンを押してください。
-    </p>
-    <form method="post">
-      {% csrf_token %}
-      <button type="submit"
-              class="w-full py-3 rounded bg-pink-600 text-white font-semibold hover:bg-pink-700 transition">
-        {% trans "確認する" %}
-      </button>
-    </form>
-  {% else %}
-    {# すでに確認済み or 無効なキーでアクセスした場合 #}
-    <h1 class="text-xl font-bold mb-4">{% trans "リンクが無効です" %}</h1>
-    <p class="mb-6">
-      この確認リンクは既に使用済み、または有効期限切れです。
-      必要であれば <a href="{% url 'account_login' %}" class="text-pink-600 underline">ログイン</a> 後、
-      「確認メールを再送する」をご利用ください。
-    </p>
-  {% endif %}
+<div class="email-confirm">
+
+  <div class="wrap container">
+    {% if confirmation %}
+      <h1>{% trans "メールアドレス確認" %}</h1>
+      <p>
+        <span>{{ confirmation.email_address.email }}</span>
+        こちらをメールアドレスとして登録します
+      </p>
+      <form method="post">
+        {% csrf_token %}
+        <button type="submit">
+          {% trans "登録" %}
+        </button>
+      </form>
+    {% else %}
+      {# すでに確認済み or 無効なキーでアクセスした場合 #}
+      <h1>{% trans "リンクが無効です" %}</h1>
+      <p>
+        この確認リンクは既に使用済み、または有効期限切れです。
+        必要であれば <a href="{% url 'account_login' %}" class="text-pink-600 underline">ログイン</a> 後、
+        「確認メールを再送する」をご利用ください。
+      </p>
+    {% endif %}
+  </div>
+
 </div>
 {% endblock %}
