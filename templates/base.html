@@ -10,11 +10,13 @@
 	<!-- <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script> -->
 
   	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <!-- Drawer CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/drawer/3.2.2/css/drawer.min.css">
+    <!-- Mmenu CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mmenu-light@3.2.2/dist/mmenu-light.min.css">
     <!-- Slick CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css">
+    <!-- SpinKit（CSS全部）-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spinkit/2.0.0/spinkit.min.css" integrity="sha512-kRYkjiYH/VXxoiaDK2oGNMKIi8VQVfie1lkYGX3kmfzWNR2kfaF5ze0885W3/eE6lIiURBsZA91M/WNvCajHMw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{% static 'css/custom.css' %}">
@@ -32,10 +34,38 @@
     <!-- google icon -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=barefoot,chevron_right,favorite,forum,star_3,home,mail,menu,person,search,help_center,schedule,location_on,check,stat_minus_3,open_in_new" />
 
-
+    <style>
+      /* 変更後 ── display をやめて opacity でフェード */
+      .loader-overlay{
+        position:fixed;
+        inset:0;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        background:rgba(255,255,255,1);
+        opacity: 1;
+        z-index:2000;
+        transition:opacity .4s ease;   /* ← 追加 */
+      }
+      body.loaded .loader-overlay{
+        opacity:0;                     /* ← 透明に */
+        pointer-events:none;           /* ← クリック透過 */
+      }
+    </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body class="{% if unverified %}unverified{% endif %} {%block base_class%}base{% endblock %} {% if not lciq_done %}lciq-unset{% endif %}">
+
+<div id="loader" class="loader-overlay">
+  <div class="sk-chase">
+    <div class="sk-chase-dot"></div>
+    <div class="sk-chase-dot"></div>
+    <div class="sk-chase-dot"></div>
+    <div class="sk-chase-dot"></div>
+    <div class="sk-chase-dot"></div>
+    <div class="sk-chase-dot"></div>
+  </div>
+</div>
 
   {% if request.resolver_match.url_name != "home" %}
 <header class="main-header container">
@@ -73,15 +103,25 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <!-- iScroll -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/iScroll/5.2.0/iscroll.min.js"></script>
-<!-- drawer.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/drawer/3.2.2/js/drawer.min.js"></script>
-<!-- Slick -->
+<!-- Mmenu.js -->
+<script src="https://cdn.jsdelivr.net/npm/mmenu-light@3.2.2/dist/mmenu-light.min.js"></script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
 <!-- swiper -->
 <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
 
 
+<script>
+window.addEventListener('load', () => {
+  document.body.classList.add('loaded');
+  /* 透明になったあと DOM から外す（0.4s + 余裕） */
+  setTimeout(() => document.getElementById('loader')?.remove(), 600);
+});
+</script>
+
+
 {% if request.user.is_authenticated %}
+
 <script>
 (function(){
   const badge   = document.getElementById('notif-badge');

@@ -1,207 +1,163 @@
 @use "../global/global" as *;
 
-.container-home{
-    width: 100%;
-    padding: 16px;
+
+.mm-spn.mm-spn--light{
+    background-color: unset;
 }
+.mm-spn li:after{
+    margin-left: 0;
+}
+
 .home{
-        .kv{
-            position: relative;
-            &::before, &::after{
-                content: 'This Moment';
-                font-family: "mina", serif;
-                @include fs(30);
-                position: absolute;
-                left: 0;
-                top: 0;
-                color: $mc;
-                z-index: 999;
-                padding: 0px 8px;
-                @include md{
-                    @include fs(20);
-                    color: white;
+    position: relative;
+    .header{
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color:  rgba($color: white, $alpha: 0.9);
+        border-bottom: 1px lightgray solid;
+        &__wrap{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 8px 16px;
+            @include md{
+            display: none;
+            }
+            .logo{
+                img{
+                    height: 40px;
                 }
             }
-            &::after{
-                content:'This Time';
-                left: unset;
-                top: unset;
-                right: 0;
-                bottom: 0;
-            }
-            &__line{
-                position: absolute;
-                width: 100%;
-                height: 100%;
-                z-index: 999;
-                .migi,
-                .hidari {
-                    /* 共通のスタイル */
-                    &::before,
-                    &::after {
-                        content: "";
-                        position: absolute;
-                    }
-                }
-                /* 右上 */
-                .migi {
-                    &::before {//水平
-                        width: 70vw;
-                        height: 1px;
-                        top: 20px;
-                        right: 20px;
-                        background-color: $mc;
-                        transform-origin: top right;
-                        @include md{
-                            width: 30vw;
-                            background-color: white;
-                        }
-                    }
-                
-                    &::after {//垂直
-                        height: 85vh;
-                        width: 1px;
-                        top: 20px;
-                        right: 20px;
-                        background-color: $mc;
-                        transform-origin: top right;
-                        @include md{
-                            background-color: white;
-                        }
-                    }
-                }
-                
-                /* 左下 */
-                .hidari {
-                    &::before {//水平
-                        width: 70vw;
-                        height: 1px;
-                        bottom: 20px;
-                        left: 20px;
-                        background-color: $mc; /* 線の色 */
-                        transform-origin: bottom left;
-                        @include md{
-                            width: 30vw;
-                            background-color: white;
-                        }
-                    }
-                
-                    &::after {//垂直
-                        height: 85vh;
-                        width: 1px;
-                        bottom: 20px;
-                        left: 20px;
-                        background-color: $mc; /* 線の色 */
-                        transform-origin: bottom left;
-                        @include md{
-                            background-color: white;
-                        }
-                    }
-                }
-                            
-            }
-            &__wrap{
-                width: 100%;
-                height: 100vh;
+            ul{
                 @include flex();
-                position: relative;
+                gap: 16px;
+            }
+        }
+        .sp{
+            display: none;
+            @include md{
+                display: flex;
+            }
+            .nav-button{
+                background-color: unset;
+                border: unset;
+                box-shadow: unset;
+                border-radius: unset;
+                width: auto;
+                transition: unset;
+            }
+        }
+    }
+    .kv{
+        &__wrap{
+            width: 100%;
+            height: 100vh;
+            background-image: url(../img/kv.webp);
+            background-position: center;
+            background-size: cover;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            @include md{
+                padding: unset;
+                background-position: 20%;
+            }
+            .area{
+                width: 50%;
+                height: 100%;
+                @include flex();
                 @include md{
-                    flex-direction: column;
-                    background-image: url(../img/kv.webp);
-                    background-size: cover;
-                    background-position: center;
-                    background-repeat: no-repeat;
-                }
-                >div{
-                    width: 50%;
-                    @include md{
-                        width: 100%;
-                    }
+                width: 100%;
                 }
                 .box{
                     @include flex();
                     flex-direction: column;
-                    color: $mc;
-                    z-index: 999;
+                    gap: 40px;
+                    background-color: rgba($color: white, $alpha: 0.9);
+                    border-radius: 16px;
+                    padding: 40px 16px;
+                    width: 70%;
+                    max-width: 400px;
                     @include md{
-                        padding: 24px;
-                        background-color: rgba(255, 255, 255, 0.9); // 透明度30%の白  
+                    width: auto;
                     }
-                    .t1{
-                        letter-spacing: 10px;
-                        margin-bottom: 16px;
-                    }
-                    .logo{
-                        margin-bottom: 16px;
-                        img{
-                            max-width: 300px;
-                            width: 100%;
-                            @include md{
-                                max-width: 100%;
-                            }
+                    h2{
+                        color: $mc;
+                        @include fs(20);
+                        font-weight: bold;
+                        letter-spacing: 4px;
+                        &::after{
+                            content: '';
+                            width: 40px;
+                            height: 2px;
+                            background-color: $mc;
+                            margin: 16px auto;
                         }
                     }
-                    button{
-                        width: 50%;
-                        margin-bottom: 40px;
-                        @include md{
-                            width: 100%;
-                        }
+                    h3{
+                        text-align: center;
+                        line-height: 180%;
+                        letter-spacing: 2px;
                     }
-                    .maru{
+                    .wrap{
                         @include flex();
-                        gap: 40px;
-                        >a{
-                            border-radius: 100%;
-                            border: 1px $mc solid;
-                            @include flex();
-                            flex-direction: column;
-                            text-align: center;
-                            height: 100px;
-                            width: 100px;
-                            color: $mc;
-                            line-height: 100%;
-                            @include fs(12);
-                            gap: 8px;
-                        }
-                        .oik{
-                            &::before{
-                                font: var(--fa-font-solid);
-                                content: '\f002';
-                                color: $mc;
-                                @include fs(30);
-                            }
-                        }
-                        .idk{
-                            border: 1px $pink solid;
-                            color: $pink;
-                            &::before{
-                                font: var(--fa-font-solid);
-                                content: '\f3c5';
-                                color: $pink;
-                                @include fs(30);
-                            }
-                        }
-                    }
-                }//box
-                .image{
-                    height: 50vh;
-                    @include md{
-                        display: none;
-                    }
-                    img{
+                        flex-direction: column;
+                        gap: 8px;
                         width: 100%;
-                        height: auto;
-                        object-fit: contain
+                        .button{
+                            color: white;
+                            background-color: $mc;
+                            padding: 8px;
+                            @include flex();
+                            width: 100%;
+                            border-radius: 100px;
+                        }
                     }
-                }
-            }//__wrap
-        }//kv
+
+                }//box
+            }
+        }//__wrap
+    }//kv
+
+    .cv{
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        z-index: 999;
+        border-top: 1px lightgray solid;
+        background-color:  rgba($color: white, $alpha: 0.9);
+        margin-bottom: 0px;
+        transform:translateY(100%);
+        opacity: 0;
+        transition:opacity .4s ease, transform .4s ease;
+        box-sizing: border-box;
+        &__wrap{
+            @include flex();
+            padding: 16px;
+            .button{
+                background-color: $mc;
+                @include flex();
+                width: 300px;
+                border-radius: 100px;
+                color:white;
+                padding: 8px;
+
+            }
+        }
+        &.show{
+            opacity: 1;
+            transform:translateY(0);
+        }
+    }
         .midashi{
             @include flex();
             flex-direction: column;
             .h1{
-                @include fs(35);
+                @include fs(20);
                 color: $mc;
                 text-align: center;
                 font-weight: bold;
@@ -212,7 +168,7 @@
             }
             p{
                 text-align: center;
-                margin-bottom: 40px;
+                margin-bottom: 16px;
             }
             .banner{
                 &__wrap{
@@ -235,141 +191,115 @@
         }//midashi
         .mainTitle{
             @include flex();
-            @include fs(30);
+            @include fs(20);
             font-weight: bold;
             color: $mc;
             letter-spacing: 10px;
             @include md{
-                @include fs(25);
+                @include fs(20);
                 letter-spacing: normal;
                 margin-bottom: 16px;
             }
         }
         .feature{
-            @include dotBg();
-            position: relative;
-            // &::after{
-            //     content: '';
-            //     position: absolute;
-            //     border: 5px white solid;
-            //     top: 0;
-            //     left: 0;
-            //     bottom: 0;
-            //     right: 0;
-            //     margin: auto;
-            //     width: 95%;
-            //     height: 95%;
-            // }
             &__wrap{
-                padding: 40px 0px;
-            }
-            &__area{
-                z-index: 10;
-                .mainTitle{
-                    gap: 24px;
-                    &::before, &::after{
-                        content: '';
-                        background-image: url(../img/fuki1.svg);
-                        width: 20px;
-                        height: 20px;
-                        background-repeat: no-repeat;
-                        background-position: center;
-                        background-size: contain;
-                    }
-                    &::after{
-                        transform: scaleX(-1);
-                    }
-                }
                 .area{
-                    display: grid;
-                    grid-template-columns: repeat(2,1fr);
-                    gap: 16px;
-                    @include md{
-                        grid-template-columns: 1fr;
-                    }
-                    .box{
-                        display: flex;
-                        flex-direction: column;
-                        .point{
+                    margin-bottom: 80px;
+                    .title{
+                        margin-bottom: 16px;
+                        .honki{
                             @include fs(20);
-                            font-weight: bold;
                             @include flex();
                             gap: 16px;
-                            justify-content: flex-start;
-                            width: 100%;
-                            margin-bottom: 8px;
-                            line-height: 100%;
+                            color: $mc;
+                            font-weight: bold;
+                            &::before, &::after{
+                                content: '';
+                                background-image: url(../img/fuki1.svg);
+                                width: 20px;
+                                height: 20px;
+                                background-repeat: no-repeat;
+                                background-position: center;
+                                background-size: contain;
+                            }
+                            &::after{
+                                transform: scaleX(-1);
+                            }
                         }
-                        .point-img{
-                            aspect-ratio: 4/3;
-                            max-height: 300px;
-                            width: 100%;
-                            object-fit: cover;
+                        .subtitle{
+                            @include fs(20);
+                            text-align: center;
+                            margin-top: 8px;
+                            font-weight: bold;
                         }
-                        p{
-                           margin-top: 16px;
+                    }
+                    .outer{
+                        @include flex();
+                        gap: 16px;
+                        align-items: flex-start;
+                        @include sp{
+                            flex-direction: column;
                         }
-
+                        .box{
+                            flex: 1;
+                            .img{
+                                img{
+                                    width: 100%;
+                                    aspect-ratio: 16/9;
+                                    object-fit: cover;
+                                }
+                            }
+                            .text{
+                                .head{
+                                    font-weight: bold;
+                                    margin: 8px auto 4px;
+                                    @include fs(18);
+                                }
+                                p{
+                                    @include fs(14);
+                                }
+                            }
+                        }
                     }
                 }
             }
         }//feature
 
-        .btn__area{
-            @include flex();
-            gap: 40px;
-            >button{
-                color: white;
-                padding: 8px;
-                @include fs(20);
-                @include flex();
+        .koe{
+            .area{
+                margin-top: 16px;
+                display: grid;
+                grid-template-columns: repeat(3,1fr);
+                align-items: start;
                 gap: 16px;
-                margin-bottom: 16px;
-            }
-            .male{
-                border: 1px $mc solid;
-                color: $mc;
-                background: white;
-                &::before{
-                    font: var(--fa-font-solid);
-                    content: '\f183';
-                    @include fs(20);
-                    color: $mc;
+                @include md{
+                    grid-template-columns: 1fr;
                 }
-            }
-            .female{
-                border: 1px $pink solid;
-                color: $pink;
-                background: white;
-                &::before{
-                    font: var(--fa-font-solid);
-                    content: '\f182';
-                    @include fs(20);
-                }
-            }
-            .imadoko{
-                border-radius: 100%;
-                border: 1px $pink solid;
-                @include flex();
-                flex-direction: column;
-                text-align: center;
-                height: 100px;
-                width: 100px;
-                color: $pink;
-                line-height: 100%;
-                @include fs(12);
-                gap: 8px;
-                background-color: white;
-                &::before{
-                    font: var(--fa-font-solid);
-                    content: '\f3c5';
-                    color: $pink;
-                    @include fs(30);
+                .box{
+                    .img{
+                        img{
+                            width: 100%;
+                            aspect-ratio: 16/9;
+                            object-fit: cover;
+                        }
+                    }
+                    .text{
+                        .head{
+                            font-weight: bold;
+                            margin: 8px auto 4px;
+                            @include fs(14);
+                        }
+                        p{
+                            @include fs(14);
+                        }
+                    }
                 }
             }
         }
+        
         .oaite{
             .mainTitle{
+                margin-bottom: 16px;
                 &::before{
                     font: var(--fa-font-solid);
                     content: '\f002';
@@ -386,13 +316,17 @@
                 @include flex();
                 white-space: nowrap;
                 justify-content: flex-start;
+                .slick-track{
+                    @include flex();
+                    gap: 16px;
+                }
                 .box{
                     flex-shrink: 0;
                     .image{
                         position: relative;
                         z-index: 0;
                         img{
-                            max-width: 250px;
+                            max-width: 200px;
                             width: 100%;
                             height: 100%;
                             border-radius: 8px;
@@ -413,6 +347,7 @@
                         gap: 4px;
                         .name{
                             font-weight: bold;
+                            @include fs(10);
                             &::after{
                                 content: '/';
                                 margin-left: 4px;
@@ -421,7 +356,7 @@
                         }
                         .lciq{
                             margin-left: 8px;
-                            @include fs(20);
+                            @include fs(10);
                             @include flex();
                             align-items: baseline;
                             &::after{
@@ -434,102 +369,41 @@
                     }
                 }
             }
+
+            .button-area{
+                @include flex();
+                gap: 16px;
+                margin: 40px auto;
+                button{
+                    color: white;
+                    padding: 4px;
+                    &.female{
+                        $female-color:$pink;
+                        border: 1px $female-color solid;
+                        background-color: white;
+                        color: $female-color;
+                        &.active{
+                            border: unset;
+                            background-color: $female-color;
+                            color: white;
+                        }
+                    }
+                    &.male{
+                        $male-color:$mc;
+                        border: 1px $male-color solid;
+                        background-color: white;
+                        color: $male-color;
+                        &.active{
+                            background-color: $male-color;
+                            border: unset;
+                            color: white;
+                        }
+                    }
+                }
+
+            }
         }//oaite
 
-        .imadoko{
-            .mainTitle{
-                color: $pink;
-                &::before{
-                    font: var(--fa-font-solid);
-                    content: '\f3c5';
-                    color: $pink;
-                    @include fs(40);
-                }
-            }
-            p{
-                text-align: center;
-                margin-bottom: 40px;
-            }
-            iframe{
-                width: 100%;
-                aspect-ratio: 16/9;
-                height: auto;
-                @include md{
-                    aspect-ratio: 1/1;
-                }
-            }
-        }
-        .cv{
-            @include dotBg();
-            @include flex();
-            min-height: 120px;
-            gap: 16px;
-            padding: 40px 0px;
-            &__wrap{
-                @include flex();
-                flex-direction: column;
-                .catch{
-                    text-align: center;
-                    font-weight: bold;
-                    color: $mc;
-                    margin-bottom: 16px;
-                }
-                button{
-                    width: 50%;
-                    @include md{
-                        width: 100%;
-                    }
-                    a{
-                        font-weight: bold;
-                    }
-                }
-            }
-
-        }
-        .merit{
-            &__wrap{
-                @include flex();
-                flex-direction: column;
-                gap: 40px;
-                margin-top: 40px;
-                .box{
-                    width: 100%;
-                    flex: 1;
-                    display: grid;
-                    grid-template-columns: repeat(2,1fr);
-                    align-items: center;
-                    gap: 40px;
-                    @include md{
-                        grid-template-columns: 1fr;
-                    }
-                    &:nth-child(2){
-                        .image{
-                            order: 2;
-                            @include md{
-                                order: 1;
-                            }
-                        }
-                        .text{
-                            order: 1;
-                            @include md{
-                                order: 2;
-                            }
-                        }
-                    }
-                    .image{
-                        img{
-                            width: 100%;
-                        }
-                    }
-                    .text{
-                        .title{
-                            font-weight: bold;
-                            @include fs(20);
-                        }
-                    }
-                }
-            }
-        }//merit
 
         .subtitle{
             text-align: center;
@@ -541,6 +415,300 @@
                 display: block;
                 @include fs(10);
                 text-align: center;
+            }
+        }
+
+        .price-home{
+            $free-color:$green;
+            $standard-color:$mc;
+            $option-color:$pink;
+            .subtitle{
+                margin-top: 16px;
+            }
+
+            &__wrap{
+                .numb-month{
+                    display: flex;
+                    align-items: baseline;
+                    @include fs(40);
+                    font-weight: bold;
+                    gap: 4px;
+                    &::after{
+                        content: '円/月';
+                        @include fs(16);
+                    }
+
+                }
+                .frame-area{
+                    margin: 40px auto;
+                    max-width: 768px;
+                    .box{
+                        .head{
+                            width: 100%;
+                            @include flex();
+                            color: white;
+                            background-color: $free-color;
+                        }
+                        .wrap{
+                            border: 1px $free-color solid;
+                            padding: 16px;
+                            .outer{
+                                @include flex();
+                                @include md{
+                                    flex-direction: column;
+                                    gap: 40px;
+                                }
+                                .left, .right{
+                                    flex:1;
+                                }
+                                .left{
+                                    @include flex();
+                                    flex-direction: column;
+                                    gap: 16px;
+                                    p{
+                                        @include fs(14);
+                                        text-align: center;
+                                    }
+                                }
+                                .right{
+                                    ul{
+                                        li{
+                                            &::before{
+                                                @include gi(check);
+                                                color: $free-color;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                .standard-area{
+                    .catch{
+                        text-align: center;
+                        @include flex();
+                        margin: 24px auto;
+                    }
+                    .plan{
+                        @include flex();
+                        gap: 40px;
+                    }
+                }
+                .pack-area{
+                    display: grid;
+                    grid-template-columns: repeat(3,300px);
+                    gap: 16px;
+                    margin-top: 40px;
+                    overflow-x: auto;
+                    justify-content: center;
+                    padding: 16px 0px;
+                    @include md{
+                        grid-template-columns: repeat(3,80vw);
+                        justify-content: start;
+                    }
+                    .box{
+                        display: flex;
+                        flex-direction: column;
+                        gap: 40px;
+                        box-shadow: 0px 0px 15px -10px #777777;
+                        padding: 8px;
+                        padding-bottom: 40px;
+                        .head{
+                            @include flex();
+                            font-weight: bold;
+                            background-color: $standard-color;
+                            color: white;
+                            padding: 8px;
+                        }
+                        .inner{
+                            text-align: center;
+                            font-weight: bold;
+                            @include flex();
+                            .getugaku{
+                                @include fs(40);
+                                justify-content: center;
+                            }
+                        }
+                        .amount{
+                            @include flex();
+                            align-items: baseline;
+                            gap: 4px;
+                            &::before{
+                                content: '合計';
+                                padding: 4px 16px;
+                                background-color:gray;
+                                @include fs(10);
+                                color: white;
+                                margin-right: 4px;
+                            }
+                            span{
+                                @include fs(10);
+                            }
+                        }
+                        .special{
+                            width: 100%;
+                            border-radius: 16px;
+                            border: 1px $mc solid;
+                            padding: 8px;
+                        }
+                        .agel{
+                            .wrap{
+                                @include flex();
+                                flex-direction: column;
+                                gap: 8px;
+                                .numb{
+                                    @include flex();
+                                    align-items: baseline;
+                                    font-weight: bold;
+                                    @include fs(40);
+                                    span{
+                                        @include fs(16);
+                                    }
+                                }
+                                .inner{
+                                    @include flex();
+                                    font-weight: bold;
+                                    text-align: left;
+                                    gap: 8px;
+                                    &::before{
+                                        content:'';
+                                        width: 40px;
+                                        height: 40px;
+                                        background-image: url(../img/a-gel.png);
+                                        background-position: center;
+                                        background-size: contain;
+                                        background-repeat: no-repeat;
+                                    }
+                                }
+                            }
+                        }
+                        .opening{
+                            border: 1px $pink solid;                            
+                            .wrap{
+                                .head{
+                                    @include flex();
+                                    gap: 4px;
+                                    color: $pink;
+                                    background: unset;
+                                    padding: unset;
+                                    margin-top: 8px;
+                                    &::before,&::after{
+                                        content: '';
+                                        background-image: url("../img/fuki2.svg");
+                                        background-repeat: no-repeat;
+                                        background-image: contain;
+                                        background-position: bottom;
+                                        width: 20px;
+                                        height: 20px;
+                                    }
+                                    &::after{
+                                        transform: scaleX(-1);
+                                    }
+                                }
+                                .span{
+                                    font-weight: bold;
+                                    @include fs(40);
+                                    color: $pink;
+                                    @include flex();
+                                }
+                            }
+                        }
+                    }
+                }
+                .option-area{
+                    margin-top: 40px;
+                    .catch{
+                        text-align: center;
+                        @include flex();
+                    }
+                    .box{
+                        .head{
+                            background-color: $option-color;
+                        }
+                        .wrap{
+                            border: 1px $option-color solid;
+                            .outer{
+                                .left{
+                                    .off{
+                                        display: none;
+                                    }
+                                    .sp{
+                                        display: none;
+                                    }
+                                    &.special{
+                                        $tri-gap: 8px;
+                                        @include flex();
+                                        flex-direction: column;
+                                        gap: $tri-gap;
+                                        .normal{
+                                            position: relative;
+                                            @include flex();
+                                            gap: 8px;
+                                            .off{
+                                                @include flex();
+                                                background-color: red;
+                                                color: white;
+                                                font-weight: bold;
+                                                border-radius: 100%;
+                                                aspect-ratio: 1/1;
+                                                padding: 8px;
+                                                text-align: center;
+                                            }
+                                            .numb-month{
+                                                @include flex();
+                                                align-items: flex-end;
+                                                margin: auto;
+                                                position: relative;
+                                                border: unset;
+                                                &::before{
+                                                    content: "";
+                                                    height: 2px;
+                                                    position: absolute;
+                                                    width: 100%;
+                                                    top: 50%;
+                                                    background-color: red;
+                                                }
+                                            }
+                                        }
+                                        .sp{
+                                            @include flex();
+                                            flex-direction: column;
+                                            gap: $tri-gap;
+                                            .triangle{
+                                                span{
+                                                    @include fs(20);
+                                                }
+                                            }
+                                            .numb-month{
+                                                @include fs(40);
+                                                font-weight: bold;
+                                                @include flex();
+                                                align-items: flex-end;
+                                                gap: 4px;
+                                                color: red;
+                                                span{
+                                                    @include fs(16);
+                                                    margin-bottom: 4px;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                .right{
+                                    ul{
+                                        li{
+                                            &::before{
+                                                @include gi(check);
+                                                color: $option-color;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -615,43 +783,20 @@
             }//__wrap
         }//faq  
 
+        .exm-banner{
+            @include flex();
+            flex-direction: column;
+            margin: 80px auto;
+            h2{
+                font-weight: bold;
+                text-align: center;
+                @include flex();
+                margin-bottom: 40px;
+                line-height: 150%;
+            }
+        }
 
     //■■■■■■■■■■■ swiper ■■■■■■■■■■■ //
-
-    .banner{
-        &.swiper {
-            width: 100%;
-            max-width: 1200px; /* 最大幅を設定（任意） */
-            margin: 0 auto;
-            overflow: hidden;
-        }
-        
-        .swiper-slide {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: transform 0.3s ease, opacity 0.3s ease;
-        }
-        .swiper-pagination{
-            position: relative;
-            margin-top: 24px;
-        }
-        
-        .swiper-slide img {
-            width: 100%;
-        }
-        
-        .swiper-slide-prev,
-        .swiper-slide-next {
-            transform: scale(0.9); /* 少し縮小 */
-            opacity: 0.5; /* 薄く表示 */
-        }
-        
-        .swiper-slide-active {
-            transform: scale(1); /* 通常サイズ */
-            opacity: 1; /* はっきり表示 */
-        }
-    }
 
     .oaite__loop{
         &.swiper {
@@ -756,13 +901,10 @@
     }
 }
 
-.header{
-    &__wrap{
-        @include flex();
-    }
-}
 
 .footer-home{
+    background-color: $lb;
+    padding: 40px 0px;
     .sns{
         @include flex();
         justify-content: space-around;

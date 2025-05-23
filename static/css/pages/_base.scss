@@ -302,6 +302,7 @@
                 button{
                     background-color: $mc;
                     transition: background-color 0.3s ease;
+                    color: white;
                     &:hover{
                         background-color: lighten($mc, 10%);
                     }
