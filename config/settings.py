@@ -10,13 +10,18 @@ import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")   
 
-# ───────── デフォルト = SQLite（ローカル） ─────────
+
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "exmatch_local",
+        "USER": "exuser",
+        "PASSWORD": "admin",
+        "HOST": "localhost",
+        "PORT": "",
     }
 }
+
 
 # ───────── Heroku など DATABASE_URL が定義されている環境では Postgres ─────────
 if "DATABASE_URL" in os.environ:
