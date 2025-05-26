@@ -343,6 +343,24 @@ body {
   padding-top: 16px;
   padding-bottom: 16px;
 }
+.footer__wrap .chat {
+  position: relative;
+}
+.footer__wrap .chat .badge {
+  position: absolute;
+  top: -6px;
+  left: -10px;
+  width: 16px;
+  height: 16px;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  font-size: clamp(0.8rem, 0.7346938776rem + 0.2040816327vw, 1rem);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+}
 
 .mm-spn.mm-spn--light {
   background-color: unset;
@@ -2534,6 +2552,9 @@ body {
 .feed .box .btn__area .message {
   background-color: #F07884;
 }
+.feed.no-lciq .profile img {
+  filter: blur(4px) !important;
+}
 
 .feed-mini {
   display: grid;
@@ -2596,6 +2617,9 @@ body {
 .feed-mini .area button {
   color: white;
   padding: 8px;
+}
+.feed-mini .no-lciq .profile-feed-mini img {
+  filter: blur(4px) !important;
 }
 
 .unverified img.user-thumb {

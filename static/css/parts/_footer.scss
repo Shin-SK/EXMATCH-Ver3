@@ -11,5 +11,21 @@
 		justify-content: space-between;
 		padding-top: 16px;
 		padding-bottom: 16px;
+		.chat{
+			position: relative;
+			.badge{
+				position: absolute;
+				top: -6px;
+				left: -10px;
+				width: 16px;
+				height: 16px;
+				background-color: red;
+				color: white;
+				border-radius: 50%;
+				@include fs(8);
+				@include flex();
+				font-weight: bold;
+			}
+		}
 	}
 }

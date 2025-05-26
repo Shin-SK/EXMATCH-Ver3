@@ -92,7 +92,7 @@
     <ul class="footer__wrap container">
         <li><a href="{% url 'my_page' %}"><span class="material-symbols-outlined">person</span></a></li>
         <li><a href="{% url 'userprofile_list' %}"><span class="material-symbols-outlined">search</span></a></li>
-        <li><a href="{% url 'chat_index' %}"><span id="notif-badge" class="badge" style="display:none;">0</span><span class="material-symbols-outlined">mail</span></a></li>
+        <li class="chat"><a href="{% url 'chat_index' %}"><span id="notif-badge" class="badge" style="display:none;">0</span><span class="material-symbols-outlined">mail</span></a></li>
         <!-- <li><a href="{% url 'account_logout' %}">ログアウト</a></li> -->
     </ul>
 </footer>
@@ -133,7 +133,7 @@ window.addEventListener('load', () => {
       .then(({unread}) => {
         if(unread){
           badge.textContent = unread;
-          badge.style.display = 'inline-block';
+          badge.style.display = 'flex';
         }else{
           badge.style.display = 'none';
         }

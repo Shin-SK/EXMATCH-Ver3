@@ -2,7 +2,7 @@
 {% load static %}
 
 {% for user_obj in users %}
-<div class="feed">
+<div class="feed {% if not lciq_done %}no-lciq{% endif %}">
     <div class="box">
       <div class="box__wrap">
           <div class="profile image">

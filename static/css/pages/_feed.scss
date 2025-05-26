@@ -122,6 +122,13 @@
 			}
 		}
 	}//box
+	&.no-lciq{
+		.profile{
+			img{
+				filter: blur(4px)!important;
+			}
+		}
+	}
 }
 
 .feed-mini{
@@ -182,6 +189,16 @@
 		button{
 			color: white;
 			padding: 8px;
+		}
+	}
+
+
+
+	.no-lciq{
+		.profile-feed-mini{
+			img{
+				filter: blur(4px)!important;
+			}
 		}
 	}
 }

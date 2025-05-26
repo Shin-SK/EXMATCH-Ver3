@@ -70,7 +70,6 @@ def my_page(request):
 
     missing_total = missing_fixed_cnt + missing_custom_cnt
 
-
     # --- いいね数をカウント ---
     like_count = Match.objects.filter(
         to_user=profile.user,  # ログインユーザーが「いいね」を受けた
@@ -78,7 +77,21 @@ def my_page(request):
     ).count()
 
     # lciqの入力したかどうか
-    lciq_done = profile.has_lciq() 
+    lciq_done = bool(profile.lciq_image)
+
+    # --- ② プロフィール全部埋まった？ ---
+    all_filled = (missing_total == 0)
+
+    # --- ③ スタンダード会員？ ---
+    is_standard = profile.is_standard_plan()
+
+    # --- ④ プラスプロフィールを書いた？ ---
+    plus_filled = (
+        ProfileFieldValue.objects
+        .filter(user_profile=profile, field__category='plus')
+        .exclude(value__in=["", None])
+        .exists()
+    )
 
     # --- lciqポイント取得 --- #
     lciq_val_obj = profile_field_values.filter(field__field_key='lciq_score').first()
@@ -129,6 +142,9 @@ def my_page(request):
         'liked_users': liked_users,
         "missing_total": missing_total,
         "lciq_done": lciq_done,
+        "all_filled": all_filled,
+        "is_standard": is_standard,
+        "plus_filled": plus_filled,
     })
 
 @login_required
@@ -143,7 +159,6 @@ def likes_received_list(request):
                   {'likes_received': likes_received})
 
 
-# core/views.py
 @login_required
 def profile_edit(request):
     profile = request.user.userprofile
@@ -169,7 +184,7 @@ def profile_edit(request):
     })
 
 
-# core/views.py  ※ user_profile_detail だけ抜粋
+
 @login_required
 def user_profile_detail(request, user_id):
     target_user = get_user_model().objects.select_related('userprofile').get(id=user_id)
@@ -245,9 +260,6 @@ def user_profile_detail(request, user_id):
     })
 
 
-
-
-# core/views.py
 @login_required
 def footprint_list(request):
     """
