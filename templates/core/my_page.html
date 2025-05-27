@@ -22,40 +22,36 @@
 		<div class="image">
 			{% if profile.profile_image %}
 			<img src="{{ profile.profile_image.url }}" alt="プロフィール画像">
-		{% else %}
-		
+			{% else %}
 			<img src="{% static 'img/user-unset.webp' %}" alt="">
-		{% endif %}
-		</div>
-		<div class="base-profile">
+			{% endif %}
 			<div class="text">
-				<div class="name"> {{ profile.nickname }}</div>
-				<button><a href="{% url 'profile_edit' %}">プロフィールを編集する</a></button>
+				<div class="name"> {{ profile.nickname }}<span>{{ profile.main_area }}</span></div>
 			</div>
-			
-			<div class="area">
-				<div class="box grid grid-cols-2">
-					<div class="head">メインエリア</div>
-					<div class="text">{{ profile.main_area }}</div>
+		</div>
+		<div class="lciq-score">
+			<div class="wrap">
+				<div class="lciq-shot">
+					{% if profile.lciq_image %}
+					<img src="{{ profile.lciq_image.url }}" alt="LCIQ スクリーンショット">
+					{% else %}
+						<img src="{% static 'img/noimage.jpg' %}" alt="">
+					{% endif %}
 				</div>
-				<div class="box">
-					<div class="head">自己紹介</div>
-					<div class="text">{{ profile.bio }}</div>
+				<div class="head-area">
+					<div class="title">LCIQスコア</div>
+					<div class="numb">{{ lciq_value }}</div>
 				</div>
-			</div>
+				<div class="button-area">
+					<button class="yellow"><a href="https://exm.lciq.jp/">再診断</a></button>
+					<a class="point" href="https://exm.lciq.jp/">スコアをあげるには？<i class="fas fa-angle-right"></i></a>
+				</div>
+		</div>
 		</div>
 	</section>
 
 	<section class="score">
 		<div class="score__wrap">
-			<div class="box lciq">
-				<div class="title">LCIQスコア</div>
-				<div class="numb">
-					{{ lciq_value }}
-				</div>
-				<button class="yellow"><a href="https://exm.lciq.jp/">再診断</a></button>
-				<a class="point" href="/">スコアをあげるには？<i class="fas fa-angle-right"></i></a>
-			</div>
 			<div class="box like">
 				<div class="title"><i class="fas fa-heart"></i>いいね</div>
 				<div class="numb">{{ like_count }}</div>
@@ -64,7 +60,7 @@
 			<div class="box prof">
 				<div class="title">プロフ充実度</div>
 				<div class="numb">{{ completeness_percent }}</div>
-				<button><a href="/">編集する</a></button>
+				<button><a href="{% url 'profile_edit' %}">編集する</a></button>
 				<div class="point">{{ answered_count }} / {{ total_fields }} 項目回答済み</div>
 			</div>
 		</div>
@@ -73,7 +69,7 @@
 	<section class="matched">
 		<div class="head-title">マッチしたユーザー</div>
 		<div class="area">
-			{% include 'core/partials/parts-userprofile.html' with users=matched_users only %}
+			{% include 'core/partials/parts-userprofile.html' with users=matched_users %}
 		</div>
 	</section>
 
@@ -104,6 +100,13 @@
 		<div class="toggleTitle" data-toggle="ap-area">あなたのプロフィール<i class="fas fa-chevron-right"></i></div>
 		<div class="wrap" data-content="ap-area" style="display: none;">
 			<div class="area">
+			<div class="area">
+				<div class="box">
+					<div class="head">自己紹介</div>
+					<div class="text">{{ profile.bio }}</div>
+				</div>
+			</div>
+
 				{% for pfv in profile_field_values %}
 				<div class="box grid grid-cols-[150px_1fr]">
 					<div class="head">{{ pfv.field.field_label }}</div>
@@ -181,7 +184,7 @@
 	</section>
 
 	<div class="logout" style="text-align:center; color: lightgray;">
-		<a href="{% url 'account_logout' %}">ログアウト</a></li>
+		<a href="{% url 'account_logout' %}">テスト用ログアウト</a>
 	</div>
 
 

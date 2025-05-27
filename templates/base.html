@@ -54,7 +54,7 @@
     </style>
     {% block extra_css %}{% endblock %}
 </head>
-<body class="{% if unverified %}unverified{% endif %} {%block base_class%}base{% endblock %} {% if not lciq_done %}lciq-unset{% endif %}">
+<body class="{% if unverified %}unverified{% endif %} {%block base_class%}base{% endblock %} {% if user.is_authenticated and not user.userprofile.lciq_image %}lciq-unset{% endif %}">
 
 <div id="loader" class="loader-overlay">
   <div class="sk-chase">
@@ -68,19 +68,26 @@
 </div>
 
   {% if request.resolver_match.url_name != "home" %}
-<header class="main-header container">
-    <div class="main-header__wrap">
+  <header class="main-header">
+    <button id="toggle-main"><span class="material-symbols-outlined">menu</span></button>
+    <nav id="menu-main">
       <div class="logo">
-        <a href="{% url 'my_page' %}">
+        <a href="/">
           <img src="{% static 'img/logo.svg' %}" alt="">
         </a>
       </div>
-      <div class="menu">
-        <span class="material-symbols-outlined">menu</span>
-      </div>
-    </div>
-</header>
+      <ul>
+        <li><a href="{% url 'my_page' %}">マイページ</a></li>
+        <li><a href="{% url 'userprofile_list' %}">検索</a></li>
+        <li><a href="{% url 'chat_index' %}">メッセージ</a></li>
+        <li><a href="{% url 'profile_edit' %}">設定</a></li>
+      </ul>
+    </nav>
+  </header>
+
 {% endif %}
+
+
 
 <main class="{% block main_container %}container{% endblock %} m-auto">
     {% block content %}

@@ -1,21 +1,4 @@
-// $(document).ready(function() {
-//     // midashiの位置を取得
-//     var blockPosition = $('.index #midashi').offset().top; // #midashi の位置を取得
-//     var isVisible = false; // 現在の表示状態を保持するフラグ
-
-//     $(window).on('scroll', function() {
-//         var scrollTop = $(this).scrollTop(); // 現在のスクロール位置を取得
-//         if (scrollTop > blockPosition && !isVisible) {
-//             $('#navigation').addClass('visible'); // visibleクラスを付与
-//             isVisible = true;
-//         } else if (scrollTop <= blockPosition && isVisible) {
-//             $('#navigation').removeClass('visible'); // visibleクラスを削除
-//             setTimeout(() => $('#navigation').css('visibility', 'hidden'), 500); // visibilityをhiddenに
-//             isVisible = false;
-//         }
-//     });
-// });
-
+// custom.js
   
 $(document).ready(function () {
     $("[data-toggle='click']").on("click", function () {
@@ -35,45 +18,71 @@ $(document).ready(function () {
 
 
 $(function () {
-  /* ===== 初期表示 ===== */
+  $('#female .slider').slick({
+    infinite:true, slidesToShow:1, variableWidth:true,
+    autoplay:true, autoplaySpeed:0, speed:6000, cssEase:'linear'
+  });
+
   $("#male").hide();
   $("#female").show();
-  $(".button-area button[data-toggle='female']").addClass("active"); // 初期active
+  $(".button-area button[data-toggle='female']").addClass("active");
 
-  /* ===== クリック ===== */
   $(".button-area button").on("click", function () {
-    const targetId = $(this).data("toggle");
+    const id = $(this).data("toggle");
+    const $loop   = $("#"+id).show();      // 先に表示
+    const $slider = $loop.find(".slider");
 
-    // 表示切り替え
-    $(".oaite__loop").hide();
-    $("#" + targetId).fadeIn();
+    // まだなら生成
+    if ( ! $slider.hasClass("slick-initialized") ){
+      $slider.slick({
+        infinite:true, slidesToShow:1, variableWidth:true,
+        autoplay:true, autoplaySpeed:0, speed:6000, cssEase:'linear'
+      });
+    }
 
-    // active切り替え
+    // 毎回 幅を再計算  ← ★これを追加
+    $slider.slick("setPosition");
+
+    $(".oaite__loop").not($loop).hide();
     $(".button-area button").removeClass("active");
     $(this).addClass("active");
   });
+
 });
 
 
+
   $(document).ready(function(){
-    $('.slider').slick({
+    $('.slide-area__wrap').slick({
+      dots: true,          // 下部インジケータ
+      arrows: false,       // 矢印不要なら
       infinite: true,
+      speed: 300,
       slidesToShow: 1,
       slidesToScroll: 1,
-      autoplay: true,
-      autoplaySpeed: 0,
-      speed: 6000,
-      cssEase: 'linear',
-      variableWidth: true
+      swipe: true,        // スワイプ操作を許可
+      touchMove: true,    // フリックで移動
+      draggable: true,    // PC でドラッグ移動
+      swipeToSlide: true  // 途中からでも次スライドへ
     });
   });
-
 
 const currentPage = window.location.pathname.split("/").pop().replace(".html", ""); 
 document.querySelectorAll('.nav__wrap .menu ul li a').forEach(link => {
     if (link.classList.contains(currentPage)) { 
         link.classList.add('current');
     }
+});
+
+
+// mmenu-light 初期化（1メニューだけならこれで OK）
+document.addEventListener('DOMContentLoaded', () => {
+  const mm   = new MmenuLight(document.getElementById('menu-main'), 'all');
+  mm.navigation();
+  const drawer = mm.offcanvas();
+
+  document.getElementById('toggle-main')
+          .addEventListener('click', e => { e.preventDefault(); drawer.open(); });
 });
 
 
@@ -117,6 +126,7 @@ setupPreview('formGroupFacePhoto', 'previewFace', 'clearButtonFace');
 setupPreview('formGroupPhoto1', 'previewPhoto1', 'clearButtonPhoto1');
 setupPreview('formGroupPhoto2', 'previewPhoto2', 'clearButtonPhoto2');
 setupPreview('formGroupPhoto3', 'previewPhoto3', 'clearButtonPhoto3');
+
 
 
 

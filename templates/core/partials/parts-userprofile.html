@@ -1,71 +1,94 @@
 <!-- templates/core/partials/parts-userprofile.html -->
 {% load static %}
 
-{% for user_obj in users %}
-<div class="feed {% if not lciq_done %}no-lciq{% endif %}">
-    <div class="box">
-      <div class="box__wrap">
-          <div class="profile image">
-            <a href="{% url 'user_profile_detail' user_id=user_obj.id %}">
-              {% if user_obj.userprofile and user_obj.userprofile.profile_image %}
-                <img src="{{ user_obj.userprofile.profile_image.url }}" alt="プロフィール画像">
-              {% else %}
-                <img src="{% static 'img/user-unset.webp' %}" alt="">
-              {% endif %}
-            </a>
-          </div>
-          <div class="area">
-              <div class="area__wrap">
-                  <div class="left">
-                      <div class="name__area">
-                          <!-- user_obj.username -->
-                          <span class="name">{{ user_obj.userprofile.nickname }}</span>
 
-                          <!-- user_obj.userprofile から年齢や住所を取得する例 -->
-                          <!-- もしUserProfileに age, adress, job, off, aftermatch などのフィールドがあれば... -->
-                          <span class="age">
-                            {{ user_obj.userprofile.custom_values.age }}
-                          </span>
-                          <span class="city">
-                            {{ user_obj.userprofile.custom_values.adress }}
-                          </span>
-                      </div>
-                      <div class="info__area">
-                          <div class="title">職業</div>
-                          <div class="job">{{ user_obj.userprofile.custom_values.job }}</div>
-                          <div class="title">休日</div>
-                          <div class="off">{{ user_obj.userprofile.custom_values.off }}</div>
-                          <div class="title">マッチ後</div>
-                          <div class="afterMatch">{{ user_obj.userprofile.custom_values.aftermatch }}</div>
-                      </div>
-                  </div>
-                  <div class="right">
-                      <div class="lciq-point">{{ user_obj.userprofile.lciq_score }}</div>
-                      <div class="image">
-                        {% if user_obj.userprofile and user_obj.userprofile.lciq_image %}
-                          <img src="{{ user_obj.userprofile.lciq_image.url }}" alt="プロフィール画像">
-                        {% else %}
-                          <img src="{% static 'img/noimage.jpg' %}" alt="">
-                        {% endif %}
-                      </div>
-                  </div>
-              </div>
-              <p>
-                {{ user_obj.userprofile.bio }}
-              </p>
-          </div><!-- area -->
-      </div><!-- box__wrap -->
-      <div class="btn__area">
-          <button class="like" data-color="blue"><i class="fas fa-heart"></i>いいね</button>
+<div class="feed">
+	{% for user_obj in users %}
+	<div class="box {% if user_obj.userprofile.has_option %}option-user{% endif %}">
+		<div class="box__wrap">
+			<div class="slide-area">
 
-          <button class="message" data-color="pink" onclick="location.href='{% url 'chat_room' user_id=user_obj.id %}'">
-          <i class="fas fa-comments"></i>メッセージ
-        </button>
-      </div>
-    </div><!-- box -->
+				<div class="slide-area__wrap">
+
+					<div class="slide avator">
+						<a href="{% url 'user_profile_detail' user_id=user_obj.id %}">
+							{% if user_obj.userprofile and user_obj.userprofile.profile_image %}
+								<img src="{{ user_obj.userprofile.profile_image.url }}" alt="プロフィール画像">
+							{% else %}
+								<img src="{% static 'img/user-unset.webp' %}" alt="">
+							{% endif %}
+						</a>
+					</div>
+					<div class="slide lciq-area">
+						<div class="image">
+							{% if user_obj.userprofile and user_obj.userprofile.lciq_image %}
+								<img src="{{ user_obj.userprofile.lciq_image.url }}" alt="プロフィール画像">
+							{% else %}
+								<img src="{% static 'img/noimage.jpg' %}" alt="">
+							{% endif %}
+						</div>
+					</div>
+
+				</div><!-- slickでスライド -->
+
+				<div class="absolute-area">
+					{% if user_obj.userprofile and user_obj.userprofile.lciq_image %}
+					<div class="lciq-score">
+						<span>{{ user_obj.userprofile.lciq_score }}</span>
+					</div>
+					{% endif %}
+					<div class="text-area">
+						<div class="name">
+							{{ user_obj.userprofile.nickname }}<span>{{ user_obj.userprofile.main_area }}</span>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="info-area">
+
+				<div class="profile-list">
+					<div class="wrap">
+						{% if user_obj.userprofile.normal_pfvs %}
+							{% for pfv in user_obj.userprofile.normal_pfvs %}
+								<div class="item">
+									<!-- <div class="label">
+										{{ pfv.field.field_label }}
+									</div> -->
+									<div class="value">
+										{{ pfv.value }}
+									</div>
+								</div>
+							{% endfor %}
+						{% else %}
+								<div class="item unset">プロフィール未入力</div>
+						{% endif %}
+					</div>
+
+					<div class="bio">
+						{% if user_obj.userprofile.bio %}
+							<p>{{ user_obj.userprofile.bio }}</p>
+						{% else %}
+							<p class="unset">自己紹介未入力</p>
+						{% endif %}
+					</div>
+				</div>
+
+			</div><!-- info-area -->
+		</div><!-- box__wrap -->
+		<div class="btn__area">
+			{% if user_obj.id in matched_set %}
+				<button class="message" data-color="pink" onclick="location.href='{% url 'chat_room' user_id=user_obj.id %}'"><i class="fas fa-comments"></i>メッセージ
+			</button>
+			{% else %}
+				<button class="like" data-color="blue"><span class="material-symbols-outlined">favorite</span>いいね</button>
+			{% endif %}
+		</div>
+	</div><!-- box -->
+	{% empty %}
+		<div class="epmty">
+			<a href="{% url 'userprofile_list' %}">出会いはすぐそこに</a>
+		</div>
+	{% endfor %}
 </div>
-{% empty %}
-  <div class="epmty">
-    <a href="{% url 'userprofile_list' %}">出会いはすぐそこに</a>
-  </div>
-{% endfor %}
+

@@ -115,6 +115,10 @@ TEMPLATES = [
     },
 ]
 
+TEMPLATES[0]["OPTIONS"]["context_processors"] += [
+    "core.context_processors.matched_set",
+]
+
 WSGI_APPLICATION = 'config.wsgi.application'
 
 
@@ -205,6 +209,7 @@ AUTHENTICATION_BACKENDS = [
 
 # --- Sign-Up / 認証設定 -------------------------------
 LOGIN_REDIRECT_URL = "/mypage/"
+ACCOUNT_LOGOUT_ON_GET = True
 
 ACCOUNT_EMAIL_SUBJECT_PREFIX = "" 
 

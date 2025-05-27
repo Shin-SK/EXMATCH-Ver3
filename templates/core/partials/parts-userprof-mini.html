@@ -1,7 +1,7 @@
 <!-- templates/core/partials/parts-userprof-mini.html -->
 {% load static %}
 
-	<div class="area {% if not lciq_done %}no-lciq{% endif %}">
+	<div class="area">
 		<div class="profile-feed-mini image">
 			<a href="{% url 'user_profile_detail' user_id=user_obj.id %}">
 				{% if user_obj.userprofile.profile_image %}

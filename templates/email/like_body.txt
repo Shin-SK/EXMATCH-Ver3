@@ -1,0 +1,6 @@
+{{ user.username }} さん
+
+{{ target.from_user.username }} さんがあなたにいいね！を送りました。
+プロフィールを確認してみましょう。
+
+ログイン: https://exmatch.jp/login

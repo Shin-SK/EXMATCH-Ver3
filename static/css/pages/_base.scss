@@ -2,9 +2,7 @@
 
 .base{
     padding-bottom: 60px;
-    // .container{
-    //     max-width: 768px;
-    // }
+    padding-top: 40px;
     .current{
         opacity: 1 !important;
     }
@@ -220,30 +218,39 @@
         }//nav
     }
 
-    $main-header-height: 50px;
     .main-header{
         @include flex();
         width: 100%;
-        background-color: white;
-
-        // position: fixed;
-        // z-index: 99999;
-        // top: 0;
-        // left: 0;
-        // right: 0; 固定じゃなくていいのではなかろうか
-        // border-bottom: 1px lightgray solid;
-        &__wrap{
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            // height: $main-header-height;
-            padding: 8px 0px;
-            width: 100%;
-            .logo{
-                img{
-                    width: 100%;
-                    max-height: 30px; 
-                }
+        justify-content: flex-end;
+        position: absolute;
+        top: 0;
+        right: 0;
+        button{
+            background-color: rgba($color: white, $alpha: 0.8);
+            border-radius: 50%;
+            @include flex();
+            width: 64px;
+            height: 64px;
+            span{
+                @include fs(30);
+            }
+        }
+    }
+    .mm-spn{
+        .logo{
+            @include flex();
+            height: 50px;
+            img{
+                width: 100%;
+                max-height: 30px; 
+            }
+        }
+        &.mm-spn--navbar{
+            &::after{
+                display: none;
+            }
+            ul{
+                top: 50px;
             }
         }
     }

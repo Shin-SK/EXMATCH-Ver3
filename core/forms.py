@@ -58,33 +58,30 @@ class RegisterRequiredForm(forms.ModelForm):
 
 
 class DynamicProfileFieldForm(forms.Form):
-    """
-    通常フィールド + プラスフィールド をまとめて動的生成するフォーム
-    - プラスフィールド(category='plus') は
-      user_profile.is_standard_plan() or user_profile.has_option() が True のときだけ表示
-    """
-
     def __init__(self, *args, user_profile: UserProfile, **kwargs):
         self.user_profile = user_profile
         super().__init__(*args, **kwargs)
 
-        # -------------------------------------------------
-        # 権限判定：プラスプロフィールを編集できるか？
-        # -------------------------------------------------
         can_use_plus = (
             user_profile.is_standard_plan() or
             user_profile.has_option()
         )
 
+        # ① ここで初期化
+        self.category_map = {}
+
         # 取得対象
         qs = ProfileField.objects.all()
         if not can_use_plus:
-            qs = qs.filter(category='normal')   # plus は除外
+            qs = qs.filter(category='normal')
 
         for pf in qs:
             field_name = f"dynamic_{pf.field_key}"
 
-            # 既存値を取得
+            # ② カテゴリを記録
+            self.category_map[field_name] = pf.category   # 'normal' / 'plus'
+
+            # ------- 既存のフォームフィールド生成ロジック ---------
             existing_value = (
                 ProfileFieldValue.objects
                 .filter(user_profile=user_profile, field=pf)
@@ -93,44 +90,36 @@ class DynamicProfileFieldForm(forms.Form):
             )
             existing_list = existing_value.split(",") if existing_value else []
 
-            # -------------------------------------------------
-            # フィールド種別ごとのフォームフィールド生成
-            # -------------------------------------------------
             if pf.field_type == 'text':
                 self.fields[field_name] = forms.CharField(
                     label=pf.field_label,
                     required=False,
-                    initial=existing_value
+                    initial=existing_value,
                 )
 
             elif pf.field_type in ('select', 'radio'):
-                choices = [
-                    (c.strip(), c.strip())
-                    for c in pf.field_choices.splitlines()
-                    if c.strip()
-                ]
+                choices = [(c.strip(), c.strip())
+                           for c in pf.field_choices.splitlines() if c.strip()]
                 widget = forms.RadioSelect if pf.field_type == 'radio' else None
                 self.fields[field_name] = forms.ChoiceField(
                     label=pf.field_label,
                     choices=choices,
                     widget=widget,
                     required=False,
-                    initial=existing_value
+                    initial=existing_value,
                 )
 
             elif pf.field_type == 'checkbox':
-                choices = [
-                    (c.strip(), c.strip())
-                    for c in pf.field_choices.splitlines()
-                    if c.strip()
-                ]
+                choices = [(c.strip(), c.strip())
+                           for c in pf.field_choices.splitlines() if c.strip()]
                 self.fields[field_name] = forms.MultipleChoiceField(
                     label=pf.field_label,
                     choices=choices,
                     widget=forms.CheckboxSelectMultiple,
                     required=False,
-                    initial=existing_list
+                    initial=existing_list,
                 )
+
 
     # -------------------------------------------------
     # 保存ロジック

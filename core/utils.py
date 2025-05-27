@@ -1,7 +1,8 @@
 # core/utils.py
 import math, requests
-from django.db.models import Q
-from core.models import Match
+from django.db.models import Q, Prefetch
+from core.models import Match, ProfileFieldValue, ProfileField
+
 
 def get_matched_users(user):
     """
@@ -48,3 +49,17 @@ def haversine_distance(lat1, lon1, lat2, lon2):
 def unverified(user):
     """ログイン済み & LCIQ入力済みなら False → ぼかさない"""
     return (not user.is_authenticated) or not getattr(user.userprofile, "lciq", "")
+
+
+
+
+def attach_normal_pfv(user_qs):
+    normal_pfv = Prefetch(
+        "userprofile__profilefieldvalue_set",
+        queryset=ProfileFieldValue.objects
+                 .select_related("field")
+                 .filter(field__category="normal"),
+        to_attr="normal_pfvs"   # ← これで user_obj.normal_pfvs が使える
+    )
+    return user_qs.prefetch_related(normal_pfv)
+

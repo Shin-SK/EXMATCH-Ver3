@@ -1,8 +1,11 @@
 {% extends "base.html" %}
-{%block base_class%}{% endblock %}
+
+{% block base_class%}{% endblock %}
 {% block main_container %}{% endblock %}
 {% block footer_class %}d-none{% endblock %}
+
 {% load static %}
+{% load profile_extras %}
 
 {% block title %}トップページ{% endblock %}
 
@@ -15,11 +18,11 @@
                 <a href=""><img src="{% static 'img/logo.svg' %}" alt=""></a>
             </div>
             <ul class="menu">
-                <li><a href="">特徴</a></li>
-                <li><a href="">お客様の声</a></li>
-                <li><a href="">お相手検索</a></li>
-                <li><a href="">料金</a></li>
-                <li><a href="">ログイン</a></li>
+                <li><a href="#midashi">特徴</a></li>
+                <li><a href="#koe">お客様の声</a></li>
+                <li><a href="#search">お相手検索</a></li>
+                <li><a href="#price">料金</a></li>
+                <li><a href="{% url 'account_login' %}">ログイン</a></li>
             </ul>
         </div>
         <div class="header__wrap sp">
@@ -28,11 +31,11 @@
             </div>
             <nav id="menu">
                 <ul class="menu">
-                    <li><a href="">特徴</a></li>
-                    <li><a href="">お客様の声</a></li>
-                    <li><a href="">お相手検索</a></li>
-                    <li><a href="">料金</a></li>
-                    <li><a href="">ログイン</a></li>
+                    <li><a href="#midashi">特徴</a></li>
+                    <li><a href="#koe">お客様の声</a></li>
+                    <li><a href="#search">お相手検索</a></li>
+                    <li><a href="#price">料金</a></li>
+                    <li><a href="{% url 'account_login' %}">ログイン</a></li>
                 </ul>
             </nav>
             <button class="nav-button" id="toggle"><span class="material-symbols-outlined">menu</span></button>
@@ -54,7 +57,7 @@
                     </h3>
                     <div class="wrap">
                         <a class="button" href="{% url 'account_signup' %}">さっそくはじめる</a>
-                        <a class="login" href="">ログイン</a>
+                        <a class="login" href="{% url 'account_login' %}">ログイン</a>
                     </div>
                 </div>
             </div>
@@ -183,44 +186,63 @@
             <!-- 女性 -->
             <div class="oaite__loop" id="female">
               <div class="oaite__wrap slider">
-                {% for p in female_profiles %}
-                  <div class="box">
-                    <a href="{% url 'user_profile_detail' p.user.id %}">
-                      <div class="image">
-                        <img src="{% if p.profile_image %}{{ p.profile_image.url }}{% else %}{% static 'img/user-unset.webp' %}{% endif %}" alt="">
+                {% for u in female_profiles %}
+                <div class="box">
+                    <a href="{% url 'user_profile_detail' u.id %}">
+                    <div class="image">
+                        <img src="{% if u.userprofile.profile_image %}
+                                    {{ u.userprofile.profile_image.url }}
+                                {% else %}
+                                    {% static 'img/user-unset.webp' %}
+                                {% endif %}" alt="">
+
                         <div class="info">
-                          <div class="name">{{ p.nickname|default:p.user.username }}</div>
-                          <div class="age">{{ p.age|default:'--' }}</div>
-                          <div class="lciq">{{ p.lciq|default:'--' }}</div>
+
+                            <div class="name">
+                                {{ u.userprofile.nickname|default:u.username }}
+                            </div>
+
+                            <div class="age">
+                            {{ u.userprofile.normal_pfvs|pfv_value:'age'|default:'--' }}
+                            </div>
+
+                            <div class="lciq">{{ u.userprofile.lciq_score|default:'--' }}</div>
                         </div>
-                      </div>
+                    </div>
                     </a>
-                  </div>
-                {% empty %}
-                  <p class="text-center">まだユーザーがいません</p>
+                </div>
                 {% endfor %}
+
               </div>
             </div>
             
             <!-- 男性 -->
             <div class="oaite__loop" id="male">
               <div class="oaite__wrap slider">
-                {% for p in male_profiles %}
-                  <div class="box">
-                    <a href="{% url 'user_profile_detail' p.user.id %}">
-                      <div class="image">
-                        <img src="{% if p.profile_image %}{{ p.profile_image.url }}{% else %}{% static 'img/user-unset.webp' %}{% endif %}" alt="">
+                {% for u in male_profiles %}
+                <div class="box">
+                    <a href="{% url 'user_profile_detail' u.id %}">
+                    <div class="image">
+                        <img src="{% if u.userprofile.profile_image %}
+                                    {{ u.userprofile.profile_image.url }}
+                                {% else %}
+                                    {% static 'img/user-unset.webp' %}
+                                {% endif %}" alt="">
+
                         <div class="info">
-                          <div class="name">{{ p.nickname|default:p.user.username }}</div>
-                          <div class="age">{{ p.age|default:'--' }}</div>
-                          <div class="lciq">{{ p.lciq|default:'--' }}</div>
+                        <div class="name">
+                            {{ u.userprofile.nickname|default:u.username }}
                         </div>
-                      </div>
+                        <div class="age">
+                        {{ u.userprofile.normal_pfvs|pfv_value:'age'|default:'--' }}
+                        </div>
+                        <div class="lciq">{{ u.userprofile.lciq_score|default:'--' }}</div>
+                        </div>
+                    </div>
                     </a>
-                  </div>
-                {% empty %}
-                  <p class="text-center">まだユーザーがいません</p>
+                </div>
                 {% endfor %}
+
               </div>
             </div>
 
@@ -232,7 +254,7 @@
     </section>
 
 
-	<section class="price-home" id="price">
+	<section class="price-home container" id="price">
         <div class="mainTitle">ご利用料金</div>
         <div class="subtitle">
             一般的な結婚相談所での料金は、成婚まで平均して約30万円前後*。<br>
@@ -242,7 +264,7 @@
         </div>
 
         <div class="price-home__wrap">
-            <div class="free-area frame-area container">
+            <div class="free-area frame-area">
                 <div class="box">
                     <div class="head">フリー<span>FREE</span></div>
                     <div class="wrap">
@@ -490,12 +512,11 @@
 
 
     <footer class="footer-home">
-        <div class="sns">
+        <div class="sns container">
             <a class="youtube" href="" target="_blank"><img src="{% static 'img/sns-youtube.webp' %}" alt=""></a>
             <a class="tiktok" href="" target="_blank"><img src="{% static 'img/sns-tiktok.webp' %}" alt=""></a>
         </div>
-        <div class="footer-home__wrap">
-            <div class="logo"><a href="/"><img src="{% static 'img/logo.svg' %}" alt="Logo"></a></div>
+        <div class="footer-home__wrap container">
             <ul>
                 <li><a href="/">会社概要</a></li>
                 <li><a href="/">利用規約</a></li>
@@ -511,6 +532,7 @@
                 <li><a href="/">記事提供元一覧</a></li>
             </ul>
         </div>
+        <div class="logo"><a href="/"><img src="{% static 'img/logo.svg' %}" alt="Logo"></a></div>
         <div class="cr"><a href="/">&copy; 2024 EXMATCH</a></div>
     </div>
 

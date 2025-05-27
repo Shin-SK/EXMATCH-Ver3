@@ -2,7 +2,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% block title %}{{ profile.nickname }}{% endblock %}
-
+{% block main_container %}{% endblock %} 
 {% block content %}
 <section class="profile-detail">
 
@@ -17,8 +17,11 @@
 	<div class="profile">
 		<div class="profile__main">
 			<div class="head field">
-				{{ profile.nickname }} /
-				<div class="wrap">{{ profile.age }}<span>歳</span></div>
+				{{ profile.nickname }}
+			</div>
+			<div class="main-area field">
+				<span>メインエリア</span>
+				{{ profile.main_area }}
 			</div>
 			<div class="bio field">{{ profile.bio }}</div>
 		</div>

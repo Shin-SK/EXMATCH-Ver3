@@ -5,7 +5,10 @@
 
 {% block content %}
 <section class="login container">
-  <h1>ログイン</h1>
+	<div class="head-set">
+		<h2>LOGIN</h2>
+		<h3>ログイン</h3>
+	</div>
 
   <form method="post" action="{% url 'account_login' %}" class="form">
     {% csrf_token %}

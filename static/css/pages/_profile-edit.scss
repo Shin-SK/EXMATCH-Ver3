@@ -55,7 +55,8 @@
 							}
 						}
 					}
-				}
+
+				}//item
 				&.lciq{
 					.item{
 						.field{
@@ -76,7 +77,19 @@
 						}
 					}
 				}
-			}
+				&.plus{
+					background-color: rgba($color: $pink, $alpha: 0.2);
+					.item{
+						label{
+							&:has(> input:checked) {
+							background: $pink;      /* 好きな色へ */
+							color: #fff;
+							border-color: $pink;
+                			}
+						}
+					}
+				}
+			}//items
 		}
 	}
 	.lciq-text{

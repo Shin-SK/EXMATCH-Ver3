@@ -322,6 +322,8 @@
                 }
                 .box{
                     flex-shrink: 0;
+                    width: 200px;
+                    height: 200px;
                     .image{
                         position: relative;
                         z-index: 0;
@@ -501,7 +503,7 @@
                     gap: 16px;
                     margin-top: 40px;
                     overflow-x: auto;
-                    justify-content: center;
+                    justify-content: start;
                     padding: 16px 0px;
                     @include md{
                         grid-template-columns: repeat(3,80vw);
@@ -909,28 +911,11 @@
         @include flex();
         justify-content: space-around;
         img{
-            max-height: 50px;
+            max-height: 40px;
         }
     }
     &__wrap{
-        margin-top: 40px;
-        display: grid;
-        grid-template-columns: 1fr 3fr;
-        gap: 40px;
-        align-items: center;
-        @include md{
-            grid-template-columns: 1fr;
-            gap: 16px;
-        }
-        .logo{
-            img{
-                max-width: 200px;
-                @include md{
-                    display: block;
-                    margin: 0 auto;
-                }
-            }
-        }
+        margin: 40px auto;
         ul{
             display: grid;
             grid-auto-flow: column;
@@ -945,6 +930,13 @@
                     @include fs(12);
                 }
             }
+        }
+    }
+    .logo{
+        @include flex();
+        img{
+            width: 150px;
+            height: auto;
         }
     }
     .cr{

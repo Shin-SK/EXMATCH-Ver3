@@ -17,7 +17,7 @@ from .filters import DynamicProfileFilter
 from .forms import ProfileEditForm, DynamicProfileFieldForm
 from .models import UserProfile, Match, Message, Footprint, ProfileFieldValue, ProfileField
 from notifications.models import Notification
-from core.utils import get_matched_users
+from core.utils import get_matched_users, attach_normal_pfv
 
 @login_required
 def my_page(request):
@@ -94,13 +94,7 @@ def my_page(request):
     )
 
     # --- lciqポイント取得 --- #
-    lciq_val_obj = profile_field_values.filter(field__field_key='lciq_score').first()
-
-    # ないなら '0'、あればその .value
-    if lciq_val_obj:
-        lciq_value = lciq_val_obj.value or '0'
-    else:
-        lciq_value = '0'
+    lciq_value = profile.lciq_score or '0'
 
     # matched のレコードをまとめて取得
     matched_records = Match.objects.filter(
@@ -116,6 +110,20 @@ def my_page(request):
         if partner not in seen:
             matched_users_list.append(partner)
             seen.add(partner)
+
+    # ★ ここで id だけ取り出す
+    matched_ids = [u.id for u in matched_users_list]
+
+    # Prefetch を付けた QuerySet を再取得
+    matched_qs  = attach_normal_pfv(
+                    get_user_model().objects.filter(id__in=matched_ids)
+                )
+    matched_users_list = list(matched_qs)
+
+    # ───────── リスト取得 ─────────
+    matched_qs = get_user_model().objects.filter(id__in=matched_ids)
+    matched_qs = attach_normal_pfv(matched_qs)      # ← たった１行追加
+    matched_users_list = list(matched_qs)           # あとは元と同じ
 
 
     # いいね「された」レコードを最新順で取得
@@ -178,9 +186,21 @@ def profile_edit(request):
         form_fixed = ProfileEditForm(instance=profile)
         form_dynamic = DynamicProfileFieldForm(user_profile=profile)
 
+    normal_fields = []
+    plus_fields   = []
+
+    for fname in form_dynamic.fields.keys():
+        cat = form_dynamic.category_map.get(fname, 'normal')
+        if cat == 'plus':
+            plus_fields.append(form_dynamic[fname])
+        else:
+            normal_fields.append(form_dynamic[fname])
+
     return render(request, 'core/profile_edit.html', {
         'form_fixed': form_fixed,
-        'form_dynamic': form_dynamic
+        'form_dynamic': form_dynamic,
+        'normal_fields'   : normal_fields,
+        'plus_fields'     : plus_fields
     })
 
 
@@ -352,32 +372,46 @@ def matched_list(request):
     )
     return render(request, 'core/matched_list.html', {'matches': matches})
 
+User = get_user_model()
 def home(request):
-    """
-    とりあえずのトップページ
-    """
-    latest_female = (UserProfile.objects
-                     .filter(gender='female')
-                     .select_related('user')
-                     .order_by('-user__date_joined')[:10])
+    # ① 男女それぞれ UserProfile → user_id を抽出
+    female_ids = (
+        UserProfile.objects.filter(gender='female')
+                           .order_by('-user__date_joined')[:10]
+                           .values_list('user_id', flat=True)
+    )
+    male_ids = (
+        UserProfile.objects.filter(gender='male')
+                           .order_by('-user__date_joined')[:10]
+                           .values_list('user_id', flat=True)
+    )
 
-    latest_male   = (UserProfile.objects
-                     .filter(gender='male')
-                     .select_related('user')
-                     .order_by('-user__date_joined')[:10])
+    # ② その ID で User を取得して attach_normal_pfv
+    latest_female = attach_normal_pfv(
+        User.objects.filter(id__in=female_ids)
+                    .select_related('userprofile')
+    )
+    latest_male = attach_normal_pfv(
+        User.objects.filter(id__in=male_ids)
+                    .select_related('userprofile')
+    )
+
     if request.user.is_authenticated:
-        return redirect("my_page")
+        return redirect('my_page')
 
-    return render(request, "core/home.html",
-                  {"female_profiles": latest_female,
-                   "male_profiles":   latest_male})
+    return render(request, 'core/home.html', {
+        'female_profiles': latest_female,
+        'male_profiles':   latest_male,
+    })
 
 
 @login_required
 def user_list(request):
-    # ログインユーザー以外を一覧表示
     User = get_user_model()
-    all_users = User.objects.exclude(id=request.user.id)
+    all_users = attach_normal_pfv(          # ← ここで Prefetch
+        User.objects.exclude(id=request.user.id)
+        .select_related('userprofile')
+    )
     return render(request, 'core/user_list.html', {
         'all_users': all_users
     })
@@ -519,11 +553,21 @@ class UserProfileListView(LoginRequiredMixin, FilterView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # すでに FilterView なので self.filterset.qs は UserProfile のQS
+
+        # ↓ ① 検索結果 (UserProfile QS) を取得
         profiles = self.filterset.qs
 
-        # UserProfile → Userへ変換
-        context["users"] = [p.user for p in profiles]
+        # ↓ ② そこから user_id を抽出
+        user_ids = profiles.values_list('user_id', flat=True)
+
+        # ↓ ③ attach_normal_pfv で normal_pfvs を事前取得
+        users_qs = attach_normal_pfv(
+            get_user_model()
+            .objects.filter(id__in=user_ids)
+            .select_related('userprofile')
+        )
+
+        context["users"] = users_qs   # ← 置き換え
         return context
 
 

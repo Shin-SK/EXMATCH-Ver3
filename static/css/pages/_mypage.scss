@@ -27,8 +27,9 @@
                 gap: 0;
             }
             .image{
+                position: relative;
                 background-color: $lb;
-                padding: 24px;
+                padding: 16px;
                 @include flex();
                 border-radius: 10px;
                 width: 100%;
@@ -45,36 +46,81 @@
                     object-fit: cover;
                     object-position: center;
                 }
-            }
-            .text{
-                @include flex();
-                align-items: flex-start;
-                gap: 24px;
-                flex-direction: column;
-                .name{
-                    font-weight: bold;
-                    @include fs(20);
-                }
-                button{
-                    color: white;
-                    cursor: pointer;
-                    a{
-                        padding: 8px;
+                .text{
+                    position: absolute;
+                    bottom: 0;
+                    padding: 32px 8px 24px;
+                    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.8) 30%);
+                    @include flex();
+                    width: 100%;
+                    .name{
+                        font-weight: bold;
+                        width: 100%;
+                        display: flex;
+                        justify-content: center;
+                        align-items: baseline;
+                        @include fs(20);
+                        span{
+                            @include fs(14);
+                            @include flex();
+                            &::before{
+                                @include gi("location_on");
+                            }
+                        }
                     }
                 }
-            }
+            }//image
+
+            .lciq-score{
+                @include flex();
+                .wrap{
+                    width: 80%;
+                    @include flex();
+                    flex-direction: column;
+                    .head-area{
+                        @include flex();
+                        align-items: baseline;
+                        gap: 8px;
+                        margin-bottom: 8px;
+                        .title{
+                            @include fs(14);
+                            font-weight: bold;
+                            margin-bottom: 4px;
+                        }
+                        .numb{
+                            color: $lciq;
+                            @include fs(50);
+                            font-weight: bold;
+                            line-height: 100%
+                        }
+                    }
+                    .lciq-shot{
+                        @include flex();
+                        margin-bottom: 8px;
+                    }
+                    .button-area{
+                        width: 100%;
+                        button{
+                            background-color: $lciq;
+                            a{
+                                padding: 0px;
+                            }
+                        }
+                        .point{
+                            @include fs(12);
+                            @include flex();
+                            margin-top: 8px;
+                        }
+                    }
+                }
+            }//lciq-score
         }//profile
+
         .score{
             background-color: $lb;
             &__wrap{
                 display: grid;
-                grid-template-columns: 1fr 1fr 1fr;
-                @include md{
-                    grid-template-areas:
-                    "lciq like"
-                    "prof prof"; /* 横長 */
-                    grid-template-columns: 1fr 1fr; /* 上の2つを均等に */
-                }
+                grid-template-columns: repeat(2,1fr);
                 .box{
                     @include flex();
                     flex-direction: column;
@@ -82,7 +128,10 @@
                     gap: 8px;
                     height:  200px;
                     padding: 16px;
-
+                    border-right: 1px white solid;
+                    &:last-of-type{
+                        border-right: unset;
+                    }
                     .point{
                         position: absolute;
                         bottom: 8px;
@@ -99,7 +148,7 @@
                     .title{
                         @include fs(16);
                         font-weight: normal;
-                    }
+                    }   
                     .numb{
                         @include fs(40);
                         font-weight: bold;
@@ -110,7 +159,7 @@
                         width: 100%;
                         }
                         a{
-                            padding: 4px;
+                            padding: 0px;
                             @include fs(12);
                         }
                         &.yellow{
@@ -121,32 +170,13 @@
                         }
                     }
                 }
-                .lciq, .like{
-                    border-right: 1px white solid;
-                    @include md{
-                    border-right: unset;
-                    }
-                }
-                .lciq{
-                    @include md{
-                    grid-area: lciq;
-                    border-right: 1px white solid;
-                    }
-                }
                 .like{
-                    @include md{
-                        grid-area: like;
-                    }
                     i{
                         color: $pink;
                         margin-right: 4px;
                     }
                 }
                 .prof{
-                    @include md{
-                    border-top: 1px white solid;
-                    grid-area: prof;
-                    }
                     .numb{
                         @include flex();
                         align-items: baseline;

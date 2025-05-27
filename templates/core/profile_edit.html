@@ -99,13 +99,26 @@
 
             <h2>マッチ率アップ！選択項目</h2>
             <div class="items">
-            {% for field in form_dynamic.visible_fields %}
-                {% if field.name not in "dynamic_lciq_image dynamic_lciq_score" %}
+            {% for field in normal_fields %}
                 <div class="item">
-                    <div class="head">{{ field.label }}</div>
-                    {{ field|add_class:"field" }}
+                <div class="head">{{ field.label }}</div>
+                {{ field|add_class:"field" }}
                 </div>
-                {% endif %}
+            {% empty %}
+                <p class="note">通常プロフィール項目はありません。</p>
+            {% endfor %}
+            </div>
+
+
+            <h2>プラスプロフィール</h2>
+            <div class="items plus">
+            {% for field in plus_fields %}
+                <div class="item">
+                <div class="head">{{ field.label }}</div>
+                {{ field|add_class:"field" }}
+                </div>
+            {% empty %}
+                <p class="note">※ スタンダード会員かオプション加入で編集できます</p>
             {% endfor %}
             </div>
 
@@ -124,9 +137,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const input = document.querySelector('input.filepond');
   if (!input) return;
-    FilePond.parse(document.body);
-  FilePond.create(input, {
+
+    FilePond.create(input, {
     storeAsFile: true,
+    allowProcess: false,   // （ファイルを Ajax で送らず form に乗せる）
     labelIdle  : '画像をドラッグ＆ドロップ<br><span class="filepond--label-action">クリックして選択</span>'
   });
 });
