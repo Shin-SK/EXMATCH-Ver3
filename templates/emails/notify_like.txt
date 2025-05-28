@@ -1,0 +1,11 @@
+{{ to_profile.nickname|default:to_user.username }} 様
+
+{{ from_profile.nickname|default:from_user.username }} さんが
+あなたを「いいね！」しました 👍
+
+マイページの「いいね一覧」からご確認ください。
+https://exmatch.jp/mypage/
+
+-----------
+送信日時 : {{ now|date:"Y-m-d H:i" }}
+EXMATCH 運営

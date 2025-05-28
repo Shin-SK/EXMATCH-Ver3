@@ -8,7 +8,7 @@ Chat with {{ target_user.username }}
 
 {% block content %}
 
-<div class="chat chat-room container">
+<div class="chat chat-room">
 
   <h1>{{ target_user.username }} さんとのチャット</h1>
 
@@ -38,33 +38,41 @@ Chat with {{ target_user.username }}
   <p class="back-index"><a href="{% url 'chat_index' %}">マッチ一覧へ戻る</a></p>
   
 </div>
+
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  const list   = document.getElementById('messages');
-  let lastId   = Number(list.dataset.lastid) || 0;
-  const API    = "{% url 'chat_api' user_id=target_user.id %}";
-  const CURRENT = "{{ request.user.username|escapejs }}";   // ← 自分の名前をJSへ
-const MY_AVATAR = "{% if request.user.userprofile.profile_image %}
-                     {{ request.user.userprofile.profile_image.url }}
-                   {% else %}
-                     {% static 'img/user-unset.webp' %}
-                   {% endif %}";
+  /* ----------------  初期変数  ---------------- */
+  const list       = document.getElementById('messages');
+  let   lastId     = Number(list.dataset.lastid) || 0;
+  const API        = "{% url 'chat_api' user_id=target_user.id %}";
+  const CURRENT    = "{{ request.user.username|escapejs }}";
+  const MY_AVATAR  = `{% if request.user.userprofile.profile_image %}
+                        {{ request.user.userprofile.profile_image.url }}
+                      {% else %}
+                        {% static 'img/user-unset.webp' %}
+                      {% endif %}`.trim();
 
-function append(m){
-  const isMe = (m.sender === CURRENT);
-  const li   = document.createElement('li');
-  li.className = isMe ? 'me' : 'you';
+  /* ---------- Django が埋めた CSRF トークンを取得 ---------- */
+  const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-  const avatar = isMe ? MY_AVATAR : m.avatar;
-  li.innerHTML =
-    (isMe ? '' : `<img class="avatar" src="${avatar}" alt="">`) +
-    `<div class="bubble">${m.text}</div>`;
+  /* ---------------- メッセージ描画 ---------------- */
+  function append(m){
+    const isMe = (m.sender === CURRENT);
+    const li   = document.createElement('li');
+    li.className = isMe ? 'me' : 'you';
 
-  list.appendChild(li);
-  li.scrollIntoView();
-  lastId = m.id;
-}
+    const avatar = isMe ? MY_AVATAR : m.avatar;
+    li.innerHTML =
+      (isMe ? '' : `<img class="avatar" src="${avatar}" alt="">`) +
+      `<div class="bubble">${m.text}</div>`;
 
+    list.appendChild(li);
+    li.scrollIntoView({block:'end'});
+    lastId = m.id;
+  }
+
+  /* ---------------- ポーリング ---------------- */
   function poll(){
     fetch(`${API}?after=${lastId}`)
       .then(r => r.json())
@@ -74,21 +82,30 @@ function append(m){
   poll();
   setInterval(poll, 5000);
 
-  // 送信
-  const form = document.getElementById('chatForm');
+  /* ---------------- 送信処理 ---------------- */
+  const form  = document.getElementById('chatForm');
   const input = document.getElementById('msgInput');
+
   form.addEventListener('submit', e => {
     e.preventDefault();
-    if(!input.value.trim()) return;
-    // 通常の POST で送信 → サーバが 302 で同ページへ
+    const text = input.value.trim();
+    if (!text) return;
+
     fetch(location.href, {
       method: 'POST',
-      headers: {'X-CSRFToken': '{{ csrf_token }}'},
-      body: new URLSearchParams({text: input.value.trim()})
-    }).then(() => { input.value=''; poll(); });
+      credentials: 'same-origin',           // ← Cookie も送る
+      headers: {
+        'X-CSRFToken': csrftoken,           // ← 正しいトークンをセット
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: new URLSearchParams({ text })
+    })
+    .then(() => { input.value = ''; poll(); })
+    .catch(console.error);
   });
 });
 </script>
+
 
     
 

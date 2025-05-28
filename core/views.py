@@ -19,6 +19,14 @@ from .models import UserProfile, Match, Message, Footprint, ProfileFieldValue, P
 from notifications.models import Notification
 from core.utils import get_matched_users, attach_normal_pfv
 
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.core.mail import send_mail, EmailMessage
+from django.conf import settings
+from .forms import ContactForm
+from django.template.loader import render_to_string
+
+
 @login_required
 def my_page(request):
     profile = request.user.userprofile
@@ -332,7 +340,7 @@ def follow_user(request, user_id):
 
     if existing_match:
         # 既にいいね済み
-        return redirect('user_list')
+        return redirect(request.GET.get("next", "userprofile_list"))
 
     # 新規に「いいね」を作成
     my_match = Match.objects.create(
@@ -357,7 +365,7 @@ def follow_user(request, user_id):
         # 相手からまだいいねが来ていない
         pass
 
-    return redirect('user_list')
+    return redirect(request.GET.get("next", "userprofile_list"))
 
 
 @login_required
@@ -595,3 +603,60 @@ def chat_api(request, user_id):
     return JsonResponse({"messages": data})
 
 
+
+
+def contact_view(request):
+    if request.method == "GET":
+        initial = {}
+        if request.user.is_authenticated:
+            initial["email"] = request.user.email
+            # ニックネーム → フルネーム → ユーザ名 の順で埋める例
+            prof = getattr(request.user, "userprofile", None)
+            initial["name"] = (
+                getattr(prof, "nickname", "") or
+                request.user.get_full_name() or
+                request.user.username
+            )
+        form = ContactForm(initial=initial)
+    else:
+        form = ContactForm(request.POST)
+
+    if request.method == "POST" and form.is_valid():
+        cd = form.cleaned_data
+        context = {
+            **cd,
+            "subject_label": dict(ContactForm.SUBJECT_CHOICES).get(cd["subject"]),
+            "now": timezone.now(),
+        }
+
+        body_admin = render_to_string("emails/contact_admin.txt", context)
+        body_user  = render_to_string("emails/contact_user.txt", context)
+
+        # ────────── 管理者宛メール ──────────
+        email_admin = EmailMessage(
+            subject=f"[問い合わせ] {context['subject_label']}",
+            body    =body_admin,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to      =[settings.CONTACT_EMAIL],
+            reply_to=[cd["email"]],          # ★ ここが欲しいので EmailMessage を使用
+        )
+        email_admin.send()                   # ← send_mail ではなく send()
+
+        # ────────── ユーザー宛自動返信 ────────
+        email_user = EmailMessage(
+            subject="【EXMATCH】お問い合わせ受付いたしました。",
+            body    =body_user,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to      =[cd["email"]],
+        )
+        email_user.send()
+        
+        # フラッシュメッセージ & リダイレクト
+        messages.success(request, "お問い合わせを送信しました。ありがとうございました。")
+        return redirect("contact_done")
+
+    return render(request, "core/contact.html", {"form": form})
+
+def contact_done(request):
+    """送信完了ページ（テンプレートは簡単に）"""
+    return render(request, "core/contact_done.html")

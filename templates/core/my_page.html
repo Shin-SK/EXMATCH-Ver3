@@ -77,18 +77,21 @@
 	<section class="followed" id="followed">
 		<div class="head-title">いいねしてくれたユーザー</div>
 		<div class="area">
-			{% for like in likes_received_top %}
+			
 			<div class="feed feed-mini">
+				{% for like in likes_received_top %}
 				{% include "core/partials/parts-userprof-mini.html" with user_obj=like.from_user created=like.created_at %}
+				{% empty %}
+				<div class="epmty flex-center">
+					<a class="a-button" href="{% url 'user_list' %}">出会いはすぐそこに</a>
+				</div>
+				{% endfor %}
 			</div>
+
+			
 			<p class="more text-center">
-				<a href="{% url 'likes_received_list' %}">一覧を見る<i class="fas fa-angle-right"></i></a>
+			<a href="{% url 'likes_received_list' %}">一覧を見る<i class="fas fa-angle-right"></i></a>
 			</p>
-			{% empty %}
-			<div class="epmty flex-center">
-				<a class="a-button" href="{% url 'user_list' %}">出会いはすぐそこに</a>
-			</div>
-			{% endfor %}
 		  </div>
 	  
 
@@ -176,7 +179,7 @@
 			<li><a href="{% url 'follow_list' %}"><span class="material-symbols-outlined">favorite</span>いいね</a></li>
 			<li><a href="{% url 'chat_index' %}"><span class="material-symbols-outlined">forum</span>メッセージ</a></li>
 			<li><a href="{% url 'checkout_form' %}"><span class="material-symbols-outlined">stat_3</span>プラン購入</a></li>
-			<li><a href="{% url 'profile_edit' %}"><span class="material-symbols-outlined">help_center</span>お問い合わせ</a></li>
+			<li><a href="{% url 'contact' %}"><span class="material-symbols-outlined">help_center</span>お問い合わせ</a></li>
 			<!-- <li><a href="/"><i class="fa-solid fa-location-dot"></i>いまドコ検索</a></li> -->
 			<!-- <li><a href="/"><i class="fas fa-info-circle"></i>キャンペーン</a></li> -->
 			<!-- <li><a href="/"><i class="fas fa-pen-nib"></i>会員情報</a></li> -->

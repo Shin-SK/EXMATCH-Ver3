@@ -1,6 +1,0 @@
-{{ user.username }} さん
-
-{{ target.from_user.username }} さんがあなたとマッチしました！
-プロフィールを確認してみましょう。
-
-ログイン: https://exmatch.jp/login

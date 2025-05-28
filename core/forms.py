@@ -175,3 +175,40 @@ class CustomSignupForm(SignupForm):
         profile.save()
 
         return user
+
+
+class ContactForm(forms.Form):
+    SUBJECT_CHOICES = (
+        ("general",    "サービス全般について"),
+        ("bug_report", "不具合報告"),
+        ("payment",    "決済関連"),
+        ("other",      "その他"),
+    )
+
+    subject = forms.ChoiceField(
+        label="お問い合わせ種別",
+        choices=SUBJECT_CHOICES,
+        widget=forms.RadioSelect(attrs={"class": "form-check-input"}),
+    )
+    email   = forms.EmailField(label="メールアドレス", max_length=255)
+    name    = forms.CharField(label="お名前", max_length=50)
+    message = forms.CharField(
+        label="お問い合わせ内容",
+        widget=forms.Textarea(attrs={"rows": 6})
+    )
+
+    @classmethod
+    def for_user(cls, user):
+        """
+        ログインユーザの情報で初期値をセットしたフォームを返す。
+        未ログインなら空フォーム。
+        """
+        if not user.is_authenticated:
+            return cls()
+
+        prof   = getattr(user, "userprofile", None)
+        name   = getattr(prof, "nickname", "") or user.get_full_name() or user.username
+        return cls(initial={
+            "email": user.email,
+            "name":  name,
+        })

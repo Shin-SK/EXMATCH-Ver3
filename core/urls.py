@@ -19,5 +19,7 @@ urlpatterns = [
     path('profile/<int:user_id>/', views.user_profile_detail, name='user_profile_detail'),
     path('footprints/', views.footprint_list, name='footprint_list'),
     path('likes_received/', views.likes_received_list, name='likes_received_list'),
+    path("contact/", views.contact_view, name="contact"),
+    path("contact/sent/", views.contact_done, name="contact_done"),
 ]
 

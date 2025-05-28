@@ -1,0 +1,73 @@
+@use "../global/global" as *;
+
+.contact-thanks{
+	@include flex();
+	flex-direction: column;
+	min-height: 100%;
+	p{
+		text-align: center;
+		margin: 80px auto;
+		a{
+			margin-top: 16px;
+			border-bottom: 1px $mc solid;
+			display: inline-block;
+		}
+	}
+}
+
+
+.contact-form{
+	.form{
+		margin-top: 40px;
+		.field{
+			margin-bottom: 16px;
+			label{
+				@include fs(10);
+			}
+			input, textarea{
+				padding: 8px;
+				@include fs(14);
+				border: unset;
+				background-color: $lightgray;
+			}
+			.form-label{
+				margin-bottom: 8px;
+			}
+			&.subject{
+				.radio{
+					display: flex;
+					align-items: center;
+					gap: 8px;
+					flex-wrap: wrap;
+					label{
+						@include flex();
+						padding: 8px 24px;
+						transition: background .2s, color .2s;
+						cursor: pointer;
+						position: relative;
+						background-color: $lightgray;
+						@include fs(14);
+						&:has(> input:checked) {
+							background: $mc;      /* 好きな色へ */
+							color: #fff;
+							border-color: $mc;
+						}
+						input{
+							position: absolute;
+							opacity: 0;
+						}
+					}
+				}
+			}
+		}
+		button[type="submit"]{
+			background-color: $mc;
+			color: white;
+			@include flex();
+			width: 100%;
+			border-radius: 100px;
+			padding: 4px;
+			margin-top: 40px;
+		}
+	}
+}

@@ -3120,7 +3120,7 @@ body {
   z-index: 999;
 }
 .chat-room ul {
-  padding: 40px 16px;
+  padding: 40px 0px;
   background-color: white;
 }
 .chat-room ul li {
@@ -3646,4 +3646,77 @@ body {
 }
 .email-confirm .wrap a, .email-sent .wrap a {
   border-bottom: 1px #004C71 solid;
+}
+
+.contact-thanks {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  min-height: 100%;
+}
+.contact-thanks p {
+  text-align: center;
+  margin: 80px auto;
+}
+.contact-thanks p a {
+  margin-top: 16px;
+  border-bottom: 1px #004C71 solid;
+  display: inline-block;
+}
+
+.contact-form .form {
+  margin-top: 40px;
+}
+.contact-form .form .field {
+  margin-bottom: 16px;
+}
+.contact-form .form .field label {
+  font-size: clamp(1rem, 0.9346938776rem + 0.2040816327vw, 1.2rem);
+}
+.contact-form .form .field input, .contact-form .form .field textarea {
+  padding: 8px;
+  font-size: clamp(1.4rem, 1.3346938776rem + 0.2040816327vw, 1.6rem);
+  border: unset;
+  background-color: whitesmoke;
+}
+.contact-form .form .field .form-label {
+  margin-bottom: 8px;
+}
+.contact-form .form .field.subject .radio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.contact-form .form .field.subject .radio label {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 24px;
+  transition: background 0.2s, color 0.2s;
+  cursor: pointer;
+  position: relative;
+  background-color: whitesmoke;
+  font-size: clamp(1.4rem, 1.3346938776rem + 0.2040816327vw, 1.6rem);
+}
+.contact-form .form .field.subject .radio label:has(> input:checked) {
+  background: #004C71; /* 好きな色へ */
+  color: #fff;
+  border-color: #004C71;
+}
+.contact-form .form .field.subject .radio label input {
+  position: absolute;
+  opacity: 0;
+}
+.contact-form .form button[type=submit] {
+  background-color: #004C71;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  border-radius: 100px;
+  padding: 4px;
+  margin-top: 40px;
 }/*# sourceMappingURL=custom.css.map */

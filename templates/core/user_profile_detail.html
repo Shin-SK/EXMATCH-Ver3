@@ -38,31 +38,36 @@
 			</div>
 		</div>
 
+	{% if request.user.userprofile.has_option %}
+		{% for label, v in plus_pairs %}
 		<div class="profile__plus area">
 			<div class="title">PLUS PROFILE</div>
 				<div class="fields">
-				{% if request.user.userprofile.has_option %}
-					{% for label, v in plus_pairs %}
 					<div class="field">
 						<div class="head">{{ label }}</div>
 						<div class="value">{{ v }}</div>
 					</div>
-					{% endfor %}
-				{% endif %}
+				</div>
 			</div>
 		</div>
-	</div>
+		{% endfor %}
+	{% endif %}
 
 
+<div class="actions">
+  {# 3. 既にマッチしている #}
+  {% if is_matched %}
+	<a class="btn message" href="{% url 'chat_room' user_id=profile.user.id %}">メッセージ</a>
 
-	<div class="actions">
-		{% if not is_liked %}
-			<a class="btn like" href="{% url 'follow_user' user_id=profile.user.id %}"><span class="material-symbols-outlined">favorite</span>いいね</a>
-		{% endif %}
-		{% if is_matched %}
-			<a class="btn message" href="{% url 'chat_room' user_id=profile.user.id %}">メッセージ</a>
-		{% endif %}
-	</div>
+  {# 2. 自分は like 済みだがマッチしていない #}
+  {% elif is_liked %}
+      <p class="waiting">お相手からの返信をお待ちください…</p>
+
+  {# 1. まだ何もしていない #}
+  {% else %}
+		<a class="btn like" href="{% url 'follow_user' user_id=profile.user.id %}?next={{ request.path }}"><span class="material-symbols-outlined">favorite</span>いいね</a>
+  {% endif %}
+</div>
 
 	<!-- <p><a href="{% url 'user_list' %}">← 戻る</a></p> -->
 </section>

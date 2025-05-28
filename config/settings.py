@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import os
 import environ, os
 import dj_database_url
+from email.utils import formataddr
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -198,7 +199,10 @@ EMAIL_HOST_PASSWORD = os.getenv("DJANGO_EMAIL_HOST_PASSWORD", "")
 EMAIL_USE_TLS = os.getenv("DJANGO_EMAIL_USE_TLS", "True") == "True"
 EMAIL_USE_SSL = os.getenv("DJANGO_EMAIL_USE_SSL", "False") == "True"
 
-DEFAULT_FROM_EMAIL = os.getenv("DJANGO_DEFAULT_FROM_EMAIL", "webmaster@localhost")
+RAW_FROM_EMAIL = os.getenv("DJANGO_DEFAULT_FROM_EMAIL", "webmaster@localhost")
+DEFAULT_FROM_EMAIL = formataddr(("EXMATCH", RAW_FROM_EMAIL))
+
+CONTACT_EMAIL = os.getenv("CONTACT_EMAIL", "support@exmatch.jp")
 
 # == 認証周り ==
 AUTHENTICATION_BACKENDS = [

@@ -1,0 +1,11 @@
+{{ to_profile.nickname|default:to_user.username }} 様
+
+{{ from_profile.nickname|default:from_user.username }} さんと
+マッチしました！🎉
+
+早速メッセージを送ってみましょう！
+https://exmatch.jp/mypage/
+
+-----------
+送信日時 : {{ now|date:"Y-m-d H:i" }}
+EXMATCH 運営

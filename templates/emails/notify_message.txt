@@ -1,0 +1,16 @@
+{{ to_profile.nickname|default:to_user.username }} 様
+
+{{ from_profile.nickname|default:from_user.username }} さんから
+新しいメッセージが届きました ✉️
+
+▼ メッセージ冒頭
+--------------------------------
+{{ snippet }}
+--------------------------------
+
+アプリにログインして全文をご確認ください。
+https://exmatch.jp/chat/
+
+-----------
+送信日時 : {{ now|date:"Y-m-d H:i" }}
+EXMATCH 運営

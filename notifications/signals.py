@@ -1,64 +1,124 @@
-# notifications/signals.py
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.template.loader import render_to_string
+from django.utils import timezone
 from django.contrib.contenttypes.models import ContentType
 
 from core.models import Match, Message
-from .models import Notification
-from .utils import send_notification_email
+from notifications.models import Notification
+from notifications.utils import send_notification_email
 
-# --- いいね or マッチ -------------------------------------------------
+
+# --------------------------------------------------
+# 1) いいね！を受け取った通知
+# --------------------------------------------------
 @receiver(post_save, sender=Match)
-def notify_match_like(sender, instance, created, **kwargs):
-    # 相手への「いいね」が新規作成されたら
-    if created and instance.status == "like":
-        _create_and_email(
-            user=instance.to_user,
-            target=instance,
-            verb="like",
-            text=f"{instance.from_user.userprofile.nickname or instance.from_user.username} さんから いいね！が来ました"
+def notify_like(sender, instance, created, **kwargs):
+    if not created or instance.status != "like":
+        return
+
+    # 通知レコード
+    Notification.objects.create(
+        user   = instance.to_user,
+        target = instance,
+        verb   = "like",
+        text   = f"{instance.from_user.username} さんから いいね！",
+    )
+
+    # メール
+    ctx = {
+        "to_user":      instance.to_user,
+        "from_user":    instance.from_user,
+        "to_profile":   instance.to_user.userprofile,
+        "from_profile": instance.from_user.userprofile,
+        "now":          timezone.now(),
+    }
+    body = render_to_string("emails/notify_like.txt", ctx)
+
+    send_notification_email(
+        instance.to_user,
+        subject="【EXMATCH】👍 いいね！が届きました",
+        body=body,
+    )
+
+
+# --------------------------------------------------
+# 2) マッチ成立
+# --------------------------------------------------
+@receiver(post_save, sender=Match)
+def notify_match(sender, instance, created, **kwargs):
+    # 「created 直後」または status を 'matched' に更新した直後の両方を拾う
+    if instance.status != "matched":
+        return
+
+    ct = ContentType.objects.get_for_model(Match)
+
+    for u, other in (
+        (instance.from_user, instance.to_user),
+        (instance.to_user,   instance.from_user),
+    ):
+        # すでに同一ユーザー宛の match 通知があれば skip
+        already = Notification.objects.filter(
+            user=u,
+            content_type=ct,
+            object_id=instance.id,
+            verb="match",
+        ).exists()
+        if already:
+            continue
+
+        Notification.objects.create(
+            user=u,
+            content_type=ct,
+            object_id=instance.id,
+            verb="match",
+            text=f"{other.userprofile.nickname or other.username} さんとマッチしました！",
         )
 
-    # どちらかが matched に更新された瞬間（1 度だけ飛ばす）
-    if not created and instance.status == "matched" and not instance.to_user.notifications.filter(
-        verb="matched", object_id=instance.id
-    ).exists():
-        # 両者に通知
-        _create_and_email(
-            user=instance.to_user,
-            target=instance,
-            verb="matched",
-            text="マッチ成立！メッセージを送ってみましょう"
-        )
-        _create_and_email(
-            user=instance.from_user,
-            target=instance,
-            verb="matched",
-            text="マッチ成立！メッセージを送ってみましょう"
+        ctx = {
+            "to_user":      u,
+            "from_user":    other,
+            "to_profile":   u.userprofile,
+            "from_profile": other.userprofile,
+            "now":          timezone.now(),
+        }
+        body = render_to_string("emails/notify_match.txt", ctx)
+
+        send_notification_email(
+            u,
+            subject="【EXMATCH】🎉 マッチ成立のお知らせ",
+            body=body,
         )
 
-# --- メッセージ ------------------------------------------------------
+# --------------------------------------------------
+# 3) 新着メッセージ
+# --------------------------------------------------
 @receiver(post_save, sender=Message)
 def notify_message(sender, instance, created, **kwargs):
-    if created:
-        _create_and_email(
-            user=instance.receiver,
-            target=instance,
-            verb="message",
-            text=f"{instance.sender.userprofile.nickname or instance.sender.username} さんからメッセージが届きました"
-        )
+    if not created:
+        return
 
-# --------------------------------------------------------------------
-def _create_and_email(*, user, target, verb, text):
-    # 1) Notification レコード
+    # 通知レコード
     Notification.objects.create(
-        user=user,
-        content_type=ContentType.objects.get_for_model(target.__class__),
-        object_id=target.id,
-        verb=verb,
-        text=text
+        user   = instance.receiver,
+        target = instance,
+        verb   = "message",
+        text   = f"{instance.sender.username} さんから新しいメッセージ",
     )
-    # 2) メール送信
-    subject_tpl = f"email/{verb}_subject.txt"
-    body_tpl    = f"email/{verb}_body.txt"
-    send_notification_email(user, subject_tpl, body_tpl, {"user": user, "target": target})
+
+    # メール
+    ctx = {
+        "to_user":      instance.receiver,
+        "from_user":    instance.sender,
+        "to_profile":   instance.receiver.userprofile,
+        "from_profile": instance.sender.userprofile,
+        "snippet":      instance.text[:60],
+        "now":          timezone.now(),
+    }
+    body = render_to_string("emails/notify_message.txt", ctx)
+
+    send_notification_email(
+        instance.receiver,
+        subject="【EXMATCH】📨 新着メッセージがあります",
+        body=body,
+    )

@@ -1,19 +1,15 @@
-# notifications/utils.py
+# notifications/util.py
 from django.core.mail import send_mail
-from django.template.loader import render_to_string
 from django.conf import settings
 
-def send_notification_email(user, subject_tpl, body_tpl, ctx):
-    """
-    subject_tpl / body_tpl にはテンプレートファイル名（txt）
-    ctx はテンプレートに流し込む context dict
-    """
-    subject = render_to_string(subject_tpl, ctx).strip()
-    body    = render_to_string(body_tpl,    ctx)
+def send_notification_email(to_user, subject, body):
+    """to_user は auth.User インスタンス想定"""
+    if not to_user.email:          # アドレス未登録なら送らない
+        return
     send_mail(
-        subject,
-        body,
-        settings.DEFAULT_FROM_EMAIL,
-        [user.email],
-        fail_silently=False,   # 本番では True にしてもOK
+        subject        = subject,
+        message        = body,
+        from_email     = settings.DEFAULT_FROM_EMAIL,
+        recipient_list = [to_user.email],
+        fail_silently  = False,    # ↓開発中だけ True でも可
     )

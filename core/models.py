@@ -81,6 +81,7 @@ class UserProfile(models.Model):
     def __str__(self):
         return self.user.username
 
+    @property
     def has_option(self):
         if self.option_expiry:
             return self.option_expiry > timezone.now()

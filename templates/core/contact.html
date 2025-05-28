@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}お問い合わせ{% endblock %}
+
+{% block content %}
+
+<div class="contact-form">
+
+	<div class="head-set">
+		<h2>CONTACT</h2>
+		<h3>お問い合わせ</h3>
+	</div>
+
+<form method="post" action="" class="form">
+  {% csrf_token %}
+  {{ form.non_field_errors }}
+
+  {# ---------------- E-mail ---------------- #}
+  <div class="field">
+    <label class="form-label" for="{{ form.email.id_for_label }}">
+      {{ form.email.label }}
+    </label>
+    {{ form.email|add_class:"form-control"|attr:"placeholder:例）user@example.com" }}
+    {{ form.email.errors }}
+  </div>
+
+  {# ---------------- Name ------------------ #}
+  <div class="field">
+    <label class="form-label" for="{{ form.name.id_for_label }}">
+      {{ form.name.label }}
+    </label>
+    {{ form.name|add_class:"form-control"|attr:"placeholder:山田太郎" }}
+    {{ form.name.errors }}
+  </div>
+
+  {# ---- Subject ---- #}
+	<div class="field subject">
+	<label class="form-label">{{ form.subject.label }}</label>
+	<div class="radio">
+		{% for choice in form.subject %}
+			<label>
+				{{ choice.tag }} {{ choice.choice_label }}
+			</label>
+		{% endfor %}
+	</div>
+	{{ form.subject.errors }}
+	</div>
+
+  {# ---------------- Message --------------- #}
+  <div class="field">
+    <label class="form-label" for="{{ form.message.id_for_label }}">
+      {{ form.message.label }}
+    </label>
+    {{ form.message|add_class:"form-control"|attr:"placeholder:お問い合わせ内容を入力してください" }}
+    {{ form.message.errors }}
+  </div>
+
+  <button type="submit">送信</button>
+</form>
+{% endblock %}
+
+
+</div>
+
