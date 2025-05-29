@@ -1342,9 +1342,13 @@ body {
   height: auto;
 }
 .home .footer-home .cr {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   text-align: center;
   padding: 40px 0px;
 }
+
 .base {
   padding-bottom: 60px;
   padding-top: 40px;

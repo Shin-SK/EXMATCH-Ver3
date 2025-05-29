@@ -940,10 +940,9 @@
         }
     }
     .cr{
+        @include flex();
         text-align: center;
         padding: 40px 0px;
-        @include md{
-        }
     }
   }
 
