@@ -172,10 +172,6 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-STRIPE_PUBLIC_KEY = os.getenv("STRIPE_PUBLIC_KEY")
-STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
-STRIPE_ENDPOINT_SECRET = os.getenv("STRIPE_ENDPOINT_SECRET")
-
 ASGI_APPLICATION = 'config.asgi.application'
 CHANNEL_LAYERS = {
     "default": {
@@ -227,3 +223,15 @@ ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION        = True
 ACCOUNT_EMAIL_CONFIRMATION_USER_ACTIVATION = True
 
 ACCOUNT_FORMS = { "signup": "core.forms.CustomSignupForm" }
+
+
+# --- STRIPE -------------------------------
+
+STRIPE_PUBLIC_KEY = os.getenv("STRIPE_PUBLIC_KEY")
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
+STRIPE_ENDPOINT_SECRET = os.getenv("STRIPE_ENDPOINT_SECRET")
+
+# --- キャンペーン設定 -------------------------------
+
+CAMPAIGN_BONUS_ACTIVE = True
+OPTION_DISCOUNT_ACTIVE = True

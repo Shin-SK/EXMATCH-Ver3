@@ -3197,6 +3197,43 @@ body {
   text-align: center;
 }
 
+.upgrade-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.6);
+  justify-content: center;
+  align-items: center;
+}
+.upgrade-modal .wrap {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+}
+.upgrade-modal .wrap p {
+  text-align: center;
+}
+.upgrade-modal .wrap a {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #F07884;
+  color: #fff;
+  padding: 4px 24px;
+  border-radius: 100px;
+  text-decoration: none;
+  margin: 24px auto 8px;
+}
+.upgrade-modal .wrap button {
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  font-size: clamp(1.2rem, 1.1346938776rem + 0.2040816327vw, 1.4rem);
+}
+
 .upgrade-plan {
   background-color: whitesmoke;
   padding: 40px 16px;

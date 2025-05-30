@@ -35,6 +35,18 @@ Chat with {{ target_user.username }}
     <button>送信</button>
   </form>
 
+
+<!-- == アップグレード誘導モーダル =============================== -->
+<div id="upgradeModal" class="upgrade-modal">
+  <div class="wrap">
+      <p>スタンダードプランになって<br>この出会いを逃さない</p>
+      <a href="{% url 'checkout_form' %}">スタンダードにアップグレード</a>
+      <button id="modalClose">閉じる</button>
+  </div>
+</div>
+<!-- ========================================================== -->
+
+
   <p class="back-index"><a href="{% url 'chat_index' %}">マッチ一覧へ戻る</a></p>
   
 </div>
@@ -55,6 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ---------- Django が埋めた CSRF トークンを取得 ---------- */
   const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+  
 
   /* ---------------- メッセージ描画 ---------------- */
   function append(m){
@@ -85,17 +98,24 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ---------------- 送信処理 ---------------- */
   const form  = document.getElementById('chatForm');
   const input = document.getElementById('msgInput');
+  const POST_URL = "{% url 'chat_room' user_id=target_user.id %}";
+  const CAN_SEND = JSON.parse("{{ can_send|yesno:'true,false'|escapejs }}");
 
   form.addEventListener('submit', e => {
     e.preventDefault();
     const text = input.value.trim();
     if (!text) return;
 
-    fetch(location.href, {
+    if (!CAN_SEND) {                     // ← 2 通目以降ならモーダル
+      document.getElementById('upgradeModal').style.display = 'flex';
+      return;
+    }
+
+    fetch(POST_URL, {
       method: 'POST',
-      credentials: 'same-origin',           // ← Cookie も送る
+      credentials: 'same-origin',
       headers: {
-        'X-CSRFToken': csrftoken,           // ← 正しいトークンをセット
+        'X-CSRFToken': csrftoken,
         'Content-Type': 'application/x-www-form-urlencoded'
       },
       body: new URLSearchParams({ text })
@@ -103,6 +123,11 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(() => { input.value = ''; poll(); })
     .catch(console.error);
   });
+  /* モーダル閉じるボタン */
+  document.getElementById('modalClose')
+          .addEventListener('click', () =>
+              document.getElementById('upgradeModal').style.display = 'none');
+
 });
 </script>
 

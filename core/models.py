@@ -127,6 +127,20 @@ class UserProfile(models.Model):
             (today.month, today.day) < (self.date_of_birth.month, self.date_of_birth.day)
         )
 
+    def can_send_message_to(self, other_user) -> bool:
+        """
+        self.user が other_user へ新規にメッセージを送れるか？
+        スタンダード会員 → 無制限、フリー会員 → まだ 1 通も送っていなければ OK
+        """
+        if self.is_standard_plan():
+            return True
+
+        already_sent = Message.objects.filter(
+            sender=self.user,
+            receiver=other_user
+        ).exists()
+        return not already_sent
+
 # ======================================================================
 # 2) 可変項目用: Adminで「ラジオ/セレクト/テキスト」項目を自由に追加
 # ======================================================================

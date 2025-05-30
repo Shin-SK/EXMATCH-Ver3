@@ -427,18 +427,43 @@ def user_list(request):
 
 @login_required
 def chat_room(request, user_id):
-    """相手(user_id)とのメッセージ一覧 + 送信フォーム"""
     target_user = get_user_model().objects.get(id=user_id)
 
-    # 送信フォームがPOSTされたらメッセージを保存
+    # ここで必ず作っておく -------------
+    me_profile = request.user.userprofile
+    # ----------------------------------
+
+    # 送信処理 ----------------------------------------------------
     if request.method == 'POST':
-        text = request.POST.get('text')
-        if text and is_matched(request.user, target_user):  # マッチ判定
-            Message.objects.create(sender=request.user, receiver=target_user, text=text)
+        text = request.POST.get('text', '').strip()
+
+        # ① マッチ判定
+        if not is_matched(request.user, target_user):
             return redirect('chat_room', user_id=target_user.id)
 
-    # 自分と相手のやりとりを時系列で取得
-    messages = Message.objects.filter(
+        # ② 送信可否チェック
+        if not me_profile.can_send_message_to(target_user):
+            messages.info(
+                request,
+                "フリープランでは初回メッセージのみ送信できます。"
+                "無制限に送信するにはスタンダードプランへアップグレードしてください。"
+            )
+            return redirect('plan_upgrade')
+
+        # ③ 送信
+        if text:
+            Message.objects.create(
+                sender=request.user,
+                receiver=target_user,
+                text=text
+            )
+            return redirect('chat_room', user_id=target_user.id)
+
+    # ★ ここでフラグを計算（GET でも必ず実行される）
+    can_send = me_profile.can_send_message_to(target_user)
+
+    # メッセージ一覧取得 …（以下そのまま） -----------------------
+    messages_qs = Message.objects.filter(
         Q(sender=request.user, receiver=target_user) |
         Q(sender=target_user, receiver=request.user)
     ).order_by('created_at')
@@ -447,14 +472,16 @@ def chat_room(request, user_id):
     Notification.objects.filter(
         user=request.user,
         content_type=msg_ct,
-        object_id__in=messages.values_list('id', flat=True),
+        object_id__in=messages_qs.values_list('id', flat=True),
         is_read=False
     ).update(is_read=True)
 
-    return render(request, 'core/chat_room.html', {
-        'target_user': target_user,
-        'messages': messages
+    return render(request, "core/chat_room.html", {
+        "target_user": target_user,
+        "messages":    messages_qs,
+        "can_send":    can_send,   # ← テンプレート用フラグ
     })
+
 
 def is_matched(userA, userB):
     # どちら向きでも 'matched' があるか
