@@ -78,6 +78,16 @@ class UserProfile(models.Model):
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
 
+    #本人確認書類
+    id_doc_image    = models.ImageField("本人確認書類（表面）", upload_to="id_docs", blank=True, null=True)
+    id_doc_verified = models.BooleanField("書類確認済み", default=False)
+
+    @property
+    def is_verified(self) -> bool:
+        """機能解放フラグ（本人確認書類が承認済みか）"""
+        return bool(self.id_doc_verified)
+    # ---------------------------------------------
+
     def __str__(self):
         return self.user.username
 
@@ -129,10 +139,10 @@ class UserProfile(models.Model):
 
     def can_send_message_to(self, other_user) -> bool:
         """
-        self.user が other_user へ新規にメッセージを送れるか？
-        スタンダード会員 → 無制限、フリー会員 → まだ 1 通も送っていなければ OK
+        - スタンダードプラン *かつ* 本人確認済み → 無制限
+        - それ以外（フリー or 未確認）      → 1 通目だけ OK
         """
-        if self.is_standard_plan():
+        if self.is_standard_plan() and self.is_verified:
             return True
 
         already_sent = Message.objects.filter(

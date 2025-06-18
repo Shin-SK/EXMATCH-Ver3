@@ -1389,9 +1389,6 @@ body {
 .base .head-set h3 {
   font-weight: bold;
 }
-.base.guest-user .profile img {
-  filter: blur(5px);
-}
 .base .header #navigation {
   opacity: 1;
   visibility: unset;
@@ -2674,10 +2671,6 @@ body {
   border: 2px #F07884 solid;
 }
 
-.lciq-unset .avator img {
-  filter: blur(4px) !important;
-}
-
 .feed-mini {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -2741,16 +2734,11 @@ body {
   padding: 8px;
 }
 
-.lciq-unset .profile-feed-mini img {
-  filter: blur(4px) !important;
-}
-
-.unverified img.user-thumb {
-  filter: blur(8px);
-}
-.unverified .action-btn {
+.id-unverified .feed {
   pointer-events: none;
-  opacity: 0.4;
+}
+.id-unverified .feed img {
+  filter: blur(5px);
 }
 
 .profile-detail {
@@ -2901,10 +2889,6 @@ body {
 }
 .profile-detail .actions .btn.message {
   background-color: #004C71;
-}
-
-.lciq-unset .profile-detail .avator {
-  filter: blur(4px);
 }
 
 .mini-list h1 {

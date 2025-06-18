@@ -22,7 +22,7 @@ class ProfileEditForm(forms.ModelForm):
             'main_area',
             'lciq_score',
             'lciq_image',
-            # 必要に応じて他の項目も
+            "id_doc_image",
         ]
         labels = {
             "bio": "自己紹介",
@@ -32,6 +32,7 @@ class ProfileEditForm(forms.ModelForm):
             "main_area": "メインエリア",
             "lciq_score": "LCIQスコア",
             "lciq_image": "LCIQ診断スクショ",
+            "id_doc_image": "本人確認書類（表面）",
         }
 
         widgets = {
@@ -40,6 +41,7 @@ class ProfileEditForm(forms.ModelForm):
             "gender":forms.RadioSelect,
             "sexual_object_pref":forms.RadioSelect,
             "lciq_image": FileInput(attrs={"class": "filepond"}),
+            "id_doc_image": FileInput(attrs={"class": "filepond"}),
         }
 
 

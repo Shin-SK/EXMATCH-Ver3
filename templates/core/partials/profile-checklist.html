@@ -1,13 +1,13 @@
 {% load static %}
 
 <div class="profile-checklist">
-	{% if not lciq_done %}
-	<div class="lciq-caution">
+	{% if not id_verified %}
+	<div class="verified-caution">
 		<a href="{% url 'profile_edit' %}">
-			<img src="{% static 'img/lciq-logo.svg' %}" alt="">
+			<!-- <img src="{% static 'img/lciq-logo.svg' %}" alt=""> -->
 			<div class="wrap">
-				<div class="head">LCIQ®診断がまだ完了していません</div>
-				<p>診断をするとボカシが取れ、いいねやメッセージが送れます</p>
+				<div class="head">本人確認書類がまだ提出されていません</div>
+				<p>提出をするとボカシが取れ、いいねやメッセージが送れます</p>
 			</div>
 		</a>
 	</div>

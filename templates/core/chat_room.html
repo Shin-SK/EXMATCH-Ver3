@@ -36,15 +36,23 @@ Chat with {{ target_user.username }}
   </form>
 
 
-<!-- == アップグレード誘導モーダル =============================== -->
+<!-- ★ アップグレード誘導モーダル -->
 <div id="upgradeModal" class="upgrade-modal">
   <div class="wrap">
-      <p>スタンダードプランになって<br>この出会いを逃さない</p>
-      <a href="{% url 'checkout_form' %}">スタンダードにアップグレード</a>
-      <button id="modalClose">閉じる</button>
+    <p>スタンダードプランになって<br>この出会いを逃さない</p>
+    <a href="{% url 'checkout_form' %}">スタンダードにアップグレード</a>
+    <button class="close-btn">閉じる</button>
   </div>
 </div>
-<!-- ========================================================== -->
+
+<!-- ★ 本人確認誘導モーダル -->
+<div id="verifyModal"  class="upgrade-modal">
+  <div class="wrap">
+    <p>本人確認書類の承認が必要です</p>
+    <a href="{% url 'profile_edit' %}">書類をアップロードする</a>
+    <button class="close-btn">閉じる</button>
+  </div>
+</div>
 
 
   <p class="back-index"><a href="{% url 'chat_index' %}">マッチ一覧へ戻る</a></p>
@@ -99,15 +107,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const form  = document.getElementById('chatForm');
   const input = document.getElementById('msgInput');
   const POST_URL = "{% url 'chat_room' user_id=target_user.id %}";
-  const CAN_SEND = JSON.parse("{{ can_send|yesno:'true,false'|escapejs }}");
+  const CAN_SEND    = JSON.parse("{{ can_send|yesno:'true,false'|escapejs }}");
+  const NEED_PLAN   = JSON.parse("{{ need_plan|yesno:'true,false'|escapejs }}");
+  const NEED_VERIFY = JSON.parse("{{ need_verify|yesno:'true,false'|escapejs }}");
 
   form.addEventListener('submit', e => {
     e.preventDefault();
     const text = input.value.trim();
     if (!text) return;
 
-    if (!CAN_SEND) {                     // ← 2 通目以降ならモーダル
-      document.getElementById('upgradeModal').style.display = 'flex';
+    if (!CAN_SEND) {
+      if (NEED_PLAN)   document.getElementById('upgradeModal').style.display = 'flex';
+      if (NEED_VERIFY) document.getElementById('verifyModal').style.display  = 'flex';
       return;
     }
 

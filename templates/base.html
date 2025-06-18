@@ -54,8 +54,12 @@
     </style>
     {% block extra_css %}{% endblock %}
 </head>
-<body class="{% if unverified %}unverified{% endif %} {%block base_class%}base{% endblock %} {% if user.is_authenticated and not user.userprofile.lciq_image %}lciq-unset{% endif %}">
-
+<body
+  class="{% if not request.user.is_anonymous and not request.user.userprofile.is_verified %}
+          id-unverified
+        {% endif %}
+        {% block base_class %}base{% endblock %}"
+>
 <div id="loader" class="loader-overlay">
   <div class="sk-chase">
     <div class="sk-chase-dot"></div>

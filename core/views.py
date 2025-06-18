@@ -12,6 +12,8 @@ from django.utils import timezone
 from django.apps import apps
 from django.db.models import CharField, TextField, FloatField, DateTimeField, Exists, OuterRef, Subquery
 from django.contrib.contenttypes.models import ContentType
+from core.mixins import identity_verified_required
+
 
 from .filters import DynamicProfileFilter
 from .forms import ProfileEditForm, DynamicProfileFieldForm
@@ -84,8 +86,8 @@ def my_page(request):
         status='like'
     ).count()
 
-    # lciqの入力したかどうか
-    lciq_done = bool(profile.lciq_image)
+    # 本人確認書類入った？
+    id_verified = profile.is_verified
 
     # --- ② プロフィール全部埋まった？ ---
     all_filled = (missing_total == 0)
@@ -157,7 +159,7 @@ def my_page(request):
         'likes_received_top': likes_received_top,
         'liked_users': liked_users,
         "missing_total": missing_total,
-        "lciq_done": lciq_done,
+        'id_verified': id_verified,
         "all_filled": all_filled,
         "is_standard": is_standard,
         "plus_filled": plus_filled,
@@ -426,6 +428,7 @@ def user_list(request):
 
 
 @login_required
+# @identity_verified_required 
 def chat_room(request, user_id):
     target_user = get_user_model().objects.get(id=user_id)
 
@@ -434,21 +437,30 @@ def chat_room(request, user_id):
     # ----------------------------------
 
     # 送信処理 ----------------------------------------------------
-    if request.method == 'POST':
-        text = request.POST.get('text', '').strip()
+    if request.method == "POST":
+        text = request.POST.get("text", "").strip()
 
         # ① マッチ判定
         if not is_matched(request.user, target_user):
-            return redirect('chat_room', user_id=target_user.id)
+            return redirect("chat_room", user_id=target_user.id)
 
         # ② 送信可否チェック
         if not me_profile.can_send_message_to(target_user):
-            messages.info(
+            if not me_profile.is_standard_plan():
+                messages.info(
+                    request,
+                    "フリープランでは初回メッセージのみ送信できます。"
+                    "無制限に送信するにはスタンダードプランへアップグレードしてください。"
+                )
+                return redirect("plan_upgrade")
+
+            # スタンダードだけど本人確認が未承認
+            messages.warning(
                 request,
-                "フリープランでは初回メッセージのみ送信できます。"
-                "無制限に送信するにはスタンダードプランへアップグレードしてください。"
+                "2通目以降の送信には本人確認書類の承認が必要です。"
+                "プロフィール編集から書類をアップロードしてください。"
             )
-            return redirect('plan_upgrade')
+            return redirect("profile_edit")
 
         # ③ 送信
         if text:
@@ -457,10 +469,12 @@ def chat_room(request, user_id):
                 receiver=target_user,
                 text=text
             )
-            return redirect('chat_room', user_id=target_user.id)
+            return redirect("chat_room", user_id=target_user.id)
 
-    # ★ ここでフラグを計算（GET でも必ず実行される）
+    # ----- GET: フォーム表示判定 ------------------------------
     can_send = me_profile.can_send_message_to(target_user)
+    need_plan       = (not can_send) and (not me_profile.is_standard_plan())
+    need_verify     = (not can_send) and me_profile.is_standard_plan() and (not me_profile.is_verified)
 
     # メッセージ一覧取得 …（以下そのまま） -----------------------
     messages_qs = Message.objects.filter(
@@ -479,7 +493,9 @@ def chat_room(request, user_id):
     return render(request, "core/chat_room.html", {
         "target_user": target_user,
         "messages":    messages_qs,
-        "can_send":    can_send,   # ← テンプレート用フラグ
+        "can_send":    can_send,
+        "need_plan":   need_plan,
+        "need_verify": need_verify,
     })
 
 

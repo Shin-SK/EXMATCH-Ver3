@@ -164,13 +164,6 @@
 
 }//feed
 
-.lciq-unset{
-	.avator{
-		img{
-			filter: blur(4px)!important;
-		}
-	}
-}
 
 .feed-mini{
 	display: grid;
@@ -233,12 +226,4 @@
 		}
 	}
 
-}
-
-.lciq-unset{
-	.profile-feed-mini{
-		img{
-			filter: blur(4px)!important;
-		}
-	}
 }
