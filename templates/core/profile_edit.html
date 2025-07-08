@@ -40,6 +40,7 @@
                 <div class="inner image">
                     {% if form_fixed.instance.id_doc_image %}
                         <img src="{{ form_fixed.instance.id_doc_image.url }}" alt="current">
+                        {{ form_fixed.id_doc_image.clear_checkbox }} 画像を削除
                     {% else %}
                         <img src="{% static 'img/noimage.jpg' %}" alt="no image">
                     {% endif %}

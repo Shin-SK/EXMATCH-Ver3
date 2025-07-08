@@ -4,6 +4,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from uuid import uuid4
+from model_utils import FieldTracker
 
 # ---- 固定のChoice定義 (既存のまま) ----
 BLOOD_TYPE_CHOICES = (
@@ -81,6 +82,8 @@ class UserProfile(models.Model):
     #本人確認書類
     id_doc_image    = models.ImageField("本人確認書類（表面）", upload_to="id_docs", blank=True, null=True)
     id_doc_verified = models.BooleanField("書類確認済み", default=False)
+
+    tracker = FieldTracker(fields=['id_doc_image', 'id_doc_verified'])
 
     @property
     def is_verified(self) -> bool:

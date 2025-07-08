@@ -1,15 +1,13 @@
-# notifications/util.py
-from django.core.mail import send_mail
-from django.conf import settings
+from post_office import mail
 
-def send_notification_email(to_user, subject, body):
-    """to_user は auth.User インスタンス想定"""
-    if not to_user.email:          # アドレス未登録なら送らない
-        return
-    send_mail(
-        subject        = subject,
-        message        = body,
-        from_email     = settings.DEFAULT_FROM_EMAIL,
-        recipient_list = [to_user.email],
-        fail_silently  = False,    # ↓開発中だけ True でも可
-    )
+def send_notification_email(*, user, template, context):
+	"""
+	日本語サイトのみ → language=''（空）で固定。
+	"""
+	mail.send(
+		recipients=[user.email],
+		template=template,
+		context=context,
+		language='',        # ← Admin 側も Language を空欄にしておく
+		priority='now',
+	)

@@ -66,7 +66,7 @@ class DynamicProfileFieldForm(forms.Form):
 
         can_use_plus = (
             user_profile.is_standard_plan() or
-            user_profile.has_option()
+            user_profile.has_option
         )
 
         # ① ここで初期化

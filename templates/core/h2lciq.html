@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}LCIQスコアはどうやってはかるの？{% endblock %}
+
+{% block content %}
+
+<section class="h2lciq">
+
+	<div class="head">
+		<span class="ja">LCIQスコアのはかりかた</span>
+		<span class="en">How to measure the score of LCIQ</span>
+	</div>
+
+	<div class="wrap wrap-1">
+		<div class="main-title">
+			まずはここにアクセス
+		</div>
+		<a href="https://lciq-diagnosis.com/home?agent_id=0672689" class="btn btn-primary btn-lciq" target="_blank">
+			LICQ診断
+		</a>
+		<p>
+			こちらはLCIQをはかる専用ページです！<br>
+			楽しんで、いってらっしゃい！
+		</p>
+	</div>
+
+	<div class="wrap wrap-2">
+		<div class="main-title">LCIQとは？</div>
+		<p class="d-flex justify-content-center">
+			６つの恋愛力を分析し、あなたの恋愛偏差値をスコアリング！</p>
+
+		<div class="point point-1">
+			<div class="img">
+				<img src="{% static 'img/honki-1.webp' %}" alt="">
+			</div>
+			<div class="text">
+				<div class="title">恋愛に関連する６つの恋愛力でスコアリングをグラフ化</div>
+				<p>表現力、楽転力、認識力、共感力、魅了力、継続力。<br>
+				この６つの力は、潜在的な環境や意識に加え、日常の仕事や趣味の環境や対人感覚、さらにはその時の精神状態によってスコアリングされます。</p>
+			</div>
+		</div>
+
+		<div class="point point-2">
+			<div class="text">
+				<div class="title">総合点を出し、それぞれの力の特徴や対策なども明確に。</div>
+				<p>LCIQ®診断は資格制度のある恋愛教育システムなので、ただ結果を見るだけでなく、その先の心構えや日々の行動アドバイスもおこなっています。</p>
+			</div>
+			<div class="img">
+				<img src="{% static 'img/honki-4.webp' %}" alt="">
+			</div>
+		</div>
+
+	</div>
+
+	<div class="wrap wrap-3">
+		<div class="main-title">登録方法</div>
+		<p class="text-center">まずは公式サイトで診断を受ける</p>
+		<a href="https://lciq-diagnosis.com/home?agent_id=0672689" class="btn btn-primary btn-lciq" target="_blank">
+			LICQ診断
+		</a>
+		<div class="area">
+			<img src="{% static 'img/h2LCIQ_1.png' %}" alt="">
+			<img class="arrow" src="{% static 'img/arrow.svg' %}" alt="">
+			<img src="{% static 'img/h2LCIQ_2.png' %}" alt="">
+			<img class="arrow" src="{% static 'img/arrow.svg' %}" alt="">
+			<img src="{% static 'img/h2LCIQ_3.png' %}" alt="">
+		</div>
+	</div>
+	
+	<div class="wrap wrap-4">
+		<div class="main-title">ここをスクショ</div>
+
+		<div class="img">
+			<img src="{% static 'img/h2LCIQ_4.png' %}" alt="">
+		</div>
+
+		<div class="underline">点数が低くても大丈夫！</div>
+		<p>
+			LCIQ®診断の恋愛スコアは、少しの意識で 上げていくことができます！６つの力で恋愛力をアップさせ、 自分も周りも幸せになれるチャンスです！
+		</p>
+	</div>
+
+	<div class="wrap">
+		<div class="main-title">プロフィール編集で入力後しよう</div>
+		<a href="" class="btn btn-primary btn-lciq">プロフィール編集</a>
+	</div>
+
+	<div class="wrap wrap-last text-center">
+		出会いは。すぐそこに。
+	</div>
+</section>
+
+
+
+{% endblock %}

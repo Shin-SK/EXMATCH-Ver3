@@ -1,5 +1,6 @@
 // [1] グローバル読み込み
 @use "global/global" as *; 
+@use "global/override";
 @use "global/reset";
 
 // [2] パーツやページSCSS読み込み
@@ -23,3 +24,4 @@
 @use "pages/plan";
 @use "pages/account";
 @use "pages/contact";
+@use "pages/h2lciq";

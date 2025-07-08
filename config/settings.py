@@ -75,6 +75,7 @@ INSTALLED_APPS = [
     "django_browser_reload",
     "cloudinary",
     "cloudinary_storage",
+    'post_office',
 
     'core.apps.CoreConfig',
     'payments.apps.PaymentsConfig',
@@ -182,10 +183,11 @@ CHANNEL_LAYERS = {
 
 
 # ---------- メール設定 ----------
+EMAIL_BACKEND = 'post_office.EmailBackend'
 
 EMAIL_BACKEND = os.getenv(
-    "DJANGO_EMAIL_BACKEND",
-    "django.core.mail.backends.console.EmailBackend"  # デフォルトは console
+	"DJANGO_EMAIL_BACKEND",          # ← 環境変数があればそれを優先
+	"post_office.EmailBackend"       # ← ない場合は post_office を使う
 )
 
 EMAIL_HOST = os.getenv("DJANGO_EMAIL_HOST", "")

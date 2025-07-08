@@ -4,6 +4,7 @@ __pycache__/
 *.log
 *.pot
 *.pyc
+.zip
 .DS_Store
 
 # 環境ファイル
