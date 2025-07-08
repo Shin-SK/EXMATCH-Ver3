@@ -6,6 +6,8 @@
 // [2] パーツやページSCSS読み込み
 @use "parts/header";
 @use "parts/footer";
+@use "parts/avatar";
+
 @use "pages/home";
 // @use "pages/price";
 @use "pages/base";

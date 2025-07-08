@@ -22,6 +22,6 @@ urlpatterns = [
     path('likes_received/', views.likes_received_list, name='likes_received_list'),
     path("contact/", views.contact_view, name="contact"),
     path("contact/sent/", views.contact_done, name="contact_done"),
-    path("how-to-lciq/", TemplateView.as_view(template_name="core/h2lciq.html"),name="lp"),
+    path("how-to-lciq/", TemplateView.as_view(template_name="core/h2lciq.html"),name="h2lciq"),
 ]
 

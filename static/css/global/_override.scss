@@ -1,3 +1,16 @@
+@use "../global/global" as *;
+
+
+
+.btn {
+	@include fs(16);
+	padding: 4px 12px;
+	margin: 8px auto;
+	@include flex();
+  border-radius: 100px;
+  &.btn-flat { border-radius: 8px; }
+}
+
 
 /*------------------------------------
 - COLOR primary
@@ -156,3 +169,5 @@ button.bg-primary:focus {
 a.text-primary:hover, a.text-primary:focus {
   color: $primary_t2 !important;
 }
+
+

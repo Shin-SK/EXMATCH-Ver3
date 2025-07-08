@@ -143,6 +143,19 @@ button a {
   max-width: 768px !important;
 }
 
+.btn {
+  font-size: clamp(1.6rem, 1.5346938776rem + 0.2040816327vw, 1.8rem);
+  padding: 4px 12px;
+  margin: 8px auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 100px;
+}
+.btn.btn-flat {
+  border-radius: 8px;
+}
+
 /*------------------------------------
 - COLOR primary
 ------------------------------------*/
@@ -508,6 +521,41 @@ body {
   justify-content: center;
   align-items: center;
   font-weight: bold;
+}
+
+.check-badge {
+  position: relative;
+}
+.check-badge::before {
+  content: "";
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  width: 40px;
+  height: 40px;
+}
+.check-badge--blue::before {
+  background-image: url("../img/cb-blue.svg");
+}
+.check-badge--pink::before {
+  background-image: url("../img/cb-pink.svg");
+}
+.check-badge--silver::before {
+  background-image: url("../img/cb-silver.svg");
+}
+.check-badge--gold::before {
+  background-image: url("../img/cb-gold.svg");
+}
+
+.avatar.main-avatar {
+  position: relative;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  display: block;
+  -o-object-fit: cover;
+     object-fit: cover;
+  aspect-ratio: 1/1;
 }
 
 .mm-spn.mm-spn--light {
@@ -2257,8 +2305,6 @@ body {
   justify-content: center;
   align-items: center;
   border-radius: 10px;
-  width: 100%;
-  height: 100%;
 }
 @media screen and (max-width: 768px) {
   .mypage .profile .image {
@@ -3124,10 +3170,6 @@ body {
   text-align: center;
   margin-bottom: 40px;
 }
-.profile-edit button[type=submit] {
-  color: white;
-  padding: 8px;
-}
 
 .signup .form__wrap, .login .form__wrap {
   margin: 80px auto;
@@ -3933,15 +3975,7 @@ body {
   transform: scaleX(-1);
 }
 .h2lciq .wrap .btn-lciq {
-  display: block;
-  width: 50%;
-  font-size: clamp(1.6rem, 1.5346938776rem + 0.2040816327vw, 1.8rem);
-  padding: 4px;
-  border-radius: 8px;
   margin: 8px auto 24px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 .h2lciq .wrap .btn-lciq::after {
   font-family: "Material Symbols Outlined";

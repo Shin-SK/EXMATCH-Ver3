@@ -2,6 +2,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% load widget_tweaks %}
+{% load badges %}
 
 {% block title %}
 プロフィール編集
@@ -30,36 +31,110 @@
 
         <div class="form__wrap">
 
-            
-            <h2>本人確認書類</h2>
-            <div class="items id-doc">
+        <h2>本人確認書類</h2>
+        <div class="items id-doc">
+
+            {# 1. 身分証明書 #}
             <div class="item profile-image">
-                <div class="head">書類画像</div>
-
+                <div class="head">身分証明書画像</div>
                 <div class="field">
-                <div class="inner image">
-                    {% if form_fixed.instance.id_doc_image %}
-                        <img src="{{ form_fixed.instance.id_doc_image.url }}" alt="current">
-                        {{ form_fixed.id_doc_image.clear_checkbox }} 画像を削除
-                    {% else %}
-                        <img src="{% static 'img/noimage.jpg' %}" alt="no image">
-                    {% endif %}
+                    <div class="inner image">
+                        {% with sub=user.verifications|get_doc:'identify' %}
+                            {% if sub and sub.image %}
+                                <img src="{{ sub.image.url }}" alt="current">
+                            {% else %}
+                                <img src="{% static 'img/noimage.jpg' %}" alt="no image">
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                    <div class="inner arrow">▶</div>
+                    <div class="inner file">
+                        {% with field=form_verify.doc_identify %}
+                            {{ field|add_class:"filepond" }}
+                        {% endwith %}
+                    </div>
                 </div>
-
-                <div class="inner arrow">▶</div>
-
-                <div class="inner file">
-                    {{ form_fixed.id_doc_image }}
-                </div>
-                </div>
-                <p class="note mt-4 fs-6">※ 運転免許証・マイナンバーカードなど顔写真付き公的身分証をアップロードしてください</p>
             </div>
+
+            {# 2. 独身証明書 #}
+            <div class="item profile-image">
+                <div class="head">独身証明書画像</div>
+                <div class="field">
+                    <div class="inner image">
+                        {% with sub=user.verifications|get_doc:'single' %}
+                            {% if sub and sub.image %}
+                                <img src="{{ sub.image.url }}" alt="current">
+                            {% else %}
+                                <img src="{% static 'img/noimage.jpg' %}" alt="no image">
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                    <div class="inner arrow">▶</div>
+                    <div class="inner file">
+                        {% with field=form_verify.doc_single %}
+                            {{ field|add_class:"filepond" }}
+                        {% endwith %}
+                    </div>
+                </div>
             </div>
-            
+
+            {# 3. 年収証明書 #}
+            <div class="item profile-image">
+                <div class="head">年収証明書画像</div>
+                <div class="field">
+                    <div class="inner image">
+                        {% with sub=user.verifications|get_doc:'income' %}
+                            {% if sub and sub.image %}
+                                <img src="{{ sub.image.url }}" alt="current">
+                            {% else %}
+                                <img src="{% static 'img/noimage.jpg' %}" alt="no image">
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                    <div class="inner arrow">▶</div>
+                    <div class="inner file">
+                        {% with field=form_verify.doc_income %}
+                            {{ field|add_class:"filepond" }}
+                        {% endwith %}
+                    </div>
+                </div>
+            </div>
+
+            {# 4. 卒業証明書 #}
+            <div class="item profile-image">
+                <div class="head">卒業証明書画像</div>
+                <div class="field">
+                    <div class="inner image">
+                        {% with sub=user.verifications|get_doc:'graduate' %}
+                            {% if sub and sub.image %}
+                                <img src="{{ sub.image.url }}" alt="current">
+                            {% else %}
+                                <img src="{% static 'img/noimage.jpg' %}" alt="no image">
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                    <div class="inner arrow">▶</div>
+                    <div class="inner file">
+                        {% with field=form_verify.doc_graduate %}
+                            {{ field|add_class:"filepond" }}
+                        {% endwith %}
+                    </div>
+                </div>
+            </div>
+
+            <p class="note mt-4 fs-6">※ 各書類は JPG/PNG でアップロードしてください</p>
+        </div>
+
+        <button class="btn btn-outline-primary btn-flat" type="submit">保存</button>
+
+        <div class="head-set">
             <h2>LCIQ</h2>
-            <p class="lciq-text">
+            <h3>恋愛偏差値©を登録</h3>
+        </div>
+            <p class="lciq-text mt-5">
             LCIQ診断がまだの人は<a href="https://exm.lciq.jp/">こちら</a>から！ <br>
             診断後に画面をスクショして点数をメモして戻ってきてね！
+            <a class="btn btn-primary mt-5" href="{% url 'h2lciq' %}">LCIQ診断とは？</a>
             </p>
 
             <div class="items lciq">
@@ -151,7 +226,7 @@
 
         </div>
 
-        <button type="submit">保存</button>
+        <button class="btn btn-outline-primary btn-flat" type="submit">保存</button>
     </form>
 
 </div>

@@ -214,3 +214,15 @@ class ContactForm(forms.Form):
             "email": user.email,
             "name":  name,
         })
+
+
+
+class VerificationUploadForm(forms.Form):
+	doc_identify	= forms.ImageField(label='身分証明書', required=False,
+						widget=forms.ClearableFileInput(attrs={'class':'filepond'}))
+	doc_single		= forms.ImageField(label='独身証明書', required=False,
+						widget=forms.ClearableFileInput(attrs={'class':'filepond'}))
+	doc_income		= forms.ImageField(label='年収証明書', required=False,
+						widget=forms.ClearableFileInput(attrs={'class':'filepond'}))
+	doc_graduate	= forms.ImageField(label='卒業証明書', required=False,
+						widget=forms.ClearableFileInput(attrs={'class':'filepond'}))

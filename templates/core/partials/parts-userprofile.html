@@ -1,5 +1,6 @@
 <!-- templates/core/partials/parts-userprofile.html -->
 {% load static %}
+{% load badges %}
 
 
 <div class="feed">
@@ -12,11 +13,7 @@
 
 					<div class="slide avator">
 						<a href="{% url 'user_profile_detail' user_id=user_obj.id %}">
-							{% if user_obj.userprofile and user_obj.userprofile.profile_image %}
-								<img src="{{ user_obj.userprofile.profile_image.url }}" alt="プロフィール画像">
-							{% else %}
-								<img src="{% static 'img/user-unset.webp' %}" alt="">
-							{% endif %}
+							{{ user_obj|avatar_with_badge }}
 						</a>
 					</div>
 					<div class="slide lciq-area">

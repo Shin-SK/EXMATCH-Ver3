@@ -37,13 +37,7 @@
 			}
 		}
 		.btn-lciq{
-			display: block;
-			width: 50%;
-			@include fs(16);
-			padding: 4px;
-			border-radius: 8px;
 			margin: 8px auto 24px;
-			@include flex();
 			&::after{
 				@include gi("keyboard_arrow_right");
 				@include fs(20);

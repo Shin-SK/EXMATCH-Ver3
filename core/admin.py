@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import UserProfile, Match, Message, ProfileField, ProfileFieldValue, Footprint
+from .models import UserProfile, Match, Message, ProfileField, ProfileFieldValue, Footprint, VerificationSubmission
 from django.utils import timezone    
 from .utils import geocode_address
 
@@ -59,3 +59,12 @@ class FootprintAdmin(admin.ModelAdmin):
     list_filter = ('created_at',)
     autocomplete_fields = ('from_user', 'to_user')
     readonly_fields = ('created_at',)         # 作成日時は自動付与  
+
+
+
+@admin.register(VerificationSubmission)
+class VerificationSubmissionAdmin(admin.ModelAdmin):
+	list_display	= ('user', 'doc_type', 'status', 'submitted_at', 'reviewed_at')
+	list_filter		= ('doc_type', 'status')
+	search_fields	= ('user__username',)
+	readonly_fields	= ('submitted_at',)
