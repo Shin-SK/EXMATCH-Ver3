@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import UserProfile, Match, Message, ProfileField, ProfileFieldValue, Footprint, VerificationSubmission
+from .models import UserProfile, Match, Message, ProfileField, ProfileFieldValue, Footprint, VerificationSubmission, Report
 from django.utils import timezone    
 from .utils import geocode_address
 
@@ -68,3 +68,9 @@ class VerificationSubmissionAdmin(admin.ModelAdmin):
 	list_filter		= ('doc_type', 'status')
 	search_fields	= ('user__username',)
 	readonly_fields	= ('submitted_at',)
+
+
+@admin.register(Report)
+class ReportAdmin(admin.ModelAdmin):
+    list_display = ("reported", "reporter", "reason",
+                    "status", "created_at")

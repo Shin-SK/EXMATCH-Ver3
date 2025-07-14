@@ -101,7 +101,6 @@ button a {
   width: 100%;
   color: white;
   text-decoration: none;
-  padding: 8px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -144,16 +143,71 @@ button a {
 }
 
 .btn {
-  font-size: clamp(1.6rem, 1.5346938776rem + 0.2040816327vw, 1.8rem);
+  font-size: clamp(1.4rem, 1.3346938776rem + 0.2040816327vw, 1.6rem);
+}
+
+.btn-primary {
+  font-size: clamp(1.4rem, 1.3346938776rem + 0.2040816327vw, 1.6rem);
   padding: 4px 12px;
   margin: 8px auto;
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 100px;
 }
-.btn.btn-flat {
+.btn-primary.btn-radius {
   border-radius: 8px;
+}
+
+.btn-sm {
+  font-size: 1rem;
+}
+
+/* ── 塗りつぶしボタン ─────────────── */
+.btn-pink {
+  --bs-btn-color: #fff; /* 文字色 */
+  --bs-btn-bg: #f07884; /* 背景色 */
+  --bs-btn-border-color:#f07884;
+  --bs-btn-hover-color:#fff;
+  --bs-btn-hover-bg:#e76c78; /* hover は少し暗く */
+  --bs-btn-hover-border-color:#e76c78;
+  --bs-btn-active-bg:#d8626e; /* active でもう少し暗く */
+  --bs-btn-active-border-color:#d8626e;
+}
+
+/* ── アウトライン版 ─────────────── */
+.btn-outline-pink {
+  --bs-btn-color:#f07884;
+  --bs-btn-border-color:#f07884;
+  --bs-btn-hover-color:#fff;
+  --bs-btn-hover-bg:#f07884;
+  --bs-btn-hover-border-color:#f07884;
+  --bs-btn-active-color:#fff;
+  --bs-btn-active-bg:#d8626e;
+  --bs-btn-active-border-color:#d8626e;
+}
+
+/* 塗りつぶし ----------------------------- */
+.btn-yellow {
+  --bs-btn-color: #212529; /* 文字＝ほぼ黒 */
+  --bs-btn-bg: #F6AB00; /* 基本色 */
+  --bs-btn-border-color:#F6AB00;
+  --bs-btn-hover-color:#212529;
+  --bs-btn-hover-bg:#e09a00; /* hover＝少し暗く */
+  --bs-btn-hover-border-color:#e09a00;
+  --bs-btn-active-bg:#c88700; /* active＝さらに暗く */
+  --bs-btn-active-border-color:#c88700;
+}
+
+/* アウトライン ----------------------------- */
+.btn-outline-yellow {
+  --bs-btn-color:#F6AB00;
+  --bs-btn-border-color:#F6AB00;
+  --bs-btn-hover-color:#212529;
+  --bs-btn-hover-bg:#F6AB00;
+  --bs-btn-hover-border-color:#F6AB00;
+  --bs-btn-active-color:#212529;
+  --bs-btn-active-bg:#c88700;
+  --bs-btn-active-border-color:#c88700;
 }
 
 /*------------------------------------
@@ -556,6 +610,12 @@ body {
   -o-object-fit: cover;
      object-fit: cover;
   aspect-ratio: 1/1;
+}
+.avatar.main-avatar img {
+  width: 100%;
+  height: 100%;
+  -o-object-fit: cover;
+     object-fit: cover;
 }
 
 .mm-spn.mm-spn--light {
@@ -2393,12 +2453,6 @@ body {
 .mypage .profile .lciq-score .wrap .button-area {
   width: 100%;
 }
-.mypage .profile .lciq-score .wrap .button-area button {
-  background-color: #F6AB00;
-}
-.mypage .profile .lciq-score .wrap .button-area button a {
-  padding: 0px;
-}
 .mypage .profile .lciq-score .wrap .button-area .point {
   font-size: clamp(1.2rem, 1.1346938776rem + 0.2040816327vw, 1.4rem);
   display: flex;
@@ -2844,18 +2898,6 @@ body {
   padding-top: 0;
   margin-top: 16px;
 }
-.feed .box .btn__area button {
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  padding: 4px;
-  font-weight: bold;
-}
-.feed .box .btn__area .message {
-  background-color: #F07884;
-}
 .feed .box.option-user {
   border: 2px #F07884 solid;
 }
@@ -2934,18 +2976,11 @@ body {
   max-width: 768px;
   margin: auto;
 }
-.profile-detail .avator {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.profile-detail .avator img {
-  aspect-ratio: 16/9;
-  -o-object-fit: cover;
-     object-fit: cover;
+.profile-detail .avatar.main-avatar {
+  aspect-ratio: unset;
 }
 @media screen and (max-width: 768px) {
-  .profile-detail .avator img {
+  .profile-detail .avatar.main-avatar {
     aspect-ratio: 1/1;
   }
 }
@@ -3060,24 +3095,6 @@ body {
   align-items: center;
   gap: 16px;
   margin: 40px auto;
-  padding: 0px 16px;
-}
-.profile-detail .actions .btn {
-  border-radius: 100px;
-  color: white;
-  font-size: clamp(1.4rem, 1.3346938776rem + 0.2040816327vw, 1.6rem);
-  flex: 1;
-  padding: 8px;
-  font-weight: bold;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.profile-detail .actions .btn.like {
-  background-color: #F07884;
-}
-.profile-detail .actions .btn.message {
-  background-color: #004C71;
 }
 
 .mini-list h1 {

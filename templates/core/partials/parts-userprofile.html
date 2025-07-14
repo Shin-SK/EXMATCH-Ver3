@@ -75,10 +75,12 @@
 		</div><!-- box__wrap -->
 		<div class="btn__area">
 			{% if user_obj.id in matched_set %}
-				<button class="message" data-color="pink" onclick="location.href='{% url 'chat_room' user_id=user_obj.id %}'"><i class="fas fa-comments"></i>メッセージ
-			</button>
+			<a class="btn btn-pink w-100"
+			href="{% url 'chat_room' user_id=user_obj.id %}">
+			<i class="fas fa-comments me-3"></i>メッセージ
+			</a>
 			{% else %}
-				<button class="like" data-color="blue"><span class="material-symbols-outlined">favorite</span>いいね</button>
+				<button class="btn btn-primary w-100"><span class="material-symbols-outlined me-3">favorite</span>いいね</button>
 			{% endif %}
 		</div>
 	</div><!-- box -->

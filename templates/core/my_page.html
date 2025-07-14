@@ -40,7 +40,7 @@
 					<div class="numb">{{ lciq_value }}</div>
 				</div>
 				<div class="button-area">
-					<button class="yellow"><a href="https://exm.lciq.jp/">再診断</a></button>
+					<button class="btn btn-yellow"><a href="https://exm.lciq.jp/">再診断</a></button>
 					<a class="point" href="https://exm.lciq.jp/">スコアをあげるには？<i class="fas fa-angle-right"></i></a>
 				</div>
 		</div>
@@ -52,12 +52,12 @@
 			<div class="box like">
 				<div class="title"><i class="fas fa-heart"></i>いいね</div>
 				<div class="numb">{{ like_count }}</div>
-				<button><a href="#followed">確認する</a></button>
+				<button class="btn btn-primary"><a href="#followed">確認する</a></button>
 			</div>
 			<div class="box prof">
 				<div class="title">プロフ充実度</div>
 				<div class="numb">{{ completeness_percent }}</div>
-				<button><a href="{% url 'profile_edit' %}">編集する</a></button>
+				<button class="btn btn-primary"><a href="{% url 'profile_edit' %}">編集する</a></button>
 				<div class="point">{{ answered_count }} / {{ total_fields }} 項目回答済み</div>
 			</div>
 		</div>

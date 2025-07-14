@@ -67,6 +67,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_filters',
     'channels',
+    'django_bootstrap5',
+    'django_bootstrap_icons',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -83,6 +85,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'core.middleware.CurrentUserMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -215,10 +218,10 @@ ACCOUNT_LOGOUT_ON_GET = True
 
 ACCOUNT_EMAIL_SUBJECT_PREFIX = "" 
 
-ACCOUNT_USERNAME_REQUIRED      = False
+ACCOUNT_USERNAME_REQUIRED      = True
 ACCOUNT_EMAIL_REQUIRED         = True
 ACCOUNT_EMAIL_VERIFICATION     = "mandatory"
-ACCOUNT_AUTHENTICATION_METHOD  = "email"
+ACCOUNT_AUTHENTICATION_METHOD  = "username_email"
 
 ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = "/signup/profile/"
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION        = True
@@ -237,3 +240,13 @@ STRIPE_ENDPOINT_SECRET = os.getenv("STRIPE_ENDPOINT_SECRET")
 
 CAMPAIGN_BONUS_ACTIVE = True
 OPTION_DISCOUNT_ACTIVE = True
+
+# --- 垢BAN通報 -------------------------------
+REPORT_REASONS = [
+	("abuse",   "暴言・ハラスメント"),
+	("spam",    "スパム行為"),
+	("scam",    "詐欺・金銭要求"),
+	("harass",  "ストーカー・しつこい連絡"),
+	("illegal", "違法・不適切コンテンツ"),
+]
+REPORT_BAN_THRESHOLD = 4

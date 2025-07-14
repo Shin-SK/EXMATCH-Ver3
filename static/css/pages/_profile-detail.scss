@@ -3,14 +3,10 @@
 .profile-detail{
 	max-width: 768px;
 	margin: auto;
-	.avator{
-		@include flex();
-		img{
-			aspect-ratio: 16/9;
-			object-fit: cover;
-			@include md{
-				aspect-ratio: 1/1;
-			}
+	.avatar.main-avatar{
+		aspect-ratio: unset;
+		@include md{
+			aspect-ratio: 1/1;
 		}
 	}
 	.profile{
@@ -116,21 +112,5 @@
 		@include flex();
 		gap: 16px;
 		margin: 40px auto;
-		padding: 0px 16px;
-		.btn{
-			border-radius: 100px;
-			color: white;
-			@include fs(14);
-			flex: 1;
-			padding: 8px;
-			font-weight: bold;
-			@include flex();
-			&.like{
-				background-color: $pink;
-			}
-			&.message{
-				background-color: $mc;
-			}
-		}
 	}
 }

@@ -1,6 +1,6 @@
 <!-- templates/core/user_profile_detail.html -->
 {% extends "base.html" %}
-{% load static %}
+{% load static %}{% load badges %}
 {% block title %}{{ profile.nickname }}{% endblock %}
 {% block main_container %}{% endblock %} 
 {% block content %}
@@ -8,11 +8,7 @@
 
 	<!-- アイコンと自己紹介はお好みで -->
 	<div class="avator">
-		{% if profile.profile_image %}
-			<img src="{{ profile.profile_image.url }}" alt="">
-		{% else %}
-			<img src="{% static 'img/user-unset.webp' %}" alt="">
-		{% endif %}
+		{{ profile.user|avatar_with_badge }}
 	</div>
 	<div class="profile">
 		<div class="profile__main">
@@ -57,7 +53,7 @@
 <div class="actions">
   {# 3. 既にマッチしている #}
   {% if is_matched %}
-	<a class="btn message" href="{% url 'chat_room' user_id=profile.user.id %}">メッセージ</a>
+	<a class="btn btn-primary w-100 message" href="{% url 'chat_room' user_id=profile.user.id %}">メッセージ</a>
 
   {# 2. 自分は like 済みだがマッチしていない #}
   {% elif is_liked %}
@@ -65,10 +61,103 @@
 
   {# 1. まだ何もしていない #}
   {% else %}
-		<a class="btn like" href="{% url 'follow_user' user_id=profile.user.id %}?next={{ request.path }}"><span class="material-symbols-outlined">favorite</span>いいね</a>
+		<a class="btn btn-primary w-100 like" href="{% url 'follow_user' user_id=profile.user.id %}?next={{ request.path }}"><span class="material-symbols-outlined">favorite</span>いいね</a>
   {% endif %}
 </div>
 
 	<!-- <p><a href="{% url 'user_list' %}">← 戻る</a></p> -->
+
+<!-- 通報ボタン -->
+ <div class="d-flex justify-content-center align-items-center gap-2">
+	<button class="btn btn-outline-secondary w-auto btn-sm" data-bs-toggle="collapse" data-bs-target="#reportBox{{ user.id }}">
+		<i class="bi bi-exclamation-triangle"></i>
+	<span class="ms-1">通報</span>
+	</button>
+	<button class="btn btn-outline-secondary w-auto btn-sm js-block-btn"
+		data-uid="{{ profile.user.id }}"
+		data-blocked="{{ is_blocked|yesno:'1,0' }}">
+	{% if is_blocked %}
+	<i class="bi bi-person-check"></i><span class="ms-1">ブロック解除</span>
+	{% else %}
+	<i class="bi bi-person-x"></i><span class="ms-1">ブロック</span>
+	{% endif %}
+	</button>
+ </div>
+
+<!-- アコーディオン内フォーム -->
+<div id="reportBox{{ user.id }}" class="collapse mt-2">
+	<form class="report-form" data-user="{{ user.id }}">
+		<div class="mb-2">
+			<label class="form-label fs-5">理由</label>
+			<select name="reason" class="form-select" required>
+				{% for val,label in REPORT_REASONS %}
+				<option value="{{ val }}">{{ label }}</option>
+				{% endfor %}
+			</select>
+		</div>
+		<div class="mb-2">
+			<label class="form-label fs-5">詳細 (任意)</label>
+			<textarea name="comment" class="form-control" rows="2"></textarea>
+		</div>
+		<button type="submit" class="btn btn-secondary w-auto mx-auto d-block btn-sm">送信</button>
+		<!-- ここに完了メッセージを差し込む -->
+		<p class="mt-2 text-success d-none js-report-done d-flex justify-content-center">通報を受け付けました。ご協力ありがとうございます。</p>
+	</form>
+</div>
+
+<script>
+document.addEventListener("submit", async e=>{
+	if(!e.target.matches(".report-form")) return;
+	e.preventDefault();
+
+	const form = e.target;
+	const uid  = form.dataset.user;
+	const data = new FormData(form);
+	data.append("user_id", uid);
+
+	const res = await fetch("{% url 'create_report' %}", {
+		method: "POST",
+		body: data,
+		headers: { "X-CSRFToken": "{{ csrf_token }}" }
+	});
+	const msgElm = form.querySelector(".js-report-done");
+
+	if(res.ok){
+		msgElm.classList.remove("d-none");   // ✅ 完了文言を表示
+		form.querySelector("button[type=submit]").disabled = true;
+	} else {
+		const j = await res.json().catch(()=>({msg:"送信に失敗しました"}));
+		alert(j.msg);
+	}
+});
+
+document.addEventListener('click', async e=>{
+    const btn = e.target.closest('.js-block-btn');
+    if(!btn) return;
+
+    const uid   = btn.dataset.uid;
+    const nowBlocked = btn.dataset.blocked === '1';
+
+    if(!confirm(nowBlocked ? 'ブロックを解除しますか？'
+                           : 'このユーザーをブロックしますか？')) return;
+
+    const res = await fetch(`/block/${uid}/`, {
+        method:'POST',
+        headers:{'X-CSRFToken':'{{ csrf_token }}'}
+    });
+    const j = await res.json();
+
+    if(j.ok){
+        btn.dataset.blocked = j.blocked ? '1':'0';
+        btn.innerHTML = j.blocked
+            ? '<i class="bi bi-person-check"></i><span class="ms-1">ブロック解除</span>'
+            : '<i class="bi bi-person-x"></i><span class="ms-1">ブロック</span>';
+    }else{
+        alert(j.msg || '操作に失敗しました');
+    }
+});
+</script>
+
+
 </section>
 {% endblock %}

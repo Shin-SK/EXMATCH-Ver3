@@ -1,11 +1,12 @@
 # core/models.py
 from datetime import date
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, UserManager, AbstractUser
 from django.utils import timezone
 from uuid import uuid4
 from model_utils import FieldTracker
 from django.conf import settings
+
 
 # ---- 固定のChoice定義 (既存のまま) ----
 BLOOD_TYPE_CHOICES = (
@@ -319,6 +320,7 @@ class VerificationSubmission(models.Model):
 		on_delete=models.SET_NULL,
 		related_name='reviewed_verifications'
 	)
+	tracker = FieldTracker(fields=['status'])
 
 	class Meta:
 		unique_together = ('user', 'doc_type')
@@ -326,3 +328,75 @@ class VerificationSubmission(models.Model):
 
 	def __str__(self):
 		return f"{self.user.username}-{self.doc_type}-{self.status}"
+
+
+
+
+class Report(models.Model):
+	reporter   = models.ForeignKey(
+		settings.AUTH_USER_MODEL,
+		null=True, on_delete=models.SET_NULL,
+		related_name="reports_sent")
+	reported   = models.ForeignKey(
+		settings.AUTH_USER_MODEL,
+		on_delete=models.CASCADE,
+		related_name="reports_received")
+	reason     = models.CharField(max_length=20, choices=settings.REPORT_REASONS)
+	comment    = models.TextField(blank=True)
+	status     = models.CharField(
+		max_length=20,
+		choices=[("PENDING","未対応"),("ACTION_TAKEN","対応済み")],
+		default="PENDING")
+	created_at = models.DateTimeField(auto_now_add=True)
+	created_date    = models.DateField(default=timezone.now)
+
+	class Meta:
+		constraints = [
+			# 同一日・同一理由での重複通報ブロック
+			models.UniqueConstraint(
+				fields=["reporter","reported","reason","created_at"],
+				name="uniq_daily_report",
+				condition=models.Q(status="PENDING"),
+			)
+		]
+
+	def __str__(self):
+		return f"{self.reported} ← {self.reporter or '匿名'} ({self.reason})"
+
+
+
+
+
+
+# ----- ブロックレコード -----
+class Block(models.Model):
+    blocker = models.ForeignKey(
+        settings.AUTH_USER_MODEL, related_name='blocks_sent',
+        on_delete=models.CASCADE)
+    blocked = models.ForeignKey(
+        settings.AUTH_USER_MODEL, related_name='blocks_received',
+        on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('blocker', 'blocked')   # 二重登録防止
+
+# ----- User Manager  (自動除外付き) -----
+import threading
+_local = threading.local()
+
+def set_current_user(user):      # ミドルウェアから呼ぶ
+    _local.user = user
+
+def get_current_user():
+    return getattr(_local, 'user', None)
+
+class SafeUserManager(UserManager):
+    def get_queryset(self):
+        qs = super().get_queryset()
+        me = get_current_user()
+        if not me:
+            return qs
+        blk_to   = Block.objects.filter(blocker=me).values_list('blocked_id', flat=True)
+        blk_from = Block.objects.filter(blocked=me).values_list('blocker_id', flat=True)
+        return qs.exclude(id__in=blk_to).exclude(id__in=blk_from)

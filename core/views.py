@@ -1,4 +1,5 @@
 # --- core/views.py ---
+from django.conf import settings
 from datetime import timedelta
 from django.db import transaction
 from django.shortcuts import render, redirect, get_object_or_404
@@ -17,16 +18,18 @@ from core.mixins import identity_verified_required
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.core.mail import send_mail, EmailMessage
-from django.conf import settings
 from .forms import ContactForm
 from django.template.loader import render_to_string
-
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.db import IntegrityError
 
 from .filters import DynamicProfileFilter
 from .forms import ProfileEditForm, DynamicProfileFieldForm, VerificationUploadForm
-from .models import UserProfile, Match, Message, Footprint, ProfileFieldValue, ProfileField, VerificationSubmission
+from .models import UserProfile, Match, Message, Footprint, ProfileFieldValue, ProfileField, VerificationSubmission, Report, Block
 from notifications.models import Notification
 from core.utils import get_matched_users, attach_normal_pfv
+
 
 
 
@@ -301,7 +304,7 @@ def user_profile_detail(request, user_id):
 
 	# プラス閲覧権を持つか？
 	viewer	= request.user.userprofile
-	show_plus = viewer.is_standard_plan() or viewer.has_option()
+	show_plus = viewer.is_standard_plan() or viewer.has_option
 
 	# --- いいね / マッチ状態 ---
 	is_liked = Match.objects.filter(
@@ -312,6 +315,9 @@ def user_profile_detail(request, user_id):
 		Q(from_user=target_user, to_user=request.user, status='matched')
 	).exists()
 
+	is_blocked = Block.objects.filter(blocker=request.user,
+                                      blocked=target_user).exists()
+
 	return render(request, 'core/user_profile_detail.html', {
 		'profile':	 profile,
 		'fixed_pairs': fixed_pairs,
@@ -320,6 +326,8 @@ def user_profile_detail(request, user_id):
 		'show_plus':   show_plus,
 		'is_liked':	is_liked,
 		'is_matched':  is_matched,
+		'REPORT_REASONS': settings.REPORT_REASONS,
+		'is_blocked'    : is_blocked,
 	})
 
 
@@ -736,3 +744,57 @@ def contact_view(request):
 def contact_done(request):
 	"""送信完了ページ（テンプレートは簡単に）"""
 	return render(request, "core/contact_done.html")
+
+
+
+@login_required
+@require_POST
+def create_report(request):
+	uid     = request.POST['user_id']
+	reason  = request.POST['reason']
+	comment = request.POST.get('comment','').strip()
+
+	today = timezone.now().date()
+	exists = Report.objects.filter(
+		reporter=request.user,
+		reported_id=uid,
+		reason=reason,
+		created_date=today,
+	).exists()
+	if exists:
+		return JsonResponse({"ok": False, "msg": "今日はすでに通報済みです"}, status=400)
+
+	try:
+		Report.objects.create(
+			reporter = request.user,
+			reported_id = uid,
+			reason  = reason,
+			comment = comment,
+			created_date = today,
+		)
+	except IntegrityError:
+		return JsonResponse({"ok": False, "msg": "今日はすでに通報済みです"}, status=400)
+
+	return JsonResponse({"ok": True})
+
+
+
+
+@login_required
+def toggle_block(request, user_id):
+    # *必ず取得* したいだけなら _base_manager を使う
+    target = User._base_manager.get(id=user_id)
+
+    if target == request.user:
+        return JsonResponse({'ok': False}, status=400)
+
+    obj, created = Block.objects.get_or_create(
+        blocker=request.user, blocked=target)
+
+    if created:           # 新規作成 = ブロックした
+        blocked = True
+    else:                 # 既にあった = ブロック解除
+        obj.delete()
+        blocked = False
+
+    return JsonResponse({'ok': True, 'blocked': blocked})

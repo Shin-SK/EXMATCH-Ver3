@@ -141,18 +141,18 @@
 			padding: 16px;
 			padding-top: 0;
 			margin-top: 16px;
-			button{
-				color: white;
-				@include flex();
-				gap: 8px;
-				padding: 4px;
-				font-weight: bold;
-			}
-			.like{
-			}
-			.message{
-				background-color: $pink;
-			}
+			// button{
+			// 	color: white;
+			// 	@include flex();
+			// 	gap: 8px;
+			// 	padding: 4px;
+			// 	font-weight: bold;
+			// }
+			// .like{
+			// }
+			// .message{
+			// 	background-color: $pink;
+			// }
 		}
 
 		&.option-user{

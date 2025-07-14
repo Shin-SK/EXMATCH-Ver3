@@ -98,12 +98,12 @@
                     }
                     .button-area{
                         width: 100%;
-                        button{
-                            background-color: $lciq;
-                            a{
-                                padding: 0px;
-                            }
-                        }
+                        // button{
+                        //     background-color: $lciq;
+                        //     a{
+                        //         padding: 0px;
+                        //     }
+                        // }
                         .point{
                             @include fs(12);
                             @include flex();

@@ -8,3 +8,8 @@ class CoreConfig(AppConfig):
     def ready(self):
         import core.signals  # シグナルを読み込む
         import core.signals_message  # noqa
+        from django.contrib.auth import get_user_model
+        from core.models import SafeUserManager
+
+        User = get_user_model()            # = auth.User
+        User.add_to_class("objects", SafeUserManager())

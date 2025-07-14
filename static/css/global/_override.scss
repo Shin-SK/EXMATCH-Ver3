@@ -1,15 +1,81 @@
 @use "../global/global" as *;
 
 
+.btn{
+  @include fs(14);
+}
 
-.btn {
-	@include fs(16);
+.btn-primary {
+	@include fs(14);
 	padding: 4px 12px;
 	margin: 8px auto;
 	@include flex();
-  border-radius: 100px;
-  &.btn-flat { border-radius: 8px; }
+  &.btn-radius { border-radius: 8px; }
 }
+
+.btn-sm{
+  font-size: 1rem;
+}
+
+
+
+/* ── 塗りつぶしボタン ─────────────── */
+.btn-pink{
+  --bs-btn-color: #fff;        /* 文字色 */
+  --bs-btn-bg:    #f07884;     /* 背景色 */
+  --bs-btn-border-color:#f07884;
+
+  --bs-btn-hover-color:#fff;
+  --bs-btn-hover-bg:#e76c78;   /* hover は少し暗く */
+  --bs-btn-hover-border-color:#e76c78;
+
+  --bs-btn-active-bg:#d8626e;  /* active でもう少し暗く */
+  --bs-btn-active-border-color:#d8626e;
+}
+
+/* ── アウトライン版 ─────────────── */
+.btn-outline-pink{
+  --bs-btn-color:#f07884;
+  --bs-btn-border-color:#f07884;
+
+  --bs-btn-hover-color:#fff;
+  --bs-btn-hover-bg:#f07884;
+  --bs-btn-hover-border-color:#f07884;
+
+  --bs-btn-active-color:#fff;
+  --bs-btn-active-bg:#d8626e;
+  --bs-btn-active-border-color:#d8626e;
+}
+
+
+/* 塗りつぶし ----------------------------- */
+.btn-yellow{
+  --bs-btn-color: #212529;      /* 文字＝ほぼ黒 */
+  --bs-btn-bg:    #F6AB00;      /* 基本色 */
+  --bs-btn-border-color:#F6AB00;
+
+  --bs-btn-hover-color:#212529;
+  --bs-btn-hover-bg:#e09a00;    /* hover＝少し暗く */
+  --bs-btn-hover-border-color:#e09a00;
+
+  --bs-btn-active-bg:#c88700;   /* active＝さらに暗く */
+  --bs-btn-active-border-color:#c88700;
+}
+
+/* アウトライン ----------------------------- */
+.btn-outline-yellow{
+  --bs-btn-color:#F6AB00;
+  --bs-btn-border-color:#F6AB00;
+
+  --bs-btn-hover-color:#212529;
+  --bs-btn-hover-bg:#F6AB00;
+  --bs-btn-hover-border-color:#F6AB00;
+
+  --bs-btn-active-color:#212529;
+  --bs-btn-active-bg:#c88700;
+  --bs-btn-active-border-color:#c88700;
+}
+
 
 
 /*------------------------------------
