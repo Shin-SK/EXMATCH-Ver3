@@ -100,8 +100,7 @@ body{
     a{
         color: $black;
         :hover{
-            @include transition();
-            opacity: 0.5;
+          color: darken($black, 20%);
         }
     }
     img{

@@ -25,4 +25,6 @@ urlpatterns = [
     path("how-to-lciq/", TemplateView.as_view(template_name="core/h2lciq.html"),name="h2lciq"),
     path("reports/create/", views.create_report, name="create_report"),
     path("block/<int:user_id>/", views.toggle_block, name="toggle_block"),
+    path('verify/<str:doc_type>/delete/', views.delete_verification, name='delete_verification'),
+    path('lciq/delete/', views.delete_lciq_image, name='delete_lciq_image'),
 ]

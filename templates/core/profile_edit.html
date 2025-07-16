@@ -35,13 +35,17 @@
         <div class="items id-doc">
 
             {# 1. 身分証明書 #}
-            <div class="item profile-image">
+            <div class="item image-field">
                 <div class="head">身分証明書画像</div>
                 <div class="field">
-                    <div class="inner image">
+                    <div class="inner image position-relative">
                         {% with sub=user.verifications|get_doc:'identify' %}
                             {% if sub and sub.image %}
                                 <img src="{{ sub.image.url }}" alt="current">
+                                <button type="button"
+                                        class="btn btn-sm w-auto
+                                        position-absolute top-0 start-0 js-del-verify"
+                                        data-doc="identify"><i class="bi bi-x-circle fs-2"></i></button>
                             {% else %}
                                 <img src="{% static 'img/noimage.jpg' %}" alt="no image">
                             {% endif %}
@@ -57,13 +61,17 @@
             </div>
 
             {# 2. 独身証明書 #}
-            <div class="item profile-image">
+            <div class="item image-field">
                 <div class="head">独身証明書画像</div>
                 <div class="field">
-                    <div class="inner image">
+                    <div class="inner image position-relative">
                         {% with sub=user.verifications|get_doc:'single' %}
                             {% if sub and sub.image %}
                                 <img src="{{ sub.image.url }}" alt="current">
+                                <button type="button"
+                                        class="btn btn-sm w-auto
+                                        position-absolute top-0 start-0 js-del-verify"
+                                        data-doc="single"><i class="bi bi-x-circle fs-2"></i></button>
                             {% else %}
                                 <img src="{% static 'img/noimage.jpg' %}" alt="no image">
                             {% endif %}
@@ -79,13 +87,17 @@
             </div>
 
             {# 3. 年収証明書 #}
-            <div class="item profile-image">
+            <div class="item image-field">
                 <div class="head">年収証明書画像</div>
                 <div class="field">
-                    <div class="inner image">
+                    <div class="inner image position-relative">
                         {% with sub=user.verifications|get_doc:'income' %}
                             {% if sub and sub.image %}
                                 <img src="{{ sub.image.url }}" alt="current">
+                                <button type="button"
+                                        class="btn btn-sm w-auto
+                                        position-absolute top-0 start-0 js-del-verify"
+                                        data-doc="income"><i class="bi bi-x-circle fs-2"></i></button>
                             {% else %}
                                 <img src="{% static 'img/noimage.jpg' %}" alt="no image">
                             {% endif %}
@@ -101,13 +113,17 @@
             </div>
 
             {# 4. 卒業証明書 #}
-            <div class="item profile-image">
+            <div class="item image-field">
                 <div class="head">卒業証明書画像</div>
                 <div class="field">
-                    <div class="inner image">
+                    <div class="inner image position-relative">
                         {% with sub=user.verifications|get_doc:'graduate' %}
                             {% if sub and sub.image %}
                                 <img src="{{ sub.image.url }}" alt="current">
+                                <button type="button"
+                                        class="btn btn-sm w-auto
+                                        position-absolute top-0 start-0 js-del-verify"
+                                        data-doc="graduate"><i class="bi bi-x-circle fs-2"></i></button>                                
                             {% else %}
                                 <img src="{% static 'img/noimage.jpg' %}" alt="no image">
                             {% endif %}
@@ -134,67 +150,84 @@
             <p class="lciq-text mt-5">
             LCIQ診断がまだの人は<a href="https://exm.lciq.jp/">こちら</a>から！ <br>
             診断後に画面をスクショして点数をメモして戻ってきてね！
-            <a class="btn btn-primary mt-5" href="{% url 'h2lciq' %}">LCIQ診断とは？</a>
+            <a class="btn btn-primary w-auto mt-5" href="{% url 'h2lciq' %}">LCIQ診断とは？</a>
             </p>
-
-            <div class="items lciq">
-                <div class="item">
-
+        
+            <div class="items">
+                <div class="item image-field">
                     <div class="head">診断スクリーンショット</div>
                     <div class="field">
-                        {{ form_fixed.lciq_image }}
+                        <div class="inner image position-relative">
+                            {% if form_fixed.instance.lciq_image %}
+                            <img src="{{ form_fixed.instance.lciq_image.url }}"
+                                alt="current" class="current-img">
+                            <button type="button"
+                                    class="btn btn-sm w-auto position-absolute top-0 start-0 js-del-lciq">
+                                <i class="bi bi-x-circle fs-2"></i>
+                            </button>
+                            {% else %}
+                            <img src="{% static 'img/noimage.jpg' %}" alt="no image">
+                            {% endif %}
+                        </div>
+                        <div class="inner arrow">▶</div>
+                        <div class="inner file">
+                            {{ form_fixed.lciq_image|add_class:"filepond" }}
+                        </div>
                     </div>
-
-                    <div class="head">LCIQスコア</div>
-                    <div class="field">
+                    <div class="head mt-5">LCIQスコア</div>
+                    <div class="w-100">
                         {{ form_fixed.lciq_score }}
                     </div>
-
                 </div>
             </div>
 
             <h2>必須項目</h2>
             <div class="items">
 
-            <div class="item profile-image">
-                <div class="head">プロフィール画像</div>
+                <div class="item image-field">
+                    <div class="head">プロフィール画像</div>
 
-                <div class="field">
-                <div class="inner image">
-                    {% if form_fixed.instance.profile_image %}
-                    <img src="{{ form_fixed.instance.profile_image.url }}" alt="current">
-                    {% else %}
-                    <img src="{% static 'img/no-image.png' %}" alt="no image">
-                    {% endif %}
-                </div>
+                    <div class="field">
+                    <div class="inner image">
+                        {% if form_fixed.instance.profile_image %}
+                        <img src="{{ form_fixed.instance.profile_image.url }}" alt="current">
+                        {% else %}
+                        <img src="{% static 'img/no-image.png' %}" alt="no image">
+                        {% endif %}
+                    </div>
 
-                <div class="inner arrow">▶</div>
+                    <div class="inner arrow">▶</div>
 
-                <div class="inner file">
-                    {{ form_fixed.profile_image }}
-                </div>
+                    <div class="inner file">
+                        {{ form_fixed.profile_image }}
+                    </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="item bio">
-                <div class="head">自己紹介</div>
+            <div class="items">
+                <div class="item bio">
+                    <div class="head">自己紹介</div>
 
-                <div class="field">
-                {{ form_fixed.bio|add_class:"field" }}
+                    <div class="field">
+                    {{ form_fixed.bio|add_class:"field" }}
+                    </div>
+                    <p class="note">※ 例：趣味や好きなことを書いてみよう！</p>
                 </div>
-                <p class="note">※ 例：趣味や好きなことを書いてみよう！</p>
             </div>
 
-            <div class="item main-area">
-                <div class="head">居住地</div>
+            <div class="items">
+                <div class="item main-area">
+                    <div class="head">居住地</div>
 
-                <div class="field">
-                {{ form_fixed.main_area|add_class:"field" }}
+                    <div class="field">
+                    {{ form_fixed.main_area|add_class:"field" }}
+                    </div>
+                    <p class="note">※ マッチング時の検索に使います。市区町村程度で OK！</p>
                 </div>
-                <p class="note">※ マッチング時の検索に使います。市区町村程度で OK！</p>
             </div>
 
-            </div>
+
 
 
 
@@ -238,6 +271,26 @@ document.querySelectorAll('input.filepond').forEach(input => {
     allowProcess: false,
     labelIdle  : '画像をドラッグ＆ドロップ<br><span class="filepond--label-action">クリックして選択</span>'
   });
+});
+
+document.addEventListener('click', async e => {
+  const btn = e.target.closest('.js-del-verify');
+  if (!btn) return;
+
+  if (!confirm('画像を削除します。よろしいですか？')) return;
+
+  const doc = btn.dataset.doc;
+  const res = await fetch(`/verify/${doc}/delete/`, {
+    method: 'POST',
+    headers: {'X-CSRFToken': '{{ csrf_token }}'}
+  });
+
+  if (res.ok) {
+    alert('削除しました');        // ✅ 成功メッセージ
+    location.reload();             // ✅ 即リロード
+  } else {
+    alert('削除に失敗しました');
+  }
 });
 </script>
 

@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Case, When, Value, IntegerField
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django_filters.views import FilterView
@@ -28,10 +28,7 @@ from .filters import DynamicProfileFilter
 from .forms import ProfileEditForm, DynamicProfileFieldForm, VerificationUploadForm
 from .models import UserProfile, Match, Message, Footprint, ProfileFieldValue, ProfileField, VerificationSubmission, Report, Block
 from notifications.models import Notification
-from core.utils import get_matched_users, attach_normal_pfv
-
-
-
+from core.utils import get_matched_users, attach_normal_pfv, contains_ng, order_by_quality
 
 
 @login_required
@@ -126,31 +123,20 @@ def my_page(request):
 			matched_users_list.append(partner)
 			seen.add(partner)
 
-	# ★ ここで id だけ取り出す
-	matched_ids = [u.id for u in matched_users_list]
+	matched_ids   = [u.id for u in get_matched_users(request.user)]
+	matched_users = order_by_quality(matched_ids)
 
-	# Prefetch を付けた QuerySet を再取得
-	matched_qs  = attach_normal_pfv(
-					get_user_model().objects.filter(id__in=matched_ids)
-				)
-	matched_users_list = list(matched_qs)
-
-	# ───────── リスト取得 ─────────
-	matched_qs = get_user_model().objects.filter(id__in=matched_ids)
-	matched_qs = attach_normal_pfv(matched_qs)	  # ← たった１行追加
-	matched_users_list = list(matched_qs)		   # あとは元と同じ
-
-
-	# いいね「された」レコードを最新順で取得
 	likes_received_qs = (
 		Match.objects
 		.filter(to_user=request.user, status='like')
 		.select_related('from_user', 'from_user__userprofile')
 		.order_by('-created_at')
 	)
+	likes_received_top = likes_received_qs[:5]			  # ★そのまま Match のまま渡す
 
-	likes_received_top = likes_received_qs[:5]   # ← 上位5件だけ
-	liked_users = [lk.from_user for lk in likes_received_qs]
+	# like してきたユーザー一覧（品質順で並べ替えたいなら↓）
+	liked_ids  = [m.from_user_id for m in likes_received_qs]
+	liked_users = order_by_quality(liked_ids)			   # ★User QS に変換
 
 	return render(request, 'core/my_page.html', {
 		'profile': profile,
@@ -160,9 +146,9 @@ def my_page(request):
 		'completeness_percent': completeness_percent,
 		'like_count': like_count,  # テンプレートで表示
 		'lciq_value': lciq_value,
-		'matched_users': matched_users_list,
-		'likes_received_top': likes_received_top,
-		'liked_users': liked_users,
+		"matched_users": matched_users,
+		"likes_received_top": likes_received_top,
+		"liked_users": liked_users,
 		"missing_total": missing_total,
 		'id_verified': id_verified,
 		"all_filled": all_filled,
@@ -316,7 +302,7 @@ def user_profile_detail(request, user_id):
 	).exists()
 
 	is_blocked = Block.objects.filter(blocker=request.user,
-                                      blocked=target_user).exists()
+									  blocked=target_user).exists()
 
 	return render(request, 'core/user_profile_detail.html', {
 		'profile':	 profile,
@@ -327,7 +313,7 @@ def user_profile_detail(request, user_id):
 		'is_liked':	is_liked,
 		'is_matched':  is_matched,
 		'REPORT_REASONS': settings.REPORT_REASONS,
-		'is_blocked'    : is_blocked,
+		'is_blocked'	: is_blocked,
 	})
 
 
@@ -502,6 +488,13 @@ def chat_room(request, user_id):
 				"プロフィール編集から書類をアップロードしてください。"
 			)
 			return redirect("profile_edit")
+	
+		# ★ NG ワードチェック
+		if contains_ng(text):
+			return JsonResponse(
+				{"ok": False, "msg": "不適切な表現が含まれています。修正してください。"},
+				status=400
+			)
 
 		# ③ 送信
 		if text:
@@ -616,6 +609,27 @@ class UserProfileListView(LoginRequiredMixin, FilterView):
 		if me.sexual_object_pref:
 			qs = qs.filter(gender=me.sexual_object_pref)
 
+		qs = qs.annotate(
+			# LCIQ を持っているなら 1、無ければ 0
+			has_lciq=Case(
+				When(lciq_image__isnull=False, then=Value(1)),
+				default=Value(0),
+				output_field=IntegerField()
+			),
+			# 承認済み書類の「種類数」を数える
+			verified_docs=Count(
+				'user__verifications__doc_type',
+				filter=Q(
+					user__verifications__status=VerificationSubmission.Status.APPROVED
+				),
+				distinct=True
+			)
+		).order_by(
+			'-has_lciq',		# ① LCIQ あり優先
+			'-verified_docs',   # ② 書類が多いほど上
+			'-user__last_login' # ③ 最近ログイン順
+		)
+
 		return qs
 
 	def get_filterset(self, filterset_class=None):
@@ -643,23 +657,18 @@ class UserProfileListView(LoginRequiredMixin, FilterView):
 
 		return fs
 
+
+
 	def get_context_data(self, **kwargs):
+		# ① まず親の context
 		context = super().get_context_data(**kwargs)
 
-		# ↓ ① 検索結果 (UserProfile QS) を取得
-		profiles = self.filterset.qs
+		# ② 並び順済み UserProfile → id リスト
+		profiles	 = self.filterset.qs.select_related('user')
+		ordered_ids  = list(profiles.values_list('user_id', flat=True))
 
-		# ↓ ② そこから user_id を抽出
-		user_ids = profiles.values_list('user_id', flat=True)
-
-		# ↓ ③ attach_normal_pfv で normal_pfvs を事前取得
-		users_qs = attach_normal_pfv(
-			get_user_model()
-			.objects.filter(id__in=user_ids)
-			.select_related('userprofile')
-		)
-
-		context["users"] = users_qs   # ← 置き換え
+		# ③ quality 順 に並べ替えた User の QS を作る
+		context["users"] = order_by_quality(ordered_ids)
 		return context
 
 
@@ -750,7 +759,7 @@ def contact_done(request):
 @login_required
 @require_POST
 def create_report(request):
-	uid     = request.POST['user_id']
+	uid	 = request.POST['user_id']
 	reason  = request.POST['reason']
 	comment = request.POST.get('comment','').strip()
 
@@ -782,19 +791,51 @@ def create_report(request):
 
 @login_required
 def toggle_block(request, user_id):
-    # *必ず取得* したいだけなら _base_manager を使う
-    target = User._base_manager.get(id=user_id)
+	# *必ず取得* したいだけなら _base_manager を使う
+	target = User._base_manager.get(id=user_id)
 
-    if target == request.user:
-        return JsonResponse({'ok': False}, status=400)
+	if target == request.user:
+		return JsonResponse({'ok': False}, status=400)
 
-    obj, created = Block.objects.get_or_create(
-        blocker=request.user, blocked=target)
+	obj, created = Block.objects.get_or_create(
+		blocker=request.user, blocked=target)
 
-    if created:           # 新規作成 = ブロックした
-        blocked = True
-    else:                 # 既にあった = ブロック解除
-        obj.delete()
-        blocked = False
+	if created:		   # 新規作成 = ブロックした
+		blocked = True
+	else:				 # 既にあった = ブロック解除
+		obj.delete()
+		blocked = False
 
-    return JsonResponse({'ok': True, 'blocked': blocked})
+	return JsonResponse({'ok': True, 'blocked': blocked})
+
+
+
+
+@require_POST
+@login_required
+def delete_verification(request, doc_type):
+	try:
+		sub = VerificationSubmission.objects.get(
+			user=request.user,
+			doc_type=doc_type
+		)
+		sub.image.delete(save=False)   # Cloudinary などでも OK
+		sub.delete()				   # レコード自体も要らなければ
+		return JsonResponse({'ok': True})
+	except VerificationSubmission.DoesNotExist:
+		return JsonResponse({'ok': False, 'msg': '画像が見つかりません'}, status=404)
+
+
+
+@require_POST
+@login_required
+def delete_lciq_image(request):
+	prof = request.user.userprofile
+	if not prof.lciq_image:
+		return JsonResponse({'ok': False, 'msg': '画像がありません'}, status=404)
+
+	# Cloudinary などでも OK
+	prof.lciq_image.delete(save=False)
+	prof.lciq_image = None
+	prof.save(update_fields=['lciq_image'])
+	return JsonResponse({'ok': True})

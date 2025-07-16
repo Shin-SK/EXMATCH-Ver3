@@ -1,6 +1,19 @@
 {% load static %}
 
 <div class="profile-checklist">
+
+    {% if not profile.lciq_image %}
+    <div class="lciq-caution">
+        <a href="{% url 'h2lciq' %}">
+            <img src="{% static 'img/lciq-logo.svg' %}" alt="LCIQ">
+            <div class="wrap">
+                <div class="head">LCIQ診断がまだ登録されていません</div>
+                <p>恋愛偏差値を測定してマッチ率アップ！</p>
+            </div>
+        </a>
+    </div>
+    {% endif %}
+
 	{% if not id_verified %}
 	<div class="verified-caution">
 		<a href="{% url 'profile_edit' %}">

@@ -102,9 +102,11 @@
 
 <footer class="footer {% block footer_class %}{% endblock %}">
     <ul class="footer__wrap container">
-        <li><a href="{% url 'my_page' %}"><span class="material-symbols-outlined">person</span></a></li>
-        <li><a href="{% url 'userprofile_list' %}"><span class="material-symbols-outlined">search</span></a></li>
-        <li class="chat"><a href="{% url 'chat_index' %}"><span id="notif-badge" class="badge" style="display:none;">0</span><span class="material-symbols-outlined">mail</span></a></li>
+        <li><a href="{% url 'my_page' %}"><i class="bi bi-house-door fs-1"></i></a></li>
+        <li><a href="{% url 'userprofile_list' %}"><i class="bi bi-search fs-1"></i></a></li>
+        <li class="chat"><a href="{% url 'chat_index' %}"><span id="notif-badge" class="badge" style="display:none;">0</span>
+          <i class="bi bi-chat-heart fs-1"></i>
+        </a></li>
         <!-- <li><a href="{% url 'account_logout' %}">ログアウト</a></li> -->
     </ul>
 </footer>

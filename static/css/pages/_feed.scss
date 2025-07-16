@@ -21,7 +21,7 @@
 					max-width: 320px;   /* ← 好きな数字 */
 					margin: 0 auto;
 					width: 100%;
-					overflow: hidden;
+					// overflow: hidden;
 					.avator{
 						@include flex();
 						border-radius: 10px;
@@ -94,7 +94,7 @@
 
 			.info-area{
 				.profile-list{
-					margin-top: 16px;
+					margin-top: 32px;
 					.wrap{
 						display: flex;
 						align-items: center;
@@ -182,6 +182,22 @@
 		@include flex();
 		flex-direction: column;
 		.profile-feed-mini{
+
+			.lciq-score{
+				position: absolute;
+				top: -8px;
+				left: -8px;
+				width: 40px;
+				height: 40px;
+				border-radius: 50%;
+				background-color: $lciq;
+				@include flex();
+				span{
+					@include fs(20);
+					font-weight: bold;
+					color:white;
+				}
+			}//lciq-score
 			a{
 				img{
 					aspect-ratio: 4/3;
@@ -227,3 +243,4 @@
 	}
 
 }
+

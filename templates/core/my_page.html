@@ -40,8 +40,11 @@
 					<div class="numb">{{ lciq_value }}</div>
 				</div>
 				<div class="button-area">
-					<button class="btn btn-yellow"><a href="https://exm.lciq.jp/">再診断</a></button>
-					<a class="point" href="https://exm.lciq.jp/">スコアをあげるには？<i class="fas fa-angle-right"></i></a>
+					<button class="btn btn-yellow"><a href="{% url 'h2lciq' %}">再診断</a></button>
+					<div class="d-flex justify-content-center gap-1 align-items-center fs-5 flex-column mt-3">
+					<a href="https://exm.lciq.jp/">スコアをあげるには？<i class="bi bi-chevron-right"></i></a>
+					<a href="{% url 'profile_edit' %}">編集<i class="bi bi-chevron-right"></i></a>
+					</div>
 				</div>
 		</div>
 		</div>

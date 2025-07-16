@@ -325,9 +325,14 @@ class VerificationSubmission(models.Model):
 	class Meta:
 		unique_together = ('user', 'doc_type')
 		ordering = ['-submitted_at']
+		indexes = [
+			models.Index(fields=['user', 'status', 'doc_type']),
+		]
 
 	def __str__(self):
 		return f"{self.user.username}-{self.doc_type}-{self.status}"
+
+
 
 
 

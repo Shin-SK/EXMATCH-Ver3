@@ -8,7 +8,6 @@
 .btn-primary {
 	@include fs(14);
 	padding: 4px 12px;
-	margin: 8px auto;
 	@include flex();
   &.btn-radius { border-radius: 8px; }
 }
@@ -17,6 +16,11 @@
   font-size: 1rem;
 }
 
+
+:root{
+  --bs-link-color: #004C71;   /* 文字色 */
+  --bs-link-hover-color: darken(#004C71, 20%);;   /* hover 時 */
+}
 
 
 /* ── 塗りつぶしボタン ─────────────── */

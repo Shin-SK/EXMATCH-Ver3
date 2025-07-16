@@ -55,6 +55,7 @@ $(function () {
   $(document).ready(function(){
     $('.slide-area__wrap').slick({
       dots: true,          // 下部インジケータ
+      // dotsClass: 'dots-wrap',
       arrows: false,       // 矢印不要なら
       infinite: true,
       speed: 300,

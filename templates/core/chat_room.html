@@ -61,89 +61,26 @@ Chat with {{ target_user.username }}
 
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  /* ----------------  初期変数  ---------------- */
-  const list       = document.getElementById('messages');
-  let   lastId     = Number(list.dataset.lastid) || 0;
-  const API        = "{% url 'chat_api' user_id=target_user.id %}";
-  const CURRENT    = "{{ request.user.username|escapejs }}";
-  const MY_AVATAR  = `{% if request.user.userprofile.profile_image %}
-                        {{ request.user.userprofile.profile_image.url }}
-                      {% else %}
-                        {% static 'img/user-unset.webp' %}
-                      {% endif %}`.trim();
-
-  /* ---------- Django が埋めた CSRF トークンを取得 ---------- */
-  const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-  
-
-  /* ---------------- メッセージ描画 ---------------- */
-  function append(m){
-    const isMe = (m.sender === CURRENT);
-    const li   = document.createElement('li');
-    li.className = isMe ? 'me' : 'you';
-
-    const avatar = isMe ? MY_AVATAR : m.avatar;
-    li.innerHTML =
-      (isMe ? '' : `<img class="avatar" src="${avatar}" alt="">`) +
-      `<div class="bubble">${m.text}</div>`;
-
-    list.appendChild(li);
-    li.scrollIntoView({block:'end'});
-    lastId = m.id;
-  }
-
-  /* ---------------- ポーリング ---------------- */
-  function poll(){
-    fetch(`${API}?after=${lastId}`)
-      .then(r => r.json())
-      .then(({messages}) => messages.forEach(append))
-      .catch(console.error);
-  }
-  poll();
-  setInterval(poll, 5000);
-
-  /* ---------------- 送信処理 ---------------- */
-  const form  = document.getElementById('chatForm');
-  const input = document.getElementById('msgInput');
-  const POST_URL = "{% url 'chat_room' user_id=target_user.id %}";
-  const CAN_SEND    = JSON.parse("{{ can_send|yesno:'true,false'|escapejs }}");
-  const NEED_PLAN   = JSON.parse("{{ need_plan|yesno:'true,false'|escapejs }}");
-  const NEED_VERIFY = JSON.parse("{{ need_verify|yesno:'true,false'|escapejs }}");
-
-  form.addEventListener('submit', e => {
-    e.preventDefault();
-    const text = input.value.trim();
-    if (!text) return;
-
-    if (!CAN_SEND) {
-      if (NEED_PLAN)   document.getElementById('upgradeModal').style.display = 'flex';
-      if (NEED_VERIFY) document.getElementById('verifyModal').style.display  = 'flex';
-      return;
-    }
-
-    fetch(POST_URL, {
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: {
-        'X-CSRFToken': csrftoken,
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      body: new URLSearchParams({ text })
-    })
-    .then(() => { input.value = ''; poll(); })
-    .catch(console.error);
-  });
-  /* モーダル閉じるボタン */
-  document.getElementById('modalClose')
-          .addEventListener('click', () =>
-              document.getElementById('upgradeModal').style.display = 'none');
-
-});
+window.chatConfig = {
+  api        : "{% url 'chat_api' user_id=target_user.id %}",
+  postUrl    : "{% url 'chat_room' user_id=target_user.id %}",
+  current    : "{{ request.user.username|escapejs }}",
+  canSend    : {{ can_send|yesno:"true,false" }},
+  needPlan   : {{ need_plan|yesno:"true,false" }},
+  needVerify : {{ need_verify|yesno:"true,false" }},
+  myAvatar   : `{% if request.user.userprofile.profile_image %}
+                  {{ request.user.userprofile.profile_image.url }}
+                {% else %}
+                  {% static 'img/user-unset.webp' %}
+                {% endif %}`.trim(),
+  lastId     : {{ messages.last.id|default:0 }}
+};
 </script>
 
 
-    
+<script src="{% static 'js/chat.js' %}"></script>
+
+
 
 {% endblock %}
 

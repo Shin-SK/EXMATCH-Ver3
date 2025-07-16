@@ -5,7 +5,7 @@
 
 <div class="feed">
 	{% for user_obj in users %}
-	<div class="box {% if user_obj.userprofile.has_option %}option-user{% endif %}">
+	<div class="box d-flex flex-column justify-content-between {% if user_obj.userprofile.has_option %}option-user{% endif %}">
 		<div class="box__wrap">
 			<div class="slide-area">
 

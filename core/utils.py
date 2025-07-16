@@ -2,6 +2,13 @@
 import math, requests
 from django.db.models import Q, Prefetch
 from core.models import Match, ProfileFieldValue, ProfileField
+import re
+import unicodedata
+from django.conf import settings
+from django.contrib.auth import get_user_model 
+
+from django.db.models import Q, Count, Case, When, Value, IntegerField
+from .models import UserProfile, VerificationSubmission
 
 
 def get_matched_users(user):
@@ -59,7 +66,56 @@ def attach_normal_pfv(user_qs):
         queryset=ProfileFieldValue.objects
                  .select_related("field")
                  .filter(field__category="normal"),
-        to_attr="normal_pfvs"   # ← これで user_obj.normal_pfvs が使える
+        to_attr="normal_pfvs"
     )
     return user_qs.prefetch_related(normal_pfv)
 
+
+#誹謗中傷ワード系
+
+# ひらがな⇔カタカナ変換用
+_kana_table = str.maketrans(
+    "ぁあぃいぅうぇえぉおゃやゅゆょよっゎわゐゑゕゖゔ",
+    "ァアィイゥウェエォオャヤュユョヨッヮワヰヱヵヶヴ"
+)
+
+def _normalize(text: str) -> str:
+    # 半角→全角・大文字小文字統一など
+    text = unicodedata.normalize('NFKC', text)
+    # カタカナをひらがなに寄せる（or 逆でも可）
+    text = text.translate(_kana_table)
+    return text.lower()
+
+NG_PATTERNS = [re.compile(re.escape(_normalize(w))) for w in settings.NG_WORDS]
+
+def contains_ng(text: str) -> bool:
+    norm = _normalize(text)
+    return any(p.search(norm) for p in NG_PATTERNS)
+
+
+
+
+def order_by_quality(user_ids):
+    profiles = (
+        UserProfile.objects
+        .filter(user_id__in=user_ids)
+        .annotate(
+            has_lciq=Case(
+                When(lciq_image__isnull=False, then=Value(1)),
+                default=Value(0), output_field=IntegerField()),
+            verified_docs=Count(
+                'user__verifications__doc_type',
+                filter=Q(user__verifications__status=
+                         VerificationSubmission.Status.APPROVED),
+                distinct=True)
+        )
+        .order_by('-has_lciq', '-verified_docs', '-user__last_login')
+    )
+    ordered_ids = list(profiles.values_list('user_id', flat=True))
+    when = [When(id=pk, then=pos) for pos, pk in enumerate(ordered_ids)]
+    return attach_normal_pfv(
+        get_user_model().objects
+        .filter(id__in=ordered_ids)
+        .annotate(_o=Case(*when, output_field=IntegerField()))
+        .order_by('_o')
+    )

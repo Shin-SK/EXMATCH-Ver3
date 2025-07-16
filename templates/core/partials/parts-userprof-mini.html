@@ -1,13 +1,15 @@
 <!-- templates/core/partials/parts-userprof-mini.html -->
-{% load static %}
+{% load static %}{% load badges %}
+
 
 	<div class="area">
 		<div class="profile-feed-mini image">
-			<a href="{% url 'user_profile_detail' user_id=user_obj.id %}">
-				{% if user_obj.userprofile.profile_image %}
-					<img src="{{ user_obj.userprofile.profile_image.url }}" alt="プロフィール画像">
-				{% else %}
-					<img src="{% static 'img/user-unset.webp' %}" alt="">
+			<a href="{% url 'user_profile_detail' user_id=user_obj.id %}" class="position-relative">
+				{{ user_obj|avatar_with_badge }}
+				{% if user_obj.userprofile and user_obj.userprofile.lciq_image %}
+				<div class="lciq-score position-absolute">
+					<span>{{ user_obj.userprofile.lciq_score }}</span>
+				</div>
 				{% endif %}
 			</a>
 		</div><!-- mini -->
