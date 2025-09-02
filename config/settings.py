@@ -130,6 +130,7 @@ from corsheaders.defaults import default_headers
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "https://exmatch.netlify.app",
     FRONTEND_BASE_URL
 ]
 CORS_ALLOW_CREDENTIALS = True  # Cookie運ぶなら必須（Tokenでも問題なし）
@@ -143,6 +144,7 @@ CORS_ALLOW_HEADERS = list(default_headers) + [
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "https://exmatch.netlify.app",
     f"{'http' if DEBUG else 'https'}://{BACKEND_DOMAIN}", FRONTEND_BASE_URL
 ]
 
