@@ -55,7 +55,7 @@
         &__wrap{
             width: 100%;
             height: 100vh;
-            background-image: url(../img/kv.webp);
+            background-image: url(/img/kv.webp);
             background-position: center;
             background-size: cover;
             display: flex;
@@ -215,7 +215,7 @@
                             font-weight: bold;
                             &::before, &::after{
                                 content: '';
-                                background-image: url(../img/fuki1.svg);
+                                background-image: url(/img/fuki1.svg);
                                 width: 20px;
                                 height: 20px;
                                 background-repeat: no-repeat;
@@ -569,7 +569,7 @@
                                         content:'';
                                         width: 40px;
                                         height: 40px;
-                                        background-image: url(../img/a-gel.png);
+                                        background-image: url(/img/a-gel.png);
                                         background-position: center;
                                         background-size: contain;
                                         background-repeat: no-repeat;
@@ -589,9 +589,9 @@
                                     margin-top: 8px;
                                     &::before,&::after{
                                         content: '';
-                                        background-image: url("../img/fuki2.svg");
+                                        background-image: url("/img/fuki2.svg");
                                         background-repeat: no-repeat;
-                                        background-image: contain;
+                                        background-size: contain;
                                         background-position: bottom;
                                         width: 20px;
                                         height: 20px;
