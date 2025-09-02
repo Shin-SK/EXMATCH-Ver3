@@ -7,7 +7,11 @@ import { api } from '@/api'
 const t = localStorage.getItem('token')
 if (t) api.defaults.headers.common.Authorization = `Token ${t}`
 
+import { registerSW } from 'virtual:pwa-register'
+registerSW({ immediate: true })
+
 import { createPinia } from 'pinia'
+
 
 import Avatar from '@/components/Avatar.vue'
 import pickAvatar from '@/utils/pickAvatar'
