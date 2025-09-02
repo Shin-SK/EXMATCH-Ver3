@@ -1,0 +1,353 @@
+@use "../global/global" as *;
+@use "sass:color";
+
+.mypage{
+        .toggleTitle{
+            font-weight: bold;
+            @include flex();
+            margin: auto;
+            cursor: pointer;
+            gap: 8px;
+            i{
+                transform: rotate(0deg);
+                transition: transform 0.5s ;
+            }
+            &.active{
+                i{
+                    transform: rotate(90deg);
+                }
+            }
+        }
+
+        .profile{
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            @include md{
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+            .image{
+                position: relative;
+                background-color: $lb;
+                padding: 16px;
+                @include flex();
+                border-radius: 10px;
+                height: fit-content;
+                @include md{
+                    margin: 0px;
+                    margin-bottom: 16px;
+                }
+                img{
+                    width: 100%;
+                    height: 100%;
+                    color: white;
+                    aspect-ratio: 1/1;
+                    object-fit: cover;
+                    object-position: center;
+                }
+                .text{
+                    position: absolute;
+                    bottom: 0;
+                    padding: 32px 8px 24px;
+                    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.8) 30%);
+                    @include flex();
+                    width: 100%;
+                    .name{
+                        font-weight: bold;
+                        width: 100%;
+                        display: flex;
+                        justify-content: center;
+                        align-items: baseline;
+                        @include fs(20);
+                        span{
+                            @include fs(14);
+                            @include flex();
+                            &::before{
+                                @include gi("location_on");
+                            }
+                        }
+                    }
+                }
+            }//image
+
+            .lciq-score{
+                @include flex();
+                .wrap{
+                    width: 80%;
+                    @include flex();
+                    flex-direction: column;
+                    .head-area{
+                        @include flex();
+                        align-items: baseline;
+                        gap: 8px;
+                        margin-bottom: 8px;
+                        .title{
+                            @include fs(14);
+                            font-weight: bold;
+                            margin-bottom: 4px;
+                        }
+                        .numb{
+                            color: $lciq;
+                            @include fs(50);
+                            font-weight: bold;
+                            line-height: 100%
+                        }
+                    }
+                    .lciq-shot{
+                        @include flex();
+                        margin-bottom: 8px;
+                    }
+                    .button-area{
+                        width: 100%;
+                        // button{
+                        //     background-color: $lciq;
+                        //     a{
+                        //         padding: 0px;
+                        //     }
+                        // }
+                        .point{
+                            @include fs(12);
+                            @include flex();
+                            margin-top: 8px;
+                        }
+                    }
+                }
+            }//lciq-score
+        }//profile
+
+        .score{
+            background-color: $lb;
+            &__wrap{
+                display: grid;
+                grid-template-columns: repeat(2,1fr);
+                .box{
+                    @include flex();
+                    flex-direction: column;
+                    position: relative;
+                    gap: 8px;
+                    height:  200px;
+                    padding: 16px;
+                    border-right: 1px white solid;
+                    &:last-of-type{
+                        border-right: unset;
+                    }
+                    .point{
+                        position: absolute;
+                        bottom: 8px;
+                        left: 0;
+                        right: 0;
+                        margin: 0 auto;
+                        @include fs(10);
+                        width: fit-content;
+                        &:hover{
+                            @include transition();
+                            opacity: 0.5;
+                        }
+                    }
+                    .title{
+                        @include fs(16);
+                        font-weight: normal;
+                    }   
+                    .numb{
+                        @include fs(40);
+                        font-weight: bold;
+                    }
+                    button{
+                        width: 70%;
+                        @include md{
+                        width: 100%;
+                        }
+                        a{
+                            padding: 0px;
+                            @include fs(12);
+                        }
+                        &.yellow{
+                            background-color: $lciq;
+                            &:hover {
+                                background-color: color.adjust($lciq, $lightness: 10%);
+                            }
+                        }
+                    }
+                }
+                .like{
+                    i{
+                        color: $pink;
+                        margin-right: 4px;
+                    }
+                }
+                .prof{
+                    .numb{
+                        @include flex();
+                        align-items: baseline;
+                        gap: 4px;
+                        &::after{
+                            content:'%';
+                            @include fs(16);
+                            font-weight: normal;
+                        }
+
+                    }
+                }
+            }
+        }//score
+
+        .menu{
+            ul{
+                li{
+                    border-bottom: 1px $mc dotted;
+                    a{
+                        color: $mc;
+                        display: block;
+                        padding: 16px;
+                        @include flex();
+                        justify-content: flex-start;
+                        span{
+                            margin-right: 4px;
+                        }
+                        &:hover{
+                            @include transition();
+                            opacity: 0.5;
+                            text-decoration: unset;
+                        }
+                    }
+                }
+            }
+        }
+
+        .head-title{
+            @include fs(20);
+            font-weight: bold;
+            @include flex();
+            margin: auto;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .base-profile{
+            @include flex();
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 40px;
+            .text,.area{
+                width: 100%;
+            }
+            .name{
+                margin: auto;
+            }
+            .area{
+                .box{
+                    padding: 8px;
+                    border-bottom: 1px $mc dotted;
+                    &:last-of-type{
+                        border-bottom: unset;
+                    }
+                    .head{
+                        font-weight: bold;
+                    }
+                }
+            }
+        }//base-profile
+
+        .add-profile{
+            h2{
+                margin-bottom: 16px;
+            }
+            .area{
+                .box{
+                    padding: 16px;
+                    gap: 16px;
+                    align-items: center;
+                    &:nth-of-type(even){
+                        background-color: $lb;
+                    }
+                    .head{
+                        font-weight: bold;
+                    }
+                }
+            }
+        }
+        .user-info{
+
+            .area{
+                .box{
+                    padding: 16px;
+                    gap: 16px;
+                    align-items: center;
+                    &:nth-of-type(even){
+                        background-color: $lightgray;
+                    }
+                }
+            }
+        }
+
+
+}
+
+
+.profile-checklist{
+    max-width: 768px;
+    margin: 40px auto;
+    .lciq-caution{
+        background-color: $lciq;
+        border-radius: 100px;
+        padding: 8px 16px;
+        @include flex();
+        margin-bottom: 40px;
+        a{
+            color: white;
+            @include flex();
+            width: 100%;
+            gap: 16px;
+            @include md{
+                flex-direction: column;
+                justify-content: flex-start;
+                gap: 8px;
+            }
+            img{
+                height: 30px;
+            }
+            .head{
+                font-weight: bold;
+            }
+            p{
+                @include fs(10);
+            }
+        }
+    }
+    ul{
+        li{
+            padding: 8px 16px;
+            background-color: $lb;
+            position: relative;
+            &:nth-child(even){
+                background-color: white;
+            }
+            &::after{
+                @include gi(chevron_right);
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                margin: auto 0;
+                right: 8px;
+                @include fs(20);
+            }
+            a{
+                display: flex;
+                justify-content: center;
+                flex-direction: column;
+                width: 100%;
+                @include md{
+                    padding-right: 16px;
+                }
+                .head{
+                    font-weight: bold;
+                }
+                p{
+                    @include fs(10);
+                    color: $mc;
+                }
+            }
+        }
+    }
+}

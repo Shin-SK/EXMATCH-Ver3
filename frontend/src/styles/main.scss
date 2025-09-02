@@ -1,0 +1,32 @@
+// [1] グローバル読み込み
+
+@use "global/global" as *; 
+@use "global/override";
+@use "global/reset";
+
+// [2] パーツやページSCSS読み込み
+
+@use "parts/layout";
+@use "parts/header";
+@use "parts/footer";
+@use "parts/avatar";
+
+@use "pages/home";
+// @use "pages/price";
+@use "pages/base";
+@use "pages/form";
+@use "pages/search";
+@use "pages/mypage";
+@use "pages/registration";
+@use "pages/edit";
+@use "pages/feed";
+@use "pages/auth";
+@use "pages/profile-detail";
+@use "pages/mini-list";
+@use "pages/profile-edit";
+@use "pages/signup";
+@use "pages/chat";
+@use "pages/plan";
+@use "pages/account";
+@use "pages/contact";
+@use "pages/h2lciq";

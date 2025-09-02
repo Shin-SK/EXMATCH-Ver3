@@ -1,0 +1,33 @@
+/* 1) 先にBootstrapの関数/既定変数を読み込む */
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/variables-dark";
+
+/* 2) ブランド色を上書き */
+$primary: #004C71;
+$pink: #f07884;
+
+/* 3) テーマカラーに反映（他色は既定のまま） */
+$theme-colors: map-merge(
+  $theme-colors,
+  (
+    "primary": $primary,
+    "pink": $pink
+  )
+);
+
+/* 4) 派生色の出方を調整（hover/active などの濃さ） */
+$btn-hover-bg-shade-amount: 12%;
+$btn-active-bg-shade-amount: 18%;
+$btn-hover-border-shade-amount: 12%;
+$btn-active-border-shade-amount: 18%;
+
+/* 5) リンク色も主色に合わせる（任意） */
+$link-color: $primary;
+$link-hover-color: shade-color($link-color, 12%);
+
+/* 6) 必要に応じて影色やフォーカスも調整（任意） */
+$btn-focus-shadow-rgb: to-rgb($primary);
+
+/* 7) ここでBootstrap本体を取り込む（上記の上書きが反映される） */
+@import "bootstrap/scss/bootstrap";

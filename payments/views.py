@@ -42,52 +42,55 @@ OPTION_PRICE_HALF = {
     "plus_12m": "price_1RULhqF2VxVQdhvzimcNHgte",
 }
 
+
 @csrf_exempt
 def stripe_webhook(request):
     print("Webhook hit!", timezone.now())
+
+    payload = request.body
+    sig_header = request.META.get("HTTP_STRIPE_SIGNATURE", "")
+    event = None
     try:
         event = stripe.Webhook.construct_event(
-            request.body,
-            request.META.get("HTTP_STRIPE_SIGNATURE"),
-            settings.STRIPE_ENDPOINT_SECRET,
+            payload, sig_header, settings.STRIPE_ENDPOINT_SECRET
         )
-    except (ValueError, stripe.error.SignatureVerificationError):
+    except Exception as e:
+        # 署名不一致やパース失敗などは 400 で即終了（event は使わない）
+        print("[WEBHOOK] construct_event error:", repr(e), "has_sig:", bool(sig_header))
         return HttpResponse(status=400)
 
-    if event["type"] == "checkout.session.completed":
-        s = event["data"]["object"]
+    if event.get("type") != "checkout.session.completed":
+        return HttpResponse(status=200)  # 他イベントは無視
 
-        # ▼▼ デバッグ用 --------------------------
-        plan  = s["metadata"].get("plan")
-        print("Webhook OK:", plan, timezone.now())   # ★ ここに 1 行
-        # ▲▲ ------------------------------------
-    
+    try:
+        s = event["data"]["object"]
+        print(f"[WEBHOOK] completed session={s.get('id')} uid={s.get('client_reference_id')} meta={s.get('metadata')}")
         user_id = s.get("client_reference_id")
         if not user_id:
             return HttpResponse(status=200)
 
-        User  = get_user_model()
-        user  = User.objects.get(id=user_id)
+        User = get_user_model()
+        user = User.objects.get(id=user_id)
 
-        plan   = s["metadata"].get("plan") or "standard_1m"
-        option = s["metadata"].get("option") or None
+        plan   = (s.get("metadata") or {}).get("plan") or "standard_1m"
+        option = (s.get("metadata") or {}).get("option") or None
 
-        # ---------- 決済レコード ----------
-        Payment.objects.create(user=user, plan=plan, option=option)
+        # 決済レコード
+        Payment.objects.create(user=user, plan=plan or None, option=option or None)
 
-        # ---------- 期間計算 ----------
-        info          = PLAN_INFO.get(plan, {"base": 1, "bonus": 0})
-        bonus_months  = info["bonus"] if settings.CAMPAIGN_BONUS_ACTIVE else 0
-        total_months  = info["base"] + bonus_months
+        # 期限更新（現状仕様：上書き型、months 加算）
+        info         = PLAN_INFO.get(plan, {"base": 1, "bonus": 0})
+        bonus_months = info["bonus"] if getattr(settings, "CAMPAIGN_BONUS_ACTIVE", False) else 0
+        total_months = info["base"] + bonus_months
 
-        profile = user.userprofile
-        profile.plan         = "standard"
-        profile.plan_expiry  = timezone.now() + relativedelta(months=total_months)
-        profile.save()
-
-    return HttpResponse(status=200)
-
-
+        prof = user.userprofile
+        prof.plan = "standard"
+        prof.plan_expiry = timezone.now() + relativedelta(months=total_months)
+        prof.save(update_fields=["plan", "plan_expiry"])
+        return HttpResponse(status=200)
+    except Exception as e:
+        print("[WEBHOOK] handler error:", repr(e))
+        return HttpResponse(status=500)
 
 @login_required
 @csrf_exempt

@@ -1,0 +1,10 @@
+// 本人確認書類未提出の場合クリックさせない&画像にブラー
+
+.id-unverified{
+	.feed{
+		pointer-events:none;
+		img{
+			filter: blur(5px);
+		}
+	}
+}

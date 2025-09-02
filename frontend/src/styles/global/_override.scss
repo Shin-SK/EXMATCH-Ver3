@@ -1,0 +1,17 @@
+@use "../global/global" as *;
+
+.btn{
+  @include fs(14);
+}
+
+.form-control, .form-select{
+  @include fs(14);
+}
+
+.form-label{
+  @include fs(12);
+}
+
+small, .small{
+  @include fs(10);
+}

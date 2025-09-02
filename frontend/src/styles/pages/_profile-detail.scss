@@ -1,0 +1,116 @@
+@use "../global/global" as *;
+
+.profile-detail{
+	max-width: 768px;
+	margin: auto;
+	.avatar.main-avatar{
+		aspect-ratio: unset;
+		@include md{
+			aspect-ratio: 1/1;
+		}
+	}
+	.profile{
+		background-color: white;
+		border-radius: 16px;
+		margin-top: -40px;//ネガティマージンで重ねる
+		z-index: 1;
+    	position: relative;
+		padding: 16px;
+		.profile__main{
+			margin: 40px auto;
+			.head{
+				@include fs(30);
+				font-weight: bold;
+				@include flex();
+				gap: 8px;
+				justify-content: flex-start;
+				.wrap{
+					@include flex();
+					align-items: flex-end;
+					span{
+						@include fs(14);
+						margin-left: 4px;
+						margin-bottom: 2px;
+					}
+				}
+			}
+			.main-area{
+				font-weight: bold;
+				display: flex;
+				justify-content: flex-start;
+				align-items: baseline;
+				gap: 16px;
+				margin-bottom: 24px;
+				@include fs(20);
+				span{
+					@include fs(14);
+					display: flex;
+					align-items: center;
+					&::before{
+						@include gi("location_on");
+					}
+				}
+			}
+			.bio{
+				background-color: $lb;
+				padding: 24px 8px;
+				border-radius: 8px;
+			}
+		}
+		.area{
+			.title{
+				@include logoFont;
+				@include fs(30);
+				@include flex();
+				justify-content: flex-start;
+				gap: 16px;
+				margin-bottom: 16px;
+				color: $mc;
+				&::after{
+					content: '';
+					flex: 1;
+					height: 1px;
+					background-color: $mc;
+				}
+			}
+			.fields{
+				.field{
+					display: grid;
+					grid-template-columns: 160px 1fr;
+					align-items: center;
+					padding: 8px;
+					@include md{
+						grid-template-columns: 1fr;
+					}
+					&:nth-of-type(odd){
+						background-color: $lb;
+					}
+					.head{
+						font-weight: bold;
+					}
+				}
+			}//fields
+		}
+		.profile__plus{
+			margin-top: 40px;
+			.fields{
+				.field{
+					&:nth-of-type(odd){
+						background-color: $lightpink;
+					}
+				}
+			}
+			.title{
+				color: $pink;
+				&::after{
+					background-color: $pink;
+				}
+			}
+		}//plus
+	}
+	.actions{
+		@include flex();
+		gap: 16px;
+		margin: 40px auto;
+	}
+}

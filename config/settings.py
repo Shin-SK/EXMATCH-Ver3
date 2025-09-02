@@ -1,14 +1,18 @@
 # settings
 from pathlib import Path
 from dotenv import load_dotenv
-import os
 import environ, os
 import dj_database_url
 from email.utils import formataddr
+from corsheaders.defaults import default_headers, default_methods
+
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")   
+
+BACKEND_DOMAIN      = os.getenv("BACKEND_DOMAIN", "localhost:8000")
+FRONTEND_BASE_URL   = os.getenv("FRONTEND_BASE_URL", "http://localhost:5173").rstrip("/")
 
 
 DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
@@ -20,41 +24,39 @@ CLOUDINARY_STORAGE = {
     "MEDIA_ROOT": "media",
 }
 
+
+# ───────── Heroku など DATABASE_URL が定義されている環境では Postgres ─────────
+
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "exmatch_local",
-        "USER": "exuser",
-        "PASSWORD": "admin",
-        "HOST": "localhost",
-        "PORT": "",
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
+
+# If DATABASE_URL is set (e.g. on Heroku/Render), override with Postgres
+if os.getenv("DATABASE_URL"):
+    DATABASES["default"] = dj_database_url.config(conn_max_age=600, ssl_require=True)
+
 
 STORAGES = {
     "default": {"BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage"},
     "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
 }
 
-
-# ───────── Heroku など DATABASE_URL が定義されている環境では Postgres ─────────
-if "DATABASE_URL" in os.environ:
-    DATABASES["default"] = dj_database_url.config(
-        conn_max_age=600,
-        ssl_require=True,  # Heroku 用
-    )
-
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  
 MEDIA_URL = '/media/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-l!yk$4c0m_*3c_j2lc*zijw(0bcf@3io%gkop&%852)^=_j3p4'
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "insecure-dev-key")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'testserver' , 'exmatch-ddcece3ee103.herokuapp.com']
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = os.getenv("ACCOUNT_PROTOCOL", "http" if DEBUG else "https")
+
+ALLOWED_HOSTS = [ "127.0.0.1", "localhost", BACKEND_DOMAIN ]
 
 # Application definition
 
@@ -65,6 +67,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'django_filters',
     'channels',
     'django_bootstrap5',
@@ -75,6 +78,12 @@ INSTALLED_APPS = [
     'django_contact_form',
     'widget_tweaks',
     "django_browser_reload",
+    'rest_framework.authtoken',
+    'corsheaders',
+    'rest_framework',
+    'dj_rest_auth',
+    
+    'import_export', 
     "cloudinary",
     "cloudinary_storage",
     'post_office',
@@ -85,7 +94,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'core.middleware.CurrentUserMiddleware',
+    'corsheaders.middleware.CorsMiddleware', 
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -96,6 +105,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "allauth.account.middleware.AccountMiddleware",
     "django_browser_reload.middleware.BrowserReloadMiddleware",
+    'core.middleware.CurrentUserMiddleware',
 ]
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
@@ -103,6 +113,39 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 ROOT_URLCONF = 'config.urls'
 
 SITE_ID = 1
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework.authentication.TokenAuthentication",
+        # "rest_framework.authentication.SessionAuthentication",
+    ),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 20,
+}
+
+
+from corsheaders.defaults import default_headers
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    FRONTEND_BASE_URL
+]
+CORS_ALLOW_CREDENTIALS = True  # Cookie運ぶなら必須（Tokenでも問題なし）
+
+# 念のため明示（プリフライトでAuthorization等を許可）
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    "authorization", "x-csrftoken", "x-requested-with", "x-silent",
+]
+
+# 既に入っていればOK
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    f"{'http' if DEBUG else 'https'}://{BACKEND_DOMAIN}", FRONTEND_BASE_URL
+]
+
 
 TEMPLATES = [
     {
@@ -153,12 +196,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
+LANGUAGE_CODE = 'ja'
+TIME_ZONE = 'Asia/Tokyo'
 USE_I18N = True
-
 USE_TZ = True
 
 
@@ -186,8 +226,6 @@ CHANNEL_LAYERS = {
 
 
 # ---------- メール設定 ----------
-EMAIL_BACKEND = 'post_office.EmailBackend'
-
 EMAIL_BACKEND = os.getenv(
 	"DJANGO_EMAIL_BACKEND",          # ← 環境変数があればそれを優先
 	"post_office.EmailBackend"       # ← ない場合は post_office を使う
@@ -211,6 +249,9 @@ AUTHENTICATION_BACKENDS = [
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
+ACCOUNT_LOGIN_METHODS = {"email", "username"}  # セットで指定
+ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
+
 
 # --- Sign-Up / 認証設定 -------------------------------
 LOGIN_REDIRECT_URL = "/mypage/"
@@ -218,16 +259,17 @@ ACCOUNT_LOGOUT_ON_GET = True
 
 ACCOUNT_EMAIL_SUBJECT_PREFIX = "" 
 
-ACCOUNT_USERNAME_REQUIRED      = True
-ACCOUNT_EMAIL_REQUIRED         = True
 ACCOUNT_EMAIL_VERIFICATION     = "mandatory"
-ACCOUNT_AUTHENTICATION_METHOD  = "username_email"
 
-ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = "/signup/profile/"
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION        = True
 ACCOUNT_EMAIL_CONFIRMATION_USER_ACTIVATION = True
 
 ACCOUNT_FORMS = { "signup": "core.forms.CustomSignupForm" }
+
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True                        # クリックだけで確定
+
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL     = f"{FRONTEND_BASE_URL}/login?verified=1"
+ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = f"{FRONTEND_BASE_URL}/login?verified=1"
 
 
 # --- STRIPE -------------------------------

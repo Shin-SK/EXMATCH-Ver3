@@ -1,0 +1,939 @@
+@use "../global/global" as *;
+
+
+.mm-spn.mm-spn--light{
+    background-color: unset;
+}
+.mm-spn li:after{
+    margin-left: 0;
+}
+
+.home{
+    position: relative;
+    // .header{
+    //     position: absolute;
+    //     top: 0;
+    //     left: 0;
+    //     width: 100%;
+    //     background-color:  rgba($color: white, $alpha: 0.9);
+    //     border-bottom: 1px lightgray solid;
+    //     &__wrap{
+    //         display: flex;
+    //         align-items: center;
+    //         justify-content: space-between;
+    //         width: 100%;
+    //         padding: 8px 16px;
+    //         @include md{
+    //         display: none;
+    //         }
+    //         .logo{
+    //             img{
+    //                 height: 40px;
+    //             }
+    //         }
+    //         ul{
+    //             @include flex();
+    //             gap: 16px;
+    //         }
+    //     }
+    //     .sp{
+    //         display: none;
+    //         @include md{
+    //             display: flex;
+    //         }
+    //         .nav-button{
+    //             background-color: unset;
+    //             border: unset;
+    //             box-shadow: unset;
+    //             border-radius: unset;
+    //             width: auto;
+    //             transition: unset;
+    //         }
+    //     }
+    // }
+    .kv{
+        &__wrap{
+            width: 100%;
+            height: 100vh;
+            background-image: url(../img/kv.webp);
+            background-position: center;
+            background-size: cover;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            @include md{
+                padding: unset;
+                background-position: 20%;
+            }
+            .area{
+                width: 50%;
+                height: 100%;
+                @include flex();
+                @include md{
+                width: 100%;
+                }
+                .box{
+                    @include flex();
+                    flex-direction: column;
+                    gap: 40px;
+                    background-color: rgba($color: white, $alpha: 0.9);
+                    border-radius: 16px;
+                    padding: 40px 16px;
+                    width: 70%;
+                    max-width: 400px;
+                    @include md{
+                    width: auto;
+                    }
+                    h2{
+                        color: $mc;
+                        @include fs(20);
+                        font-weight: bold;
+                        letter-spacing: 4px;
+                        &::after{
+                            content: '';
+                            width: 40px;
+                            height: 2px;
+                            background-color: $mc;
+                            margin: 16px auto;
+                        }
+                    }
+                    h3{
+                        text-align: center;
+                        line-height: 180%;
+                        letter-spacing: 2px;
+                    }
+                    .wrap{
+                        @include flex();
+                        flex-direction: column;
+                        gap: 8px;
+                        width: 100%;
+                        .button{
+                            color: white;
+                            background-color: $mc;
+                            padding: 8px;
+                            @include flex();
+                            width: 100%;
+                            border-radius: 100px;
+                        }
+                    }
+
+                }//box
+            }
+        }//__wrap
+    }//kv
+
+    .cv{
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        z-index: 999;
+        border-top: 1px lightgray solid;
+        background-color:  rgba($color: white, $alpha: 0.9);
+        margin-bottom: 0px;
+        transform:translateY(100%);
+        opacity: 0;
+        transition:opacity .4s ease, transform .4s ease;
+        box-sizing: border-box;
+        &__wrap{
+            @include flex();
+            padding: 16px;
+            .button{
+                background-color: $mc;
+                @include flex();
+                width: 300px;
+                border-radius: 100px;
+                color:white;
+                padding: 8px;
+
+            }
+        }
+        &.show{
+            opacity: 1;
+            transform:translateY(0);
+        }
+    }
+        .midashi{
+            @include flex();
+            flex-direction: column;
+            .h1{
+                @include fs(20);
+                color: $mc;
+                text-align: center;
+                font-weight: bold;
+                margin-bottom: 16px;
+                @include md{
+                    @include fs(20);
+                }
+            }
+            p{
+                text-align: center;
+                margin-bottom: 16px;
+            }
+            .banner{
+                &__wrap{
+                    width: 70%;
+                    margin: 0 auto;
+                    @include md{
+                        width: 100%;
+                    }
+                    a{
+                        display: block;
+                        height: 80px;
+                        img{
+                            height: 100%;
+                            width: auto;
+                            object-fit: contain;
+                        }
+                    }
+                }
+            }
+        }//midashi
+        .mainTitle{
+            @include flex();
+            @include fs(20);
+            font-weight: bold;
+            color: $mc;
+            letter-spacing: 10px;
+            @include md{
+                @include fs(20);
+                letter-spacing: normal;
+                margin-bottom: 16px;
+            }
+        }
+        .feature{
+            &__wrap{
+                .area{
+                    margin-bottom: 80px;
+                    .title{
+                        margin-bottom: 16px;
+                        .honki{
+                            @include fs(20);
+                            @include flex();
+                            gap: 16px;
+                            color: $mc;
+                            font-weight: bold;
+                            &::before, &::after{
+                                content: '';
+                                background-image: url(../img/fuki1.svg);
+                                width: 20px;
+                                height: 20px;
+                                background-repeat: no-repeat;
+                                background-position: center;
+                                background-size: contain;
+                            }
+                            &::after{
+                                transform: scaleX(-1);
+                            }
+                        }
+                        .subtitle{
+                            @include fs(20);
+                            text-align: center;
+                            margin-top: 8px;
+                            font-weight: bold;
+                        }
+                    }
+                    .outer{
+                        @include flex();
+                        gap: 16px;
+                        align-items: flex-start;
+                        @include sp{
+                            flex-direction: column;
+                        }
+                        .box{
+                            flex: 1;
+                            .img{
+                                img{
+                                    width: 100%;
+                                    aspect-ratio: 16/9;
+                                    object-fit: cover;
+                                }
+                            }
+                            .text{
+                                .head{
+                                    font-weight: bold;
+                                    margin: 8px auto 4px;
+                                    @include fs(18);
+                                }
+                                p{
+                                    @include fs(14);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }//feature
+
+        .koe{
+            .area{
+                margin-top: 16px;
+                display: grid;
+                grid-template-columns: repeat(3,1fr);
+                align-items: start;
+                gap: 16px;
+                @include md{
+                    grid-template-columns: 1fr;
+                }
+                .box{
+                    .img{
+                        img{
+                            width: 100%;
+                            aspect-ratio: 16/9;
+                            object-fit: cover;
+                        }
+                    }
+                    .text{
+                        .head{
+                            font-weight: bold;
+                            margin: 8px auto 4px;
+                            @include fs(14);
+                        }
+                        p{
+                            @include fs(14);
+                        }
+                    }
+                }
+            }
+        }
+        
+        .oaite{
+            .mainTitle{
+                margin-bottom: 16px;
+            }
+            p{
+                text-align: center;
+                margin-bottom: 40px;
+            }
+
+            .oaite__splide{
+                @include flex();
+                white-space: nowrap;
+                justify-content: flex-start;
+                .slick-track{
+                    @include flex();
+                    gap: 16px;
+                }
+                .box{
+                    flex-shrink: 0;
+                    .image{
+                        position: relative;
+                        z-index: 0;
+                        img{
+                            max-width: 200px;
+                            width: 100%;
+                            height: 100%;
+                            border-radius: 8px;
+                            object-fit: cover;
+                            aspect-ratio: 1/1;
+                        }
+                    }
+                    .info{
+                        position: absolute;
+                        padding: 4px;
+                        height: auto;
+                        bottom: 0;
+                        left: 0;
+                        width: 100%;
+                        z-index: 1;
+                        background-color: rgba($color: white, $alpha: 0.5); // 赤色、透明度50%
+                        @include flex();
+                        gap: 4px;
+                        .name{
+                            font-weight: bold;
+                            @include fs(10);
+                            &::after{
+                                content: '/';
+                                margin-left: 4px;
+                                font-weight: normal;
+                            }
+                        }
+                        .lciq{
+                            margin-left: 8px;
+                            @include fs(10);
+                            @include flex();
+                            align-items: baseline;
+                            &::after{
+                                content: '/LCIQ';
+                                @include fs(12);
+                                font-family: $mincho;
+                                margin-left: 4px;
+                            }
+                        }
+                    }
+                }
+            }
+
+            .button-area{
+                @include flex();
+                gap: 16px;
+                margin: 40px auto;
+                button{
+                    color: white;
+                    padding: 4px;
+                    &.female{
+                        $female-color:$pink;
+                        border: 1px $female-color solid;
+                        background-color: white;
+                        color: $female-color;
+                        &.active{
+                            border: unset;
+                            background-color: $female-color;
+                            color: white;
+                        }
+                    }
+                    &.male{
+                        $male-color:$mc;
+                        border: 1px $male-color solid;
+                        background-color: white;
+                        color: $male-color;
+                        &.active{
+                            background-color: $male-color;
+                            border: unset;
+                            color: white;
+                        }
+                    }
+                }
+
+            }
+        }//oaite
+
+
+        .subtitle{
+            text-align: center;
+            margin-top: 24px;
+            @include md{
+                margin-top: 8px;
+            }
+            span{
+                display: block;
+                @include fs(10);
+                text-align: center;
+            }
+        }
+
+        .price-home{
+            $free-color:$green;
+            $standard-color:$mc;
+            $option-color:$pink;
+            .subtitle{
+                margin-top: 16px;
+            }
+
+            &__wrap{
+                .numb-month{
+                    display: flex;
+                    align-items: baseline;
+                    @include fs(40);
+                    font-weight: bold;
+                    gap: 4px;
+                    &::after{
+                        content: '円/月';
+                        @include fs(16);
+                    }
+
+                }
+                .frame-area{
+                    margin: 40px auto;
+                    max-width: 768px;
+                    .box{
+                        .head{
+                            width: 100%;
+                            @include flex();
+                            color: white;
+                            background-color: $free-color;
+                        }
+                        .wrap{
+                            border: 1px $free-color solid;
+                            padding: 16px;
+                            .outer{
+                                @include flex();
+                                @include md{
+                                    flex-direction: column;
+                                    gap: 40px;
+                                }
+                                .left, .right{
+                                    flex:1;
+                                }
+                                .left{
+                                    @include flex();
+                                    flex-direction: column;
+                                    gap: 16px;
+                                    p{
+                                        @include fs(14);
+                                        text-align: center;
+                                    }
+                                }
+                                .right{
+                                    ul{
+                                        li{
+                                            &::before{
+                                                @include gi(check);
+                                                color: $free-color;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                .standard-area{
+                    .catch{
+                        text-align: center;
+                        @include flex();
+                        margin: 24px auto;
+                    }
+                    .plan{
+                        @include flex();
+                        gap: 40px;
+                    }
+                }
+                .pack-area{
+                    display: grid;
+                    grid-template-columns: repeat(3,300px);
+                    gap: 16px;
+                    margin-top: 40px;
+                    overflow-x: auto;
+                    justify-content: start;
+                    padding: 16px 0px;
+                    @include md{
+                        grid-template-columns: repeat(3,80vw);
+                        justify-content: start;
+                    }
+                    .box{
+                        display: flex;
+                        flex-direction: column;
+                        gap: 40px;
+                        box-shadow: 0px 0px 15px -10px #777777;
+                        padding: 8px;
+                        padding-bottom: 40px;
+                        .head{
+                            @include flex();
+                            font-weight: bold;
+                            background-color: $standard-color;
+                            color: white;
+                            padding: 8px;
+                        }
+                        .inner{
+                            text-align: center;
+                            font-weight: bold;
+                            @include flex();
+                            .getugaku{
+                                @include fs(40);
+                                justify-content: center;
+                            }
+                        }
+                        .amount{
+                            @include flex();
+                            align-items: baseline;
+                            gap: 4px;
+                            &::before{
+                                content: '合計';
+                                padding: 4px 16px;
+                                background-color:gray;
+                                @include fs(10);
+                                color: white;
+                                margin-right: 4px;
+                            }
+                            span{
+                                @include fs(10);
+                            }
+                        }
+                        .special{
+                            width: 100%;
+                            border-radius: 16px;
+                            border: 1px $mc solid;
+                            padding: 8px;
+                        }
+                        .agel{
+                            .wrap{
+                                @include flex();
+                                flex-direction: column;
+                                gap: 8px;
+                                .numb{
+                                    @include flex();
+                                    align-items: baseline;
+                                    font-weight: bold;
+                                    @include fs(40);
+                                    span{
+                                        @include fs(16);
+                                    }
+                                }
+                                .inner{
+                                    @include flex();
+                                    font-weight: bold;
+                                    text-align: left;
+                                    gap: 8px;
+                                    &::before{
+                                        content:'';
+                                        width: 40px;
+                                        height: 40px;
+                                        background-image: url(../img/a-gel.png);
+                                        background-position: center;
+                                        background-size: contain;
+                                        background-repeat: no-repeat;
+                                    }
+                                }
+                            }
+                        }
+                        .opening{
+                            border: 1px $pink solid;                            
+                            .wrap{
+                                .head{
+                                    @include flex();
+                                    gap: 4px;
+                                    color: $pink;
+                                    background: unset;
+                                    padding: unset;
+                                    margin-top: 8px;
+                                    &::before,&::after{
+                                        content: '';
+                                        background-image: url("../img/fuki2.svg");
+                                        background-repeat: no-repeat;
+                                        background-image: contain;
+                                        background-position: bottom;
+                                        width: 20px;
+                                        height: 20px;
+                                    }
+                                    &::after{
+                                        transform: scaleX(-1);
+                                    }
+                                }
+                                .span{
+                                    font-weight: bold;
+                                    @include fs(40);
+                                    color: $pink;
+                                    @include flex();
+                                }
+                            }
+                        }
+                    }
+                }
+                .option-area{
+                    margin-top: 40px;
+                    .catch{
+                        text-align: center;
+                        @include flex();
+                    }
+                    .box{
+                        .head{
+                            background-color: $option-color;
+                        }
+                        .wrap{
+                            border: 1px $option-color solid;
+                            .outer{
+                                .left{
+                                    .off{
+                                        display: none;
+                                    }
+                                    .sp{
+                                        display: none;
+                                    }
+                                    &.special{
+                                        $tri-gap: 8px;
+                                        @include flex();
+                                        flex-direction: column;
+                                        gap: $tri-gap;
+                                        .normal{
+                                            position: relative;
+                                            @include flex();
+                                            gap: 8px;
+                                            .off{
+                                                @include flex();
+                                                background-color: red;
+                                                color: white;
+                                                font-weight: bold;
+                                                border-radius: 100%;
+                                                aspect-ratio: 1/1;
+                                                padding: 8px;
+                                                text-align: center;
+                                            }
+                                            .numb-month{
+                                                @include flex();
+                                                align-items: flex-end;
+                                                margin: auto;
+                                                position: relative;
+                                                border: unset;
+                                                &::before{
+                                                    content: "";
+                                                    height: 2px;
+                                                    position: absolute;
+                                                    width: 100%;
+                                                    top: 50%;
+                                                    background-color: red;
+                                                }
+                                            }
+                                        }
+                                        .sp{
+                                            @include flex();
+                                            flex-direction: column;
+                                            gap: $tri-gap;
+                                            .triangle{
+                                                span{
+                                                    @include fs(20);
+                                                }
+                                            }
+                                            .numb-month{
+                                                @include fs(40);
+                                                font-weight: bold;
+                                                @include flex();
+                                                align-items: flex-end;
+                                                gap: 4px;
+                                                color: red;
+                                                span{
+                                                    @include fs(16);
+                                                    margin-bottom: 4px;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                .right{
+                                    ul{
+                                        li{
+                                            &::before{
+                                                @include gi(check);
+                                                color: $option-color;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+        .security{
+            &__wrap{
+                margin-top: 40px;
+                display: grid;
+                grid-template-columns: repeat(4,1fr);
+                gap: 40px;
+                @include md{
+                    grid-template-columns: repeat(2,1fr);
+                }
+                .box{
+                    @include flex();
+                    flex-direction: column;
+                    gap: 8px;
+                    span{
+                        @include fs(10);
+                    }
+                }
+            }
+        }//security
+
+        .faq{
+            &__wrap{
+                margin-top: 40px;
+                .box{
+                    margin-bottom: 16px;
+                    .q{
+                        padding: 0px 16px;
+                        width: 100%;
+                        .title{
+                            color: $mc;
+                            &::before{
+                                content: 'Q';
+                                @include fs(30);
+                                font-weight: bold;
+                                margin-right: 16px;
+                            }
+                        }
+                    }
+                    .a{
+                        background-color: $lb;
+                        padding: 8px 16px;
+                        width: 100%;
+                        .title{
+                            color: $pink;
+                            display: flex;
+                            align-items: center;
+                            width: 100%;
+                            &:hover{
+                                cursor: pointer;
+                            }
+                            &::before{
+                                content: 'A';
+                                @include fs(30);
+                                font-weight: bold;
+                                margin-right: 16px;
+                            }
+                            span{
+                                display: flex;
+                                align-items: center;
+                                width: 100%;
+                                justify-content: space-between;
+                            }
+                        }
+                    }
+                }//box
+            }//__wrap
+        }//faq  
+
+        .exm-banner{
+            @include flex();
+            flex-direction: column;
+            margin: 80px auto;
+            h2{
+                font-weight: bold;
+                text-align: center;
+                @include flex();
+                margin-bottom: 40px;
+                line-height: 150%;
+            }
+        }
+
+    //■■■■■■■■■■■ swiper ■■■■■■■■■■■ //
+
+    .oaite__loop{
+        &.swiper {
+            width: 100%;
+            overflow: hidden; /* スライダー外の要素を隠す */
+        }
+        
+        .swiper-slide {
+            width: auto; /* コンテンツの幅に合わせる */
+            @include flex();
+        }
+
+}
+
+
+.nav{
+    &__wrap{
+        .logo{
+            height: auto;
+            img{
+                height: 40px;
+            }
+        }
+        .menu{
+            @include flex();
+            gap: 40px;
+            ul{
+                @include flex();
+                gap: 40px;
+            }
+            .login{
+                padding: 8px 16px;
+                border-radius: 100px;
+                background-color: $pink;
+                color: white;
+                span{
+                    @include flex();
+                    gap: 8px;
+                    color: white;
+                    &::before{
+                        font: var(--fa-font-solid);
+                        content: '\f090';
+                        color: white;
+                        @include fs(12);
+                    }
+                }
+            }   
+        }
+    }
+    &__sp{
+        justify-content: space-between;
+        align-items: center;
+        .logo{
+            z-index: 99999;
+            img{
+                height: 35px;
+            }
+        }
+    }//__sp
+    .nav-inner{
+        @include flex();
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+        ul{
+            width: 100%;
+            padding-top: 60px;
+            li{
+                border-bottom: 1px $mc dotted;
+                &:first-child{
+                    border-top: 1px $mc dotted;
+                }
+                a{
+                    &::after{
+                        font: var(--fa-font-solid);
+                        content: '\f105';
+                        @include fs(16);
+                        color: $mc;
+                    }
+                }
+            }
+        }
+        .login{
+            padding: 8px 16px;
+            border-radius: 100px;
+            background-color: $pink;
+            color: white;
+            margin-bottom: 100px;
+            width: 90%;
+            span{
+                @include flex();
+                gap: 8px;
+                color: white;
+                &::before{
+                    font: var(--fa-font-solid);
+                    content: '\f090';
+                    color: white;
+                    @include fs(12);
+                }
+            }
+        }
+    }
+}
+
+
+.footer-home{
+    background-color: $lb;
+    padding: 40px 0px;
+    .sns{
+        @include flex();
+        justify-content: space-around;
+        img{
+            max-height: 40px;
+        }
+    }
+    &__wrap{
+        margin: 40px auto;
+        ul{
+            display: grid;
+            grid-auto-flow: column;
+            grid-template-rows: repeat(4, auto);
+            gap: 4px;
+            @include md{
+                grid-auto-flow: row;
+                justify-items: center; /* 中央揃えを維持 */
+            }
+            li{
+                a{
+                    @include fs(12);
+                }
+            }
+        }
+    }
+    .logo{
+        @include flex();
+        img{
+            width: 150px;
+            height: auto;
+        }
+    }
+    .cr{
+        @include flex();
+        text-align: center;
+        padding: 40px 0px;
+    }
+  }
+
+}//home

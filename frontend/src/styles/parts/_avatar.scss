@@ -1,0 +1,63 @@
+/* src/styles/parts/_avatar.scss */
+/* エラー・警告が出ない版（色名は文字列、パスは /img/ を使用） */
+
+$badge-colors: ('blue', 'pink', 'silver', 'gold');
+
+.check-badge {
+  position: relative;
+
+  /* バッジ共通（疑似要素で重ねる） */
+  &::before {
+    content: '';
+    position: absolute;
+    right: 16px;
+    top: 16px;
+    width: 40px;
+    height: 40px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+  }
+
+  /* 色ごとの差分を自動生成 */
+  @each $c in $badge-colors {
+    &--#{$c} {
+      &::before {
+        /* public/img/cb-*.svg を参照 */
+        background-image: url('/img/cb-#{$c}.svg');
+      }
+    }
+  }
+
+  /* バッジ無しの明示的クラス（必要なら） */
+  &--none::before { content: none; }
+}
+
+/* ミニ表示用（サイズだけ調整） */
+.profile-feed-mini {
+  .check-badge::before {
+    right: 8px;
+    top: 8px;
+    width: 24px;
+    height: 24px;
+  }
+}
+
+/* アバター共通 */
+.avatar {
+  &.main-avatar {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+  }
+}

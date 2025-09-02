@@ -22,7 +22,7 @@ urlpatterns = [
     path('likes_received/', views.likes_received_list, name='likes_received_list'),
     path("contact/", views.contact_view, name="contact"),
     path("contact/sent/", views.contact_done, name="contact_done"),
-    path("how-to-lciq/", TemplateView.as_view(template_name="core/h2lciq.html"),name="h2lciq"),
+    # path("how-to-lciq/", TemplateView.as_view(template_name="core/h2lciq.html"),name="h2lciq"),
     path("reports/create/", views.create_report, name="create_report"),
     path("block/<int:user_id>/", views.toggle_block, name="toggle_block"),
     path('verify/<str:doc_type>/delete/', views.delete_verification, name='delete_verification'),

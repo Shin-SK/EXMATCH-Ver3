@@ -1,0 +1,35 @@
+@use "../global/global" as *;
+
+
+.email-confirm, .email-sent{
+	min-height: 50vh;
+	@include flex();
+	.wrap{
+		@include flex();
+		flex-direction: column;
+		gap: 40px;
+		h1{
+			@include fs(20);
+			font-weight: bold;
+			color: $mc;
+		}
+		p{
+			text-align: center;
+			@include flex();
+			flex-direction: column;
+			gap: 8px;
+			span{
+				display: block;
+			}
+		}
+		button{
+			color: white;
+			width: 200px;
+			border-radius: 100px;
+			padding: 4px;
+		}
+		a{
+			border-bottom: 1px $mc solid;
+		}
+	}
+}

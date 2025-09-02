@@ -1,7 +1,7 @@
 # core/models.py
 from datetime import date
 from django.db import models
-from django.contrib.auth.models import User, UserManager, AbstractUser
+from django.contrib.auth.models import User, UserManager, AbstractUser, AnonymousUser
 from django.utils import timezone
 from uuid import uuid4
 from model_utils import FieldTracker
@@ -396,12 +396,18 @@ def set_current_user(user):      # ミドルウェアから呼ぶ
 def get_current_user():
     return getattr(_local, 'user', None)
 
+
+
 class SafeUserManager(UserManager):
     def get_queryset(self):
         qs = super().get_queryset()
         me = get_current_user()
-        if not me:
+        if not me or not getattr(me, "is_authenticated", False):
             return qs
-        blk_to   = Block.objects.filter(blocker=me).values_list('blocked_id', flat=True)
-        blk_from = Block.objects.filter(blocked=me).values_list('blocker_id', flat=True)
+        try:
+            uid = int(me.pk)
+        except (TypeError, ValueError):
+            return qs
+        blk_to   = Block.objects.filter(blocker_id=uid).values_list('blocked_id', flat=True)
+        blk_from = Block.objects.filter(blocked_id=uid).values_list('blocker_id', flat=True)
         return qs.exclude(id__in=blk_to).exclude(id__in=blk_from)

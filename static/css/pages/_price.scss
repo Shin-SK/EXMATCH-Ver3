@@ -79,7 +79,7 @@
             button{
                 background-color: $green;
                 &:hover{
-                    background-color: lighten($green, 10%);
+                    background-color: color.adjust($green, $lightness: 10%);
                 }
             }
             ul{
@@ -94,7 +94,7 @@
             button{
                 background-color: $pink;
                 &:hover{
-                    background-color: lighten($pink, 10%);
+                    background-color: color.adjust($pink, $lightness: 10%);
                 }
             }
             ul{
@@ -324,7 +324,7 @@
 				button{
 					background-color: $green;
 					&:hover{
-						background-color: lighten($green, 10%);
+						background-color: color.adjust($green, $lightness: 10%);
 					}
 				}
 				ul{
@@ -369,7 +369,7 @@
 				button{
 					background-color: $pink;
 					&:hover{
-						background-color: lighten($pink, 10%);
+						background-color: color.adjust($pink, $lightness: 10%);
 					}
 				}
 				ul{

@@ -1,5 +1,6 @@
 # core/utils.py
 import math, requests
+import os
 from django.db.models import Q, Prefetch
 from core.models import Match, ProfileFieldValue, ProfileField
 import re
@@ -30,7 +31,7 @@ def get_matched_users(user):
 
 
 def geocode_address(address):
-    api_key = "AIzaSyCnyO6_HZoOw-DZrE3D_6vZjTV_6J-l16I"
+    api_key = os.getenv("GOOGLE_MAPS_API_KEY", "")
     url = f"https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={api_key}"
     resp = requests.get(url)
     data = resp.json()

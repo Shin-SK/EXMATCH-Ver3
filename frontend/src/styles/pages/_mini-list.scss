@@ -1,0 +1,8 @@
+@use "../global/global" as *;
+
+.mini-list{
+	h1{
+		@include h1;
+		margin: 16px;
+	}
+}
