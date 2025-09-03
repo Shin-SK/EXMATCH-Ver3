@@ -3,6 +3,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUser } from '@/stores/useUser'
+import { GENDER_OPTIONS, SEXUAL_PREF_OPTIONS } from '@/plugins/choices'
 import { api } from '@/api'
 
 const router = useRouter()
@@ -10,8 +11,6 @@ const userStore = useUser()
 
 // API側のchoicesと合わせる（ProfileEdit.vueと同じ）
 const BLOODS  = ['A','B','O','AB']
-const GENDERS = ['male','female']
-const PREFS   = ['male','female']
 
 const me = ref(null)
 const form = ref({
@@ -174,7 +173,9 @@ async function saveAndGo () {
             <label class="form-label">性別<span class="badge bg-danger text-white">必須</span></label>
             <select class="form-select" v-model="form.gender">
               <option value="" disabled>選択してください</option>
-              <option v-for="g in GENDERS" :key="g" :value="g">{{ g }}</option>
+              <option v-for="g in GENDER_OPTIONS" :key="g.value" :value="g.value">
+                {{ g.label }}
+              </option>
             </select>
           </div>
 
@@ -182,7 +183,9 @@ async function saveAndGo () {
             <label class="form-label">性指向<span class="badge bg-danger text-white">必須</span></label>
             <select class="form-select" v-model="form.sexual_object_pref">
               <option value="" disabled>選択してください</option>
-              <option v-for="p in PREFS" :key="p" :value="p">{{ p }}</option>
+              <option v-for="p in SEXUAL_PREF_OPTIONS" :key="p.value" :value="p.value">
+                {{ p.label }}
+              </option>
             </select>
           </div>
 
