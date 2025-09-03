@@ -22,7 +22,6 @@ User = get_user_model()
 
 # ---------- Resources（フィールド定義）----------
 class UserProfileResource(resources.ModelResource):
-    # CSV列は "username" で、UserProfile.user(FK) に紐づけ
     user = fields.Field(
         column_name='username',
         attribute='user',
@@ -31,25 +30,13 @@ class UserProfileResource(resources.ModelResource):
 
     class Meta:
         model = UserProfile
-        # username をキーに upsert（既存は更新）
         import_id_fields = ('user',)
-        fields = (
-            'id',
-            'user',               # ← CSVでは "username" 列
-            'nickname',
-            'blood_type',
-            'gender',
-            'sexual_object_pref',
-            'plan',
-            'plan_expiry',
-            'option_expiry',
-            'date_of_birth',
-            'main_area',
-            'latitude',
-            'longitude',
-            'lciq_score',
+        # 画像や内部用を除外（必要に応じて調整）
+        exclude = (
+            'lciq_image',
+            'id_doc_image',
         )
-        export_order = fields
+        # export_order を固定したければ明示的に並べる
 
 class ProfileFieldResource(resources.ModelResource):
     class Meta:
