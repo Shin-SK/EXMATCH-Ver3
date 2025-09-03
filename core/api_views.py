@@ -35,13 +35,25 @@ class _Base(APIView):
         set_current_user(request.user)
         return super().initial(request, *args, **kwargs)
 
-# core/api_views.py
-class ProfilesAPI(_Base):
-    """GET /api/profiles/?q=&gender=&has_image=&verified=&age_min=&age_max=&area=&plan=&page=1"""
-    def get(self, request):
-        q = (request.GET.get("q") or "").strip()
 
-        # ブロック相互を除外したベースQSを先に作る
+class ProfilesAPI(_Base):
+    """
+    GET /api/profiles/?q=&gender=&has_image=&verified=&age_min=&age_max=&area=&plan=&radius=&lat=&lon=&two_way=1
+    - デフォルトで「自分の sexual_object_pref に合う相手の gender」を適用
+      ※ ただし ?gender=... が指定された場合はユーザー指定を優先（デフォルト絞り込みはスキップ）
+    - ?two_way=1 で「相手の sexual_object_pref も自分の gender に合う」相互条件を追加
+    """
+    def get(self, request):
+        # ─────────────────────────────────────────────────────────────
+        # 0) 入力取得
+        # ─────────────────────────────────────────────────────────────
+        q = (request.GET.get("q") or "").strip()
+        gender_param = request.GET.get("gender")
+        two_way = (request.GET.get("two_way") or "").lower() in ("1", "true", "yes")
+
+        # ─────────────────────────────────────────────────────────────
+        # 1) ベースQS（自分自身とブロック相手を除外）
+        # ─────────────────────────────────────────────────────────────
         blk_to = Block.objects.filter(blocker=request.user).values_list("blocked_id", flat=True)
         blk_from = Block.objects.filter(blocked=request.user).values_list("blocker_id", flat=True)
         qs = (UserProfile.objects
@@ -50,7 +62,27 @@ class ProfilesAPI(_Base):
               .exclude(user_id__in=blk_to)
               .exclude(user_id__in=blk_from))
 
-        # キーワード
+        # ─────────────────────────────────────────────────────────────
+        # 2) デフォルト：自分の性指向で相手の gender を絞る
+        #     - ?gender=... がある場合はユーザー指定を優先してスキップ
+        # ─────────────────────────────────────────────────────────────
+        if not gender_param:
+            my_pref = getattr(request.user.userprofile, "sexual_object_pref", None)
+            if my_pref:
+                qs = qs.filter(gender=my_pref)
+
+        # ─────────────────────────────────────────────────────────────
+        # 3) 相互条件：相手の sexual_object_pref も自分の gender に合致（任意）
+        #     - ?two_way=1 の時だけ適用
+        # ─────────────────────────────────────────────────────────────
+        if two_way:
+            my_gender = getattr(request.user.userprofile, "gender", None)
+            if my_gender:
+                qs = qs.filter(sexual_object_pref=my_gender)
+
+        # ─────────────────────────────────────────────────────────────
+        # 4) キーワード検索（ニックネーム / 自己紹介 / 居住地）
+        # ─────────────────────────────────────────────────────────────
         if q:
             qs = qs.filter(
                 Q(nickname__icontains=q) |
@@ -58,15 +90,16 @@ class ProfilesAPI(_Base):
                 Q(main_area__icontains=q)
             )
 
-        # ── 単項目フィルタ ─────────────────
-        gender = request.GET.get("gender")
-        if gender in ("male", "female"):
-            qs = qs.filter(gender=gender)
+        # ─────────────────────────────────────────────────────────────
+        # 5) 単項目フィルタ（gender/画像あり/本人確認/プラン/エリア）
+        # ─────────────────────────────────────────────────────────────
+        if gender_param in ("male", "female"):
+            qs = qs.filter(gender=gender_param)
 
-        if (request.GET.get("has_image") or "").lower() in ("1","true","yes"):
+        if (request.GET.get("has_image") or "").lower() in ("1", "true", "yes"):
             qs = qs.filter(profile_image__isnull=False)
 
-        if (request.GET.get("verified") or "").lower() in ("1","true","yes"):
+        if (request.GET.get("verified") or "").lower() in ("1", "true", "yes"):
             qs = qs.filter(
                 Q(id_doc_verified=True) |
                 Q(
@@ -76,20 +109,25 @@ class ProfilesAPI(_Base):
             )
 
         plan = request.GET.get("plan")
-        if plan in ("free","standard"):
+        if plan in ("free", "standard"):
             qs = qs.filter(plan=plan)
 
         area = request.GET.get("area")
         if area:
             qs = qs.filter(main_area__icontains=area)
 
-        # ── 年齢フィルタ（DOBで絞る） ─────────
+        # ─────────────────────────────────────────────────────────────
+        # 6) 年齢フィルタ（生年月日から算出）
+        # ─────────────────────────────────────────────────────────────
         today = date.today()
-        def years_ago(n:int):
+
+        def years_ago(n: int):
+            # 例：年齢>=n → DOB <= years_ago(n)
             y = today.year - int(n)
             try:
                 return date(y, today.month, today.day)
             except ValueError:
+                # うるう日対策など
                 return date(y, today.month, 28)
 
         age_min = request.GET.get("age_min")
@@ -99,55 +137,62 @@ class ProfilesAPI(_Base):
         if age_max:
             qs = qs.filter(date_of_birth__gte=years_ago(int(age_max)))
 
-        #半径検索
+        # ─────────────────────────────────────────────────────────────
+        # 7) 半径検索（km）
+        #     - 与えられた中心座標に対してBBoxで荒く→円で厳密化→近い順
+        # ─────────────────────────────────────────────────────────────
         near_sorted = False
-
         radius = (request.GET.get("radius") or "").strip()
-        lat_s  = (request.GET.get("lat") or "").strip()
-        lon_s  = (request.GET.get("lon") or "").strip()
+        lat_s = (request.GET.get("lat") or "").strip()
+        lon_s = (request.GET.get("lon") or "").strip()
         if radius and lat_s and lon_s:
             try:
                 R = float(radius)
-                lat0 = float(lat_s); lon0 = float(lon_s)
+                lat0 = float(lat_s)
+                lon0 = float(lon_s)
 
-                # 1度≒111.32km、経度は緯度で補正
+                # 緯度1度 ≒ 111.32 km、経度は緯度により収縮するので cos(lat) 補正
                 lat_deg = R / 111.32
                 lon_coef = max(0.1, cos(radians(lat0)))
                 lon_deg = R / (111.32 * lon_coef)
 
-                # ① 近似BBoxで荒く絞る
+                # ① BBox で荒く絞る
                 qs = qs.filter(
                     latitude__isnull=False, longitude__isnull=False,
                     latitude__gte=lat0 - lat_deg, latitude__lte=lat0 + lat_deg,
                     longitude__gte=lon0 - lon_deg, longitude__lte=lon0 + lon_deg,
                 )
 
-                # ② 円形で厳密化 & 近い順（距離² = dlat² + (dlon*cos(lat0))²）
+                # ② 円で厳密化 & 近い順（距離² = dlat² + (dlon*cos(lat0))²）
                 qs = qs.annotate(
-                    _dlat = Abs(F('latitude')  - Value(lat0)),
-                    _dlon = Abs((F('longitude') - Value(lon0)) * Value(lon_coef)),
+                    _dlat=Abs(F('latitude') - Value(lat0)),
+                    _dlon=Abs((F('longitude') - Value(lon0)) * Value(lon_coef)),
                 ).annotate(
-                    _d2 = Power(F('_dlat'), 2) + Power(F('_dlon'), 2)
+                    _d2=Power(F('_dlat'), 2) + Power(F('_dlon'), 2)
                 ).filter(
-                    _d2__lte = (lat_deg ** 2)
+                    _d2__lte=(lat_deg ** 2)
                 ).order_by('_d2', '-id')
 
                 near_sorted = True
             except ValueError:
+                # パラメータが不正な場合は半径検索を無視
                 pass
 
-        # 半径未指定時のみ新着順
+        # ─────────────────────────────────────────────────────────────
+        # 8) ソート & distinct
+        #     - 半径未指定時は新着順
+        # ─────────────────────────────────────────────────────────────
         if not near_sorted:
             qs = qs.order_by('-id')
         qs = qs.distinct()
 
-
-
+        # ─────────────────────────────────────────────────────────────
+        # 9) ページング & レスポンス
+        # ─────────────────────────────────────────────────────────────
         paginator = PageNumberPagination()
         page = paginator.paginate_queryset(qs, request)
         data = ProfileSerializer(page, many=True, context={"request": request}).data
         return paginator.get_paginated_response(data)
-
 
 
 class MeAPI(_Base):
