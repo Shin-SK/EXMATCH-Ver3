@@ -339,7 +339,7 @@ onUnmounted(() => document.body.classList.remove('lp-scroll'))
 
         <div class="standard-area">
           <div class="catch">
-            わづらわしいポイントはありません。<br>
+            わずらわしいポイントはありません。<br>
             有料プランは、すべての機能がご利用いただけます。
           </div>
 
@@ -500,7 +500,7 @@ onUnmounted(() => document.body.classList.remove('lp-scroll'))
           </button>
           <div id="faq2" class="collapse mt-2">
             <p>
-              いいえ、サイト内で個々の活動が完結します。急ぎのサポートはメッセージ機能で対応しますが、<br>
+              サイト内で個々の活動が完結します。急ぎのサポートはメッセージ機能で対応しますが、<br>
               本格的な伴走を希望される場合は結婚相談所EXMarry®の「12ヶ月成婚パック」をご検討ください。
             </p>
           </div>
@@ -545,7 +545,7 @@ onUnmounted(() => document.body.classList.remove('lp-scroll'))
           </button>
           <div id="faq4" class="collapse mt-2">
             <p>
-              はい、ぜひトライしてください！ 単純なマッチングではなく、同一基準の診断結果を表示することで<br>
+              ぜひトライしてください！ 単純なマッチングではなく、同一基準の診断結果を表示することで<br>
               お互いの良い面や不足傾向を把握し、ゆとりあるコミュニケーションが可能になります。
             </p>
           </div>
@@ -568,7 +568,7 @@ onUnmounted(() => document.body.classList.remove('lp-scroll'))
           </button>
           <div id="faq5" class="collapse mt-2">
             <p>
-              はい、診断結果をもとに考え方や行動基準をサポートします。無料の記事から有料講座まで幅広くご用意しています。
+              診断結果をもとに考え方や行動基準をサポートします。無料の記事から有料講座まで幅広くご用意しています。
             </p>
           </div>
         </div>
@@ -590,8 +590,8 @@ onUnmounted(() => document.body.classList.remove('lp-scroll'))
           </button>
           <div id="faq6" class="collapse mt-2">
             <p>
-              〇枚まで掲載できます（カメラマン撮影が理想）。バストショットや全身などバリエーションを付けると印象が上がります。<br>
-              無料プランでは写真にボカシが入ります。
+              １枚まで掲載できます（カメラマン撮影が理想）。現在、複数枚写真をアップできるようアップデート中です。バストショットや全身などバリエーションを付けると印象が上がります。<br>
+              LCIQのポイント、スクリーンショットを設定していない方は、写真にボカシが入ります。
             </p>
           </div>
         </div>
@@ -613,7 +613,7 @@ onUnmounted(() => document.body.classList.remove('lp-scroll'))
           </button>
           <div id="faq7" class="collapse mt-2">
             <p>
-              はい、通報制度があります。内容・頻度によっては強制退会となる場合もありますので、時間をムダにしないためにもご活用ください。
+              通報制度があります。内容・頻度によっては強制退会となる場合もありますので、時間をムダにしないためにもご活用ください。
             </p>
           </div>
         </div>
@@ -680,7 +680,7 @@ onUnmounted(() => document.body.classList.remove('lp-scroll'))
           </button>
           <div id="faq10" class="collapse mt-2">
             <p>
-              はい、グループの「TRY SUPPORT」ポータルサイトで内面・外見を磨く多彩なサービスをご提供しています。<br>
+              グループの「TRY SUPPORT」ポータルサイトで内面・外見を磨く多彩なサービスをご提供しています。<br>
               登録無料でお得に利用できます（東京版／今秋オープン予定）。
             </p>
           </div>
@@ -703,7 +703,7 @@ onUnmounted(() => document.body.classList.remove('lp-scroll'))
           </button>
           <div id="faq11" class="collapse mt-2">
             <p>
-              いいえ、月会費以外は一切かかりません。安心してステキな出会いを楽しんでください。
+              月会費以外は一切かかりません。安心してステキな出会いを楽しんでください。
             </p>
           </div>
         </div>
