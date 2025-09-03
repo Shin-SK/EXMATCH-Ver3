@@ -10,6 +10,6 @@ def confirm_email_and_redirect(request, key):
             confirmation = EmailConfirmation.objects.get(key=key)
         confirmation.confirm(request)
     except Exception:
-        # 期限切れ/不正キーでも最終的にフロントへ戻す
         pass
-    return redirect(f"{settings.FRONTEND_BASE_URL}/login?verified=1")
+    # ★ signup後の導線：ログイン画面へ。成功時 next=/onboarding に流す
+    return redirect(f"{settings.FRONTEND_BASE_URL}/login?verified=1&next=/onboarding")

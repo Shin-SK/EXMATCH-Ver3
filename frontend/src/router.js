@@ -1,6 +1,7 @@
 // src/router.js
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuth } from '@/stores/useAuth'
+import { useUser } from '@/stores/useUser'
 
 const routes = [
   {
@@ -19,10 +20,11 @@ const routes = [
       { path: 'footprints', component: () => import('@/views/Footprints.vue'), meta: { title: 'Footprints' } },
       { path: 'profile/edit', name: 'profile-edit', component: () => import('@/views/ProfileEdit.vue'), meta: { title: 'プロフィール編集' } },
       { path: 'contact', name: 'contact', component: () => import('@/views/Contact.vue'), meta:{ title:'お問い合わせ', requiresAuth:false } },
-      { path: 'h2lciq', name: 'h2lciq', component: () => import('@/views/H2Lciq.vue'), meta:{ title:'LCIQスコアはどうやってはかるの？' } },
+      { path: 'h2lciq', name: 'h2lciq', component: () => import('@/views/H2Lciq.vue'), meta:{ title:'LCIQスコアはどうやってはかるの？', requiresAuth: false, skipOnboarding: true }},
       { path: 'plan/checkout', name: 'plan-checkout', component: () => import('@/views/PlanCheckout.vue'), meta:{ title:'プラン購入' } },
       { path: 'plan/success', name: 'plan-success', component: () => import('@/views/PlanSuccess.vue'), meta:{ title:'決済完了' } },
       { path: 'signup', name: 'signup', component: () => import('@/views/Signup.vue'), meta:{ title:'新規登録', requiresAuth:false } },
+      { path: 'onboarding', name: 'onboarding', component: () => import('@/views/Onboarding.vue'),meta:{ title:'初期設定', requiresAuth:true } },
 
     ],
   },
@@ -42,23 +44,40 @@ router.afterEach((to) => {
 })
 
 
-router.beforeEach((to)=>{
+
+// src/router.js （beforeEach を一部差し替え）
+router.beforeEach(async (to) => {
   const auth = useAuth()
-  if(!auth.token) auth.initFromStorage()
+  if (!auth.token) auth.initFromStorage()
 
   if (to.path === '/') {
     return auth.isAuthed ? { path: '/mypage' } : { path: '/home' }
   }
   const need = to.meta?.requiresAuth !== false
-  // ★ 未ログインで保護ページに来たら LP に戻す（ログインはLPから）
   if (need && !auth.isAuthed) {
     return { path: '/home', query: { next: to.fullPath } }
   }
-  // ログイン済みで /login は不要 → マイページへ
   if (to.path === '/login' && auth.isAuthed) {
     return { path: '/mypage' }
   }
-  
+
+  // ★ここでスキップ判定
+  const skipOnboarding = to.meta?.skipOnboarding === true
+
+  if (auth.isAuthed && !skipOnboarding) {
+    const user = useUser()
+    try {
+      if (!user.me) await user.fetchMe()
+      const incomplete = user.me && user.me.is_profile_complete === false
+      if (incomplete && to.path !== '/onboarding') {
+        return { path: '/onboarding' }
+      }
+      if (!incomplete && to.path === '/onboarding') {
+        return { path: '/mypage' }
+      }
+    } catch (_) {}
+  }
 })
+
 
 export default router

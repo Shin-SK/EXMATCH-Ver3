@@ -3,8 +3,10 @@ from .api_views import (
     ProfilesAPI, MeAPI, LikeAPI, MatchesAPI,
     MessagesAPI, BlockToggleAPI, ChatThreadsAPI, ProfileDetailAPI, BlocksAPI,
     ReportCreateAPI, ReportsSentAPI, ReportsReceivedAPI,
-    ProfileFieldsAPI, MeCustomFieldsAPI, MeAvatarAPI, VerificationsAPI, VerificationDeleteAPI,
-    LikesSentAPI, FootprintTouchAPI, UnmatchAPI, LikesReceivedAPI, FootprintsAPI, ChatUnreadMapAPI, ChatThreadReadAPI
+    ProfileFieldsAPI, MeCustomFieldsAPI, MeAvatarAPI, MeLciqImageAPI,  # ★追加
+    VerificationsAPI, VerificationDeleteAPI,
+    LikesSentAPI, FootprintTouchAPI, UnmatchAPI, LikesReceivedAPI, FootprintsAPI,
+    ChatUnreadMapAPI, ChatThreadReadAPI
 )
 from payments.api_views import PaymentsCheckoutAPI
 from core.api_contact import ContactAPI
@@ -24,7 +26,8 @@ urlpatterns = [
     path("reports/received/",   ReportsReceivedAPI.as_view(),name="api_reports_received"),
     path("profile-fields/",       ProfileFieldsAPI.as_view(),   name="api_profile_fields"),
     path("me/custom-fields/",     MeCustomFieldsAPI.as_view(),  name="api_me_custom_fields"),
-    path("me/avatar/", MeAvatarAPI.as_view(), name="api_me_avatar"),
+    path("me/avatar/",      MeAvatarAPI.as_view(),     name="api_me_avatar"),
+    path("me/lciq-image/",  MeLciqImageAPI.as_view(),  name="api_me_lciq_image"),  # ★追加
     path("verifications/", VerificationsAPI.as_view(), name="api_verifications"),
     path("verifications/<int:pk>/", VerificationDeleteAPI.as_view(), name="api_verification_delete"),
     path("likes/sent/", LikesSentAPI.as_view(), name="api_likes_sent"),

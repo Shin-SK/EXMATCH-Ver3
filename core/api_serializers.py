@@ -16,37 +16,42 @@ class UserMiniSerializer(serializers.ModelSerializer):
         fields = ("id", "username")
 
 class ProfileSerializer(serializers.ModelSerializer):
-    id                = serializers.SerializerMethodField()   # ← user.id を直で
-    username          = serializers.SerializerMethodField()
-    profile_image_url = serializers.SerializerMethodField()
-    lciq_image_url    = serializers.SerializerMethodField()
-    age               = serializers.SerializerMethodField()
-    verification_badge = serializers.SerializerMethodField()
-    verification_count = serializers.SerializerMethodField()
+    id                  = serializers.SerializerMethodField()   # user.id を返す
+    username            = serializers.SerializerMethodField()
+    profile_image_url   = serializers.SerializerMethodField()
+    lciq_image_url      = serializers.SerializerMethodField()
+    age                 = serializers.SerializerMethodField()
+    verification_badge  = serializers.SerializerMethodField()
+    verification_count  = serializers.SerializerMethodField()
+    is_profile_complete = serializers.SerializerMethodField()   # ★追加
 
     class Meta:
         model  = UserProfile
         fields = (
             "id","username",
-            "nickname","bio","main_area",
+            "nickname","bio","main_area","date_of_birth",
             "age","profile_image_url","lciq_image_url",
             "blood_type","gender","sexual_object_pref",
             "plan","plan_expiry","option_expiry",
             "lciq_score","id_doc_verified",
             "latitude","longitude",
             "verification_badge","verification_count",
+            "is_profile_complete",                           # ★追加
         )
 
-    def get_id(self, obj): return obj.user_id
-    def get_username(self, obj): return obj.user.username
-
+    # ------- 既存のユーティリティ（抜粋） -------
     def _abs_url(self, url):
         req = self.context.get("request")
         return req.build_absolute_uri(url) if (req and url) else url
 
+    def get_id(self, obj):
+        return obj.user_id
+
+    def get_username(self, obj):
+        return getattr(obj.user, "username", None)
+
     def get_profile_image_url(self, obj):
         f = getattr(obj, "profile_image", None)
-        # ← name が空なら .url に触らない
         if f and getattr(f, "name", ""):
             return self._abs_url(f.url)
         return None
@@ -59,16 +64,29 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     def get_age(self, obj):
         from datetime import date
-        if not obj.date_of_birth: return None
+        if not obj.date_of_birth:
+            return None
         d, t = obj.date_of_birth, date.today()
         return t.year - d.year - ((t.month, t.day) < (d.month, d.day))
-    
+
     def get_verification_badge(self, obj):
         return obj.verification_badge
 
     def get_verification_count(self, obj):
         return obj.verification_count
-    
+
+    # ------- ここが肝：必須項目の充足で判定 -------
+    def get_is_profile_complete(self, obj):
+        ok_nickname  = bool(obj.nickname and obj.nickname.strip())
+        ok_avatar    = bool(getattr(obj, "profile_image", None) and getattr(obj.profile_image, "name", ""))
+        ok_blood     = bool(obj.blood_type)
+        ok_gender    = bool(obj.gender)
+        ok_pref      = bool(obj.sexual_object_pref)
+        ok_dob       = bool(obj.date_of_birth)
+        ok_main_area = bool(obj.main_area)
+        return all([ok_nickname, ok_avatar, ok_blood, ok_gender, ok_pref, ok_dob, ok_main_area])
+
+
 
 class ProfileUpdateSerializer(serializers.ModelSerializer):
     class Meta:
@@ -76,16 +94,17 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
         fields = (
             "nickname","bio","main_area","date_of_birth",
             "blood_type","gender","sexual_object_pref",
-            "latitude","longitude",          # ← 明示的に残す
+            "latitude","longitude",
+            "lciq_score",                     # ★任意を保存できるように追加
         )
 
     def update(self, instance, validated_data):
         old_area = instance.main_area
-        # ① 通常更新
         res = super().update(instance, validated_data)
 
-        # ② main_area が変わった & リクエストで lat/lon 未指定 → 自動ジオコード
-        area_changed = "main_area" in validated_data and validated_data["main_area"] != (old_area or "")
+        # main_area 変更 & 緯度経度未指定なら自動ジオコード（既存動作）
+        from .utils import geocode_address
+        area_changed = "main_area" in validated_data and (validated_data["main_area"] or "") != (old_area or "")
         lat_given    = "latitude" in validated_data
         lon_given    = "longitude" in validated_data
         if area_changed and not (lat_given and lon_given):
@@ -95,6 +114,7 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
                 instance.longitude = lon
                 instance.save(update_fields=["latitude","longitude"])
         return res
+    
 
 
 class MatchSerializer(serializers.ModelSerializer):

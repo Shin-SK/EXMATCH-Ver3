@@ -603,6 +603,27 @@ class MeAvatarAPI(_Base):
         return Response({"ok": True})
 
 
+class MeLciqImageAPI(_Base):
+    """POST/DELETE /api/me/lciq-image/  (multipart: image)"""
+    parser_classes = (MultiPartParser, FormParser)
+
+    def post(self, request):
+        f = request.FILES.get('image')
+        if not f:
+            return Response({"detail":"imageは必須です"}, status=400)
+        prof = request.user.userprofile
+        prof.lciq_image = f
+        prof.save(update_fields=["lciq_image"])
+        return Response(ProfileSerializer(prof, context={"request": request}).data, status=201)
+
+    def delete(self, request):
+        prof = request.user.userprofile
+        if prof.lciq_image:
+            prof.lciq_image.delete(save=False)
+            prof.lciq_image = None
+            prof.save(update_fields=["lciq_image"])
+        return Response({"ok": True})
+
 # 送信したLike一覧
 class LikesSentAPI(_Base):
     """GET /api/likes/sent/?page=1"""
