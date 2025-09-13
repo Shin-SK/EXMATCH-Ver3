@@ -4,19 +4,22 @@
 	--sab: env(safe-area-inset-bottom);
 	--header-h: 0px;     /* 使ってるなら 56px などに */
 	--footer-h: 64px;    /* フッターの実高さ */
+  --app-h: 100vh;
 }
+@supports (height: 100dvh) { :root{ --app-h: 100dvh; } }  /* 新Unit */
+@supports (height: 100svh) { :root{ --app-h: 100svh; } }  /* さらに安定 */
 
 
 /* 100dvhが使える環境で優先（PWA/iOSで安定） */
 
-html, body, #app { height: 100dvh; }
+html, body, #app { height: var(--app-h); }
 body { overflow: hidden; }            /* ルートはスクロールさせない */
 body.lp-scroll { overflow-y: auto !important; }
 
 /* ▼ヘッダーが無い画面なら main-scroll に top 安全域を付ける */
 .main-scroll{
 	/* safe-area を高さ計算に含める：減算 + padding */
-	height: calc(100dvh - var(--header-h) - var(--footer-h) - max(var(--sat), 0px));
+	height: calc(var(--app-h) - var(--sat) - var(--sab) - var(--header-h) - var(--footer-h));
 	padding-top: max(var(--sat), 0px);
 	overflow: auto;
 }
