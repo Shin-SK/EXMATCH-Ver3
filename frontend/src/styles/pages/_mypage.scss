@@ -290,6 +290,8 @@
     margin: 40px auto;
     .lciq-caution{
         background-color: $lciq;
+        width: fit-content;
+        margin: auto;
         border-radius: 100px;
         padding: 8px 16px;
         @include flex();
@@ -297,13 +299,9 @@
         a{
             color: white;
             @include flex();
-            width: 100%;
-            gap: 16px;
-            @include md{
-                flex-direction: column;
-                justify-content: flex-start;
-                gap: 8px;
-            }
+            justify-content: flex-start;
+            gap: 8px;
+            
             img{
                 height: 30px;
             }
@@ -323,23 +321,11 @@
             &:nth-child(even){
                 background-color: white;
             }
-            &::after{
-                @include gi(chevron_right);
-                position: absolute;
-                top: 0;
-                bottom: 0;
-                margin: auto 0;
-                right: 8px;
-                @include fs(20);
-            }
             a{
                 display: flex;
                 justify-content: center;
-                flex-direction: column;
+                align-items: center;
                 width: 100%;
-                @include md{
-                    padding-right: 16px;
-                }
                 .head{
                     font-weight: bold;
                 }

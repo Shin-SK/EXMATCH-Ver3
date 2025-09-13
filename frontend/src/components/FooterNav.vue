@@ -1,12 +1,12 @@
-<!-- src/components/FooterNav.vue -->
 <script setup>
-import { onMounted, onBeforeUnmount, watch, computed } from 'vue'
+import { onMounted, onBeforeUnmount, watch, computed, ref } from 'vue'
 import SideMenu from '@/components/SideMenu.vue'
 import { useAuth } from '@/stores/useAuth'
 import { useUnread } from '@/stores/useUnread'
 
 const auth   = useAuth()
 const unread = useUnread()
+const showMenu = ref(false)
 
 onMounted(() => { if (auth.isAuthed) unread.startPolling(8000) })
 watch(() => auth.isAuthed, v => { v ? unread.startPolling(8000) : unread.stopPolling() })
@@ -45,16 +45,14 @@ const unreadText = computed(() => unread.count > 99 ? '99+' : String(unread.coun
 
       <li>
         <button
-          class="d-inline-flex align-items-center gap-2 border-0 text-white bg-transparent"
+          class="d-inline-flex align-items-center gap-2 border-0 bg-transparent"
           type="button"
-          data-bs-toggle="offcanvas"
-          data-bs-target="#mainMenu"
-          aria-controls="mainMenu"
           aria-label="メニュー"
+          @click="showMenu = true"
         >
           <IconMenu2 :size="24" :stroke="2" class="text-primary"/>
         </button>
-        <SideMenu />
+        <SideMenu v-model="showMenu" />
       </li>
     </ul>
   </footer>

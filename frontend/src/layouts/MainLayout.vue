@@ -19,20 +19,6 @@ onUnmounted(() => { if (t) clearTimeout(t) })
       <div class="spinner-border" role="status" aria-label="loading"></div>
     </div>
 
-    <!-- <header class="main-header">
-      <nav class="nav p-3 w-100 d-flex align-items-center justify-content-between">
-        <router-link to="/mypage" class="logo d-flex align-items-center gap-2">
-          <img src="/img/logo.svg" alt="logo" style="height: 40px; width: auto;">
-        </router-link>
-        <div class="links d-flex align-items-center gap-3">
-          <router-link to="/mypage">マイページ</router-link>
-          <router-link to="/users">検索</router-link>
-          <router-link to="/chats">メッセージ</router-link>
-          <router-link to="/profile/edit">設定</router-link>
-        </div>
-      </nav>
-    </header> -->
-
     <!-- メイン -->
     <main class="container main-scroll">
         <router-view />

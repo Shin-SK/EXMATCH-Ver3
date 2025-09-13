@@ -2,6 +2,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { fetchMe, fetchProfileFields, fetchMyCustomFields } from '@/api'
+import { IconChevronRight } from '@tabler/icons-vue'
 
 const loading = ref(true)
 const me = ref(null)
@@ -64,13 +65,17 @@ const needVerify    = computed(()=> !me.value?.id_doc_verified)
 
 <template>
   <div v-if="!loading && me" class="profile-checklist">
-    <div v-if="needLciqImage" class="lciq-caution">
+    <div v-if="needLciqImage" class="lciq-caution p-4">
       <router-link to="/h2lciq">
-        <img src="/img/lciq-logo.svg" alt="LCIQ" />
-        <div class="wrap">
-          <div class="head">LCIQ診断がまだ登録されていません</div>
-          <p>恋愛偏差値を測定してマッチ率アップ！</p>
+        <div class="outer ms-5">
+          <img src="/img/lciq-logo.svg" alt="LCIQ" />
+          <div class="wrap mt-3">
+            <div class="head">LCIQ診断がまだ登録されていません</div>
+            <p>恋愛偏差値を測定してマッチ率アップ！</p>
+          </div>
         </div>
+
+        <IconChevronRight class="ms-auto"/>
       </router-link>
     </div>
     <ul>
@@ -80,26 +85,36 @@ const needVerify    = computed(()=> !me.value?.id_doc_verified)
             <div class="head">本人確認書類がまだ提出されていません</div>
             <p>提出をするとボカシが取れ、いいねやメッセージが送れます</p>
           </div>
+          <IconChevronRight class="ms-auto" />
         </router-link>
       </li>
       <li v-if="!allFilled" class="profile-check">
         <router-link to="/profile/edit">
-          <div class="head">プロフィールを完成させるとマッチ率アップ！</div>
-          <p>あと {{ missingTotal }} 項目！本当の出会いまであと少し！</p>
+          <div class="wrap">
+            <div class="head">プロフィールを完成させるとマッチ率アップ！</div>
+            <p>あと {{ missingTotal }} 項目！本当の出会いまであと少し！</p>
+          </div>
+          <IconChevronRight class="ms-auto" />
         </router-link>
       </li>
 
       <li v-if="!isStandard">
         <router-link to="/plan/checkout">
-          <div class="head">スタンダード会員ではすべての機能が使えるようになります</div>
-          <p>わずらわしいポイントやメッセージ制限はありません</p>
+          <div class="wrap">
+            <div class="head">スタンダード会員ではすべての機能が使えるようになります</div>
+            <p>わずらわしいポイントやメッセージ制限はありません</p>
+          </div>
+          <IconChevronRight class="ms-auto" />
         </router-link>
       </li>
 
       <li v-if="!plusFilled">
         <router-link to="/plan/checkout">
-          <div class="head">プラスプロフィールで、本当に合う人と出会おう</div>
-          <p>出会ってから「違った」と言いにくいことは、出会う前に知っておこう</p>
+          <div class="wrap">
+            <div class="head">プラスプロフィールで、本当に合う人と出会おう</div>
+            <p>「違った」と言いにくいことは、出会う前に知っておこう</p>
+          </div>
+          <IconChevronRight class="ms-auto"/>
         </router-link>
       </li>
     </ul>

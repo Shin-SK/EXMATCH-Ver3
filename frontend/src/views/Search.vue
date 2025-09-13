@@ -148,6 +148,6 @@ onMounted(async () => {
   display:flex;
   align-items:center;
   justify-content:center;
-  z-index: 1049;
+  z-index: 1030;
   }
 </style>

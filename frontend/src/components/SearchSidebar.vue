@@ -1,7 +1,8 @@
-<!-- frontend/src/components/SearchSidebar.vue（全文置換） -->
+<!-- frontend/src/components/SearchSidebar.vue -->
 <script setup>
-import { computed, watch, onMounted, onBeforeUnmount } from 'vue'
-import { IconLocation, IconSearch, IconX } from '@tabler/icons-vue'
+import { computed } from 'vue'
+import SlideOver from '@/components/SlideOver.vue'
+import { IconLocation, IconSearch } from '@tabler/icons-vue'
 
 const props = defineProps({
 	modelValue: { type: Boolean, default: false },
@@ -14,9 +15,8 @@ const isOpen = computed({
 	set: v  => emit('update:modelValue', v)
 })
 
-function close(){ isOpen.value = false }
-function onGeo(){ emit('geo-search'); close() }
-function onDetail(){ emit('detail-search'); close() }
+function onGeo(){ emit('geo-search'); isOpen.value = false }
+function onDetail(){ emit('detail-search'); isOpen.value = false }
 function onReset(){ emit('reset') }
 
 function locate(){
@@ -27,141 +27,89 @@ function locate(){
 		{ enableHighAccuracy:false, timeout:6000 }
 	)
 }
-
-// Escで閉じる／背景スクロール固定
-function onKey(e){ if(e.key === 'Escape') close() }
-watch(isOpen, v => { document.documentElement.style.overflow = v ? 'hidden' : '' })
-onMounted(() => window.addEventListener('keydown', onKey))
-onBeforeUnmount(() => {
-	window.removeEventListener('keydown', onKey)
-	document.documentElement.style.overflow = ''
-})
 </script>
 
 <template>
-	<Teleport to="body">
-		<!-- オーバーレイ：フェード -->
-		<Transition name="fade">
-			<div v-if="isOpen" class="sb__overlay" @click="close" />
-		</Transition>
+	<SlideOver v-model="isOpen" side="right" title="検索条件">
+		<!-- 現在地検索 -->
+		<div class="item radius mb-3">
+			<h2 class="h6 d-flex align-items-center gap-1">
+				<IconLocation :size="16" /> 現在地からの距離（km）
+			</h2>
 
-		<!-- パネル：右→左スライド -->
-		<Transition name="slide">
-			<aside v-if="isOpen" class="sb__panel" role="dialog" aria-modal="true">
-				<div class="sb__head">
-					<strong>検索条件</strong>
-					<button class="btn btn-sm btn-outline-secondary" @click="close" aria-label="閉じる">
-						<IconX :size="18" />
-					</button>
+			<div class="d-flex flex-column align-items-start gap-2 mt-2 w-100">
+				<button class="btn btn-outline-secondary btn-sm" type="button" @click="locate">現在地を取得</button>
+				<span class="text-muted small">lat: {{ f.lat || '-' }}, lon: {{ f.lon || '-' }}</span>
+			</div>
+
+			<input class="form-control my-3" v-model="f.radius" placeholder="例: 5（数字のみ）" inputmode="numeric">
+			<div class="d-grid gap-2">
+				<button type="button" class="btn btn-primary" @click="onGeo">距離で検索</button>
+			</div>
+		</div>
+
+		<!-- 詳細検索 -->
+		<h2 class="h6 d-flex align-items-center gap-1 mt-3">
+			<IconSearch :size="16" /> プロフィール検索
+		</h2>
+
+		<div class="detail mt-2">
+			<div class="mb-2">
+				<label class="form-label">キーワード</label>
+				<input class="form-control" v-model="f.q" placeholder="ニックネーム/自己紹介/エリア">
+			</div>
+
+			<div class="row g-2">
+				<div class="col-6">
+					<label class="form-label">性別</label>
+					<select class="form-select" v-model="f.gender">
+						<option value="">指定なし</option>
+						<option value="male">男性</option>
+						<option value="female">女性</option>
+					</select>
 				</div>
-
-				<div class="sb__body">
-					<!-- 現在地検索 -->
-					<div class="item radius mb-3">
-						<h2 class="h6 d-flex align-items-center gap-1">
-							<IconLocation :size="16" /> 現在地からの距離（km）
-						</h2>
-
-						<div class="d-flex flex-column align-items-start gap-2 mt-2 w-100">
-							<button class="btn btn-outline-secondary btn-sm" type="button" @click="locate">現在地を取得</button>
-							<span class="text-muted small">lat: {{ f.lat || '-' }}, lon: {{ f.lon || '-' }}</span>
-						</div>
-
-						<input class="form-control my-3" v-model="f.radius" placeholder="例: 5（数字のみ）" inputmode="numeric">
-						<div class="d-grid gap-2">
-							<button type="button" class="btn btn-primary" @click="onGeo">距離で検索</button>
-						</div>
-					</div>
-
-					<!-- 詳細検索 -->
-					<h2 class="h6 d-flex align-items-center gap-1 mt-3">
-						<IconSearch :size="16" /> プロフィール検索
-					</h2>
-
-					<div class="detail mt-2">
-						<div class="mb-2">
-							<label class="form-label">キーワード</label>
-							<input class="form-control" v-model="f.q" placeholder="ニックネーム/自己紹介/エリア">
-						</div>
-
-						<div class="row g-2">
-							<div class="col-6">
-								<label class="form-label">性別</label>
-								<select class="form-select" v-model="f.gender">
-									<option value="">指定なし</option>
-									<option value="male">男性</option>
-									<option value="female">女性</option>
-								</select>
-							</div>
-							<div class="col-6">
-								<label class="form-label">プラン</label>
-								<select class="form-select" v-model="f.plan">
-									<option value="">指定なし</option>
-									<option value="free">フリー</option>
-									<option value="standard">スタンダード</option>
-								</select>
-							</div>
-							<div class="col-6">
-								<label class="form-label">年齢(下限)</label>
-								<input class="form-control" v-model="f.age_min" inputmode="numeric" placeholder="18">
-							</div>
-							<div class="col-6">
-								<label class="form-label">年齢(上限)</label>
-								<input class="form-control" v-model="f.age_max" inputmode="numeric" placeholder="40">
-							</div>
-						</div>
-
-						<div class="mt-2">
-							<label class="form-label">エリア</label>
-							<input class="form-control" v-model="f.area" placeholder="渋谷など">
-						</div>
-
-						<div class="d-flex gap-3 align-items-center mt-2">
-							<div class="form-check">
-								<input class="form-check-input" type="checkbox" id="hasImg" v-model="f.has_image">
-								<label class="form-check-label" for="hasImg">画像あり</label>
-							</div>
-							<div class="form-check">
-								<input class="form-check-input" type="checkbox" id="verified" v-model="f.verified">
-								<label class="form-check-label" for="verified">本人確認済</label>
-							</div>
-						</div>
-
-						<div class="d-grid gap-2 my-3">
-							<button type="button" class="btn btn-primary" @click="onDetail">条件で検索</button>
-							<button type="button" class="btn btn-link btn-sm text-dark" @click="onReset">リセット</button>
-						</div>
-					</div>
+				<div class="col-6">
+					<label class="form-label">プラン</label>
+					<select class="form-select" v-model="f.plan">
+						<option value="">指定なし</option>
+						<option value="free">フリー</option>
+						<option value="standard">スタンダード</option>
+					</select>
 				</div>
-			</aside>
-		</Transition>
-	</Teleport>
+				<div class="col-6">
+					<label class="form-label">年齢(下限)</label>
+					<input class="form-control" v-model="f.age_min" inputmode="numeric" placeholder="18">
+				</div>
+				<div class="col-6">
+					<label class="form-label">年齢(上限)</label>
+					<input class="form-control" v-model="f.age_max" inputmode="numeric" placeholder="40">
+				</div>
+			</div>
+
+			<div class="mt-2">
+				<label class="form-label">エリア</label>
+				<input class="form-control" v-model="f.area" placeholder="渋谷など">
+			</div>
+
+			<div class="d-flex gap-3 align-items-center mt-2">
+				<div class="form-check">
+					<input class="form-check-input" type="checkbox" id="hasImg" v-model="f.has_image">
+					<label class="form-check-label" for="hasImg">画像あり</label>
+				</div>
+				<div class="form-check">
+					<input class="form-check-input" type="checkbox" id="verified" v-model="f.verified">
+					<label class="form-check-label" for="verified">本人確認済</label>
+				</div>
+			</div>
+
+			<div class="d-grid gap-2 my-3">
+				<button type="button" class="btn btn-primary" @click="onDetail">条件で検索</button>
+				<button type="button" class="btn btn-link btn-sm text-dark" @click="onReset">リセット</button>
+			</div>
+		</div>
+	</SlideOver>
 </template>
 
 <style scoped>
-/* レイヤー */
-.sb__overlay{
-	position:fixed; inset:0; z-index:1050;
-	background:rgba(0,0,0,.25);
-}
-.sb__panel{
-	position:fixed; top:0; right:0; z-index:1051;
-	height:100%; width:min(92vw, 360px);
-	background:#fff; box-shadow:-8px 0 24px rgba(0,0,0,.12);
-	display:flex; flex-direction:column;
-}
-.sb__head{ display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border-bottom:1px solid #eee; }
-.sb__body{ padding:12px 16px; overflow:auto; }
-
-/* アニメーション */
-.fade-enter-active, .fade-leave-active { transition: opacity .18s ease; }
-.fade-enter-from, .fade-leave-to { opacity: 0; }
-
-.slide-enter-active, .slide-leave-active { transition: transform .28s cubic-bezier(.2,.8,.2,1); will-change: transform; }
-.slide-enter-from, .slide-leave-to { transform: translateX(100%); }
-
-@media (prefers-reduced-motion: reduce){
-	.fade-enter-active, .fade-leave-active,
-	.slide-enter-active, .slide-leave-active { transition: none; }
-}
+/* 追加CSS不要：アニメ/オーバーレイは SlideOver 側で提供 */
 </style>
