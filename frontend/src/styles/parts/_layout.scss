@@ -14,7 +14,7 @@ body.lp-scroll { overflow-y: auto !important; }
 }
 
 #app{
-  padding-top: env(safe-area-inset-bottom);
+  margin-top: env(safe-area-inset-top);
 }
 
 .app-footer-fixed {
@@ -30,5 +30,5 @@ body.lp-scroll { overflow-y: auto !important; }
 }
 
 .home{
-  padding-top: env(safe-area-inset-top);
+  margin-top: env(safe-area-inset-top);
 }
