@@ -20,5 +20,11 @@ body.lp-scroll { overflow-y: auto !important; }
   z-index: 1030;
   /* iOS安全域 */
   padding-bottom: env(safe-area-inset-bottom);
+  display: flex;
+  align-items: center;
   height: calc(var(--footer-h) + env(safe-area-inset-bottom));
+}
+
+.home{
+  padding-top: env(safe-area-inset-top);
 }
