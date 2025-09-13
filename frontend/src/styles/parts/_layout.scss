@@ -4,7 +4,7 @@
   --footer-h: 64px;   /* フッターの実高さに合わせる */
 }
 
-html, body, #app { height: 100%; }
+html, body, #app { height: 100dvh; }
 body { overflow: hidden; }               /* ← ルートはスクロールさせない */
 body.lp-scroll { overflow-y: auto !important; }
 
