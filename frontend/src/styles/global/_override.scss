@@ -12,31 +12,39 @@
 
 /* 100dvhが使える環境で優先（PWA/iOSで安定） */
 
-html, body, #app { height: 100dvh; }
+html, body, #app { height: var(--app-h); }
 body { overflow: hidden; }            /* ルートはスクロールさせない */
 body.lp-scroll { overflow-y: auto !important; }
 
-/* ▼ヘッダーが無い画面なら main-scroll に top 安全域を付ける */
+/* 通常 */
 .main-scroll{
-	/* safe-area を高さ計算に含める：減算 + padding */
-	height: calc(100dvh - var(--header-h) - var(--footer-h) - max(var(--sat), 0px));
-	padding-top: max(var(--sat), 0px);
-	overflow: auto;
+  height: calc(var(--app-h) - var(--header-h) - var(--footer-h));
+  overflow:auto;
 }
 
+/* PWAだけ下を安全域ぶん引く（必要なら） */
+@media (display-mode: standalone){
+  .main-scroll{
+    height: calc(var(--app-h) - var(--header-h) - var(--footer-h) - env(safe-area-inset-bottom));
+  }
+}
 
+.home{
+  padding-top: var(--sat);
+}
 
 .app-footer-fixed{
 	position: fixed;
 	left: 0; right: 0; bottom: 0;
 	z-index: 1030;
-	/* 安全域ぶん底上げして被らないようにする */
-	height: calc(var(--footer-h) + max(var(--sab), 0px));
-	padding-bottom: max(var(--sab), 0px);
-
 	display: flex;
 	align-items: center;
 	background: #fff;
 	border-top: 1px solid #eee;
 }
 
+@media (display-mode: standalone){
+  .app-footer-fixed{
+    padding-bottom: env(safe-area-inset-bottom); /* iOSノッチぶんだけ増える */
+  }
+}

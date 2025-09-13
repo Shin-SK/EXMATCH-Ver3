@@ -76,7 +76,7 @@ onMounted(async () => {
     <div v-else-if="err">{{ err }}</div>
 
     <template v-else>
-      <section class="checklist">
+      <section class="checklist mb-0">
         <ProfileChecklist />
       </section>
       <section class="profile" v-if="me">
