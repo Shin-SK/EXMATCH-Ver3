@@ -12,14 +12,14 @@
 
 /* 100dvhが使える環境で優先（PWA/iOSで安定） */
 
-html, body, #app { height: var(--app-h); }
+html, body, #app { height: 100dvh; }
 body { overflow: hidden; }            /* ルートはスクロールさせない */
 body.lp-scroll { overflow-y: auto !important; }
 
 /* ▼ヘッダーが無い画面なら main-scroll に top 安全域を付ける */
 .main-scroll{
 	/* safe-area を高さ計算に含める：減算 + padding */
-	height: calc(var(--app-h) - var(--sat) - var(--sab) - var(--header-h) - var(--footer-h));
+	height: calc(100dvh - var(--header-h) - var(--footer-h) - max(var(--sat), 0px));
 	padding-top: max(var(--sat), 0px);
 	overflow: auto;
 }

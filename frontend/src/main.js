@@ -12,8 +12,6 @@ registerSW({ immediate: true })
 
 import { createPinia } from 'pinia'
 
-import { mountViewportFix } from '@/utils/viewport'
-mountViewportFix()
 import Avatar from '@/components/Avatar.vue'
 import pickAvatar from '@/utils/pickAvatar'
 
