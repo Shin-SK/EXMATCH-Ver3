@@ -13,6 +13,10 @@ body.lp-scroll { overflow-y: auto !important; }
   overflow: auto;
 }
 
+#app{
+  padding-top: env(safe-area-inset-bottom);
+}
+
 .app-footer-fixed {
   position: fixed;
   left: 0; right: 0; bottom: 0;
