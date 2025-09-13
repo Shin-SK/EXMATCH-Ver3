@@ -1,26 +1,39 @@
-@use "../global/global" as *;
-
-.btn{
-  @include fs(14);
+/* src/styles/_layout.scss */
+:root{
+	--sat: env(safe-area-inset-top);
+	--sab: env(safe-area-inset-bottom);
+	--header-h: 0px;     /* 使ってるなら 56px などに */
+	--footer-h: 64px;    /* フッターの実高さ */
 }
 
-.form-control, .form-select{
-  @include fs(14);
+
+/* 100dvhが使える環境で優先（PWA/iOSで安定） */
+
+html, body, #app { height: 100dvh; }
+body { overflow: hidden; }            /* ルートはスクロールさせない */
+body.lp-scroll { overflow-y: auto !important; }
+
+/* ▼ヘッダーが無い画面なら main-scroll に top 安全域を付ける */
+.main-scroll{
+	/* safe-area を高さ計算に含める：減算 + padding */
+	height: calc(100dvh - var(--header-h) - var(--footer-h) - max(var(--sat), 0px));
+	padding-top: max(var(--sat), 0px);
+	overflow: auto;
 }
 
-.form-label{
-  @include fs(12);
-}
 
-small, .small{
-  @include fs(10);
-}
 
-.app-footer-fixed {
-  position: fixed;
-  left: 0; right: 0; bottom: 0;
-  z-index: 1030;
-  /* iOS安全域 */
-  padding-bottom: env(safe-area-inset-bottom);
+.app-footer-fixed{
+	position: fixed;
+	left: 0; right: 0; bottom: 0;
+	z-index: 1030;
+	/* 安全域ぶん底上げして被らないようにする */
+	height: calc(var(--footer-h) + max(var(--sab), 0px));
+	padding-bottom: max(var(--sab), 0px);
+
+	display: flex;
+	align-items: center;
+	background: #fff;
+	border-top: 1px solid #eee;
 }
 
