@@ -69,13 +69,17 @@ router.beforeEach(async (to) => {
     try {
       if (!user.me) await user.fetchMe()
       const incomplete = user.me && user.me.is_profile_complete === false
-      if (incomplete && to.path !== '/onboarding') {
-        return { path: '/onboarding' }
+      if (incomplete && to.path !== '/onboarding') return { path: '/onboarding' }
+      if (!incomplete && to.path === '/onboarding') return { path: '/mypage' }
+    } catch (e) {
+      const st = e?.response?.status
+      if (st === 401) {
+        const { useAuth } = await import('@/stores/useAuth')
+        const auth = useAuth()
+        auth.setToken('')  // ← localStorage と axios の両方をクリア
+        return { path:'/login', query:{ next: to.fullPath } }
       }
-      if (!incomplete && to.path === '/onboarding') {
-        return { path: '/mypage' }
-      }
-    } catch (_) {}
+    }
   }
 })
 

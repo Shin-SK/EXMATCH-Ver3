@@ -5,8 +5,6 @@ billiard==4.2.1
 bleach==6.2.0
 celery==5.5.2
 certifi==2025.1.31
-channels==4.2.2
-channels_redis==4.2.1
 charset-normalizer==3.4.1
 click==8.2.1
 click-didyoumean==0.3.1
@@ -44,7 +42,6 @@ psycopg==3.2.9
 psycopg2-binary==2.9.10
 python-dateutil==2.9.0.post0
 python-dotenv==1.1.0
-redis==5.2.1
 requests==2.32.3
 six==1.17.0
 sqlparse==0.5.3

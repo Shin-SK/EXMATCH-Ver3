@@ -24,14 +24,20 @@ api.interceptors.response.use(
   r => r,
   err => {
     const st = err?.response?.status
-    const p  = window.location.pathname
-    if (st === 401 && p !== '/home' && p !== '/login') {
-      window.location.assign('/home')  // ← ここを /login ではなく /home へ
+    if (st === 401) {
+      // 失効・不正トークンは即破棄
+      localStorage.removeItem('token')
+      delete api.defaults.headers.common.Authorization
+
+      // 今いる場所を next に積んでログインへ
+      const here = window.location.pathname + window.location.search
+      if (window.location.pathname !== '/login') {
+        window.location.assign(`/login?next=${encodeURIComponent(here)}`)
+      }
     }
     return Promise.reject(err)
   }
 )
-
 
 
 /* ───────── API wrappers ───────── */

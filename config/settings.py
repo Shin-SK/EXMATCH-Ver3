@@ -58,6 +58,8 @@ ACCOUNT_DEFAULT_HTTP_PROTOCOL = os.getenv("ACCOUNT_PROTOCOL", "http" if DEBUG el
 
 ALLOWED_HOSTS = [ "127.0.0.1", "localhost", BACKEND_DOMAIN ]
 
+# ACCOUNT_ADAPTER = 'core.adapters.MyAccountAdapter'    # ★allauthアダプタ有効化
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -69,7 +71,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'django_filters',
-    'channels',
     'django_bootstrap5',
     'django_bootstrap_icons',
     'allauth',
@@ -87,7 +88,8 @@ INSTALLED_APPS = [
     "cloudinary",
     "cloudinary_storage",
     'post_office',
-
+    
+    'accounts',
     'core.apps.CoreConfig',
     'payments.apps.PaymentsConfig',
     'notifications',
@@ -124,6 +126,8 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 20,
 }
 
+
+AUTH_USER_MODEL = 'accounts.User'
 
 from corsheaders.defaults import default_headers
 
@@ -218,13 +222,6 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-ASGI_APPLICATION = 'config.asgi.application'
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {"hosts": [("127.0.0.1", 6379)]},
-    },
-}
 
 
 # ---------- メール設定 ----------
