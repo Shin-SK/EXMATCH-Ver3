@@ -13,7 +13,7 @@ onUnmounted(() => { if (t) clearTimeout(t) })
 </script>
 
 <template>
-  <div class="app-shell">
+  <div class="app-shell bg-light-subtle">
     <!-- Loader -->
     <div class="loader-overlay" :class="{ hide: loaded }">
       <div class="spinner-border" role="status" aria-label="loading"></div>

@@ -9,7 +9,10 @@ from corsheaders.defaults import default_headers, default_methods
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-load_dotenv(BASE_DIR / ".env")   
+load_dotenv(BASE_DIR / ".env")
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = os.getenv("DEBUG", "True") == "True"
 
 BACKEND_DOMAIN      = os.getenv("BACKEND_DOMAIN", "localhost:8000")
 FRONTEND_BASE_URL   = os.getenv("FRONTEND_BASE_URL", "http://localhost:5173").rstrip("/")
@@ -36,7 +39,8 @@ DATABASES = {
 
 # If DATABASE_URL is set (e.g. on Heroku/Render), override with Postgres
 if os.getenv("DATABASE_URL"):
-    DATABASES["default"] = dj_database_url.config(conn_max_age=600, ssl_require=True)
+    ssl_require = os.getenv("DATABASE_SSL_REQUIRE", "True" if not DEBUG else "False") == "True"
+    DATABASES["default"] = dj_database_url.config(conn_max_age=600, ssl_require=ssl_require)
 
 
 STORAGES = {
@@ -50,9 +54,6 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "insecure-dev-key")
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DEBUG", "True") == "True"
 
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = os.getenv("ACCOUNT_PROTOCOL", "http" if DEBUG else "https")
 

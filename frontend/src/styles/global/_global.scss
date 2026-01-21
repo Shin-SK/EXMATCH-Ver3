@@ -94,10 +94,7 @@ $time: 0.5s;
   @include flex();
 }
 
-html {font-size: 62.5%;}
-
 body{
-    @include fs(14);
     font-family: $gosic;
     a{
         color: $black;
@@ -238,6 +235,17 @@ a.a-button{
       max-width: 768px !important;
 }
 
+.df-center{
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+.df-start{
+  display: flex !important;
+  align-items: center;
+  justify-content: flex-start;
+}
 
 
 

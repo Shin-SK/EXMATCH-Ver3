@@ -15,8 +15,10 @@ import { createPinia } from 'pinia'
 import Avatar from '@/components/Avatar.vue'
 import pickAvatar from '@/utils/pickAvatar'
 
+import 'flatpickr/dist/flatpickr.min.css'
+
 // tabler
-import { IconMapPin, IconHeart, IconLocation, IconSearch, IconHome, IconMessages, IconMenu2, IconSend, IconClock, IconChevronRight } from '@tabler/icons-vue'
+import { IconMapPin, IconHeart, IconLocation, IconSearch, IconHome, IconMessages, IconMenu2, IconSend, IconClock, IconChevronRight, IconUpload } from '@tabler/icons-vue'
 
 import '@/styles/bootstrap.scss'  
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'
@@ -39,6 +41,7 @@ app.component('IconMenu2', IconMenu2)
 app.component('IconSend', IconSend)
 app.component('IconClock', IconClock)
 app.component('IconChevronRight', IconChevronRight)
+app.component('IconUpload', IconUpload)
 
 app.component('Avatar', Avatar) // ← <Avatar> をどこでも使えるように
 app.mount('#app')
