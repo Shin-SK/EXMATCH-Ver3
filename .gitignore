@@ -25,3 +25,5 @@ compose.yml
 !.env.example
 .env*
 !.env.example
+.env-production
+.env-local
