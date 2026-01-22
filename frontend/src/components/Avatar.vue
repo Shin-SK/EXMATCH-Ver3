@@ -5,7 +5,7 @@ import { computed, ref } from 'vue'
 const props = defineProps({
   src:      { type: String, default: '' },
   alt:      { type: String, default: '' },
-  to:       { type: String, default: '' },            // 画像全体をリンクにしたい時
+  to:       { type: [String, Object], default: '' },  // 画像全体をリンクにしたい時（文字列またはルート設定）
   fallback: { type: String, default: '/img/user-unset.webp' },
 
   /* 表示モード：

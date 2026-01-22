@@ -21,6 +21,8 @@ const likeCount = ref(0)
 const completeness = ref({ percent: 0, answered: 0, total: 0 })
 const loading = ref(true)
 const err = ref('')
+const activeTab = ref('matched')  // navタブの選択状態
+const href = { name: 'profile-edit' }  // Avatarリンク先
 const profiles = useProfiles()
 
 const auth = useAuth()
@@ -76,157 +78,274 @@ onMounted(async () => {
     <div v-else-if="err">{{ err }}</div>
 
     <template v-else>
+      <section class="profile pt-5" v-if="me">
+        <div class="df-center flex-column my-5">
+          <div class="avatar-area">
+            <Avatar :src="$avatar.me(me)" :size="120" :to="href" />
+          </div>
+          <div class="name-area text-center">
+            <div class="fw-bold">{{ me.nickname || me.username }}</div>
+            <div class="df-center"><IconMapPin :size="16" />{{ me.area || me.main_area || '未設定' }}</div>
+          </div>
+
+        </div>
+        <div class="first-area row g-1 border-top border-bottom py-3 mx-0">
+          <div class="col-4">
+            <div class="lciq-box area d-flex flex-column align-items-center flex-column h-100">
+              <div class="box numb position-relative">
+                <div class="fw-bold p-2" style="font-size: 2rem;">{{ me.lciq_score ?? me.lciq ?? '-' }}</div>
+                  <router-link 
+                    class="position-absolute" 
+                    :to="{ name:'profile-edit' }"
+                    style="top: -8px; right: -8px;">
+                    <IconPencil :size="16" />
+                  </router-link>
+              </div>
+              <div class="df-start gap-1 flex-column">
+                  <div class="fw-bold small lh-1">LCIQ</div>
+                <router-link class="btn btn-sm btn-link d-flex align-items-center p-0 m-0" :to="{ name:'h2lciq' }">再診断</router-link>
+              </div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="like-box area d-flex flex-column align-items-center flex-column h-100">
+              <div class="numb position-relative df-center">
+                <div class="fw-bold p-2" style="font-size: 2rem;">{{ likeCount }}</div>
+                <router-link 
+                  class="position-absolute"
+                  :to="{ name:'liked' }"
+                  style="top: -8px; right: -8px;"><IconZoomCheck :size="16" />
+                </router-link>
+              </div>
+              <div class="df-start flex-column gap-1">
+                <div class="fw-bold small lh-1">いいね</div>
+                <router-link class=" btn btn-link btn-sm p-0 m-0" :to="{ name:'liked' }" >確認する</router-link>
+              </div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="area d-flex flex-column align-items-center flex-column h-100">
+              <div class="numb position-relative df-center">
+                <div class="fw-bold p-2" style="font-size: 2rem;">{{ completeness.percent }}<span style="font-size: 1rem;">%</span></div>
+                <router-link
+                  class="position-absolute"
+                  :to="{ name:'profile-edit' }"
+                  style="top: -8px; right: -8px;">
+                  <IconPencil :size="16" />
+                </router-link>
+              </div>
+              <div class="df-start flex-column gap-1">
+                <div class="fw-bold small lh-1">プロフ充実度</div>
+                <div class="point">{{ completeness.answered }} / {{ completeness.total }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+          
+
       <section class="checklist mb-0">
         <ProfileChecklist />
       </section>
-      <section class="profile" v-if="me">
-        <div class="d-flex w-100 align-items-center justify-content-between my-4">
-          <div class="name-area">
-            <div class="fw-bold fs-1">{{ me.nickname || me.username }}</div>
-            <div class="d-flex"><IconMapPin :size="16" />{{ me.area || me.main_area || '未設定' }}</div>
-          </div>
-          <div class="avatar-area">
-            <Avatar :src="$avatar.me(me)" :size="80" :to="href" />
-          </div>
-        </div>
-        <div class="d-flex justify-content-between align-items-center" style="border-bottom: 1px gray solid;">
-        <div class="fw-bold fs-3 me-2">LCIQスコア</div>
-        <router-link :to="{ name:'h2lciq' }" class="text-muted d-block mt-2 fs-5">スコアをあげるには？</router-link>          
-        </div>
 
-        <div class="lciq-box d-flex justify-content-between align-items-center mb-4">
-          <div class="box">
-            <div class="fw-bold p-2" style="font-size: 4rem;">{{ me.lciq_score ?? me.lciq ?? '-' }}</div>
-          </div>
-          <div class="wrap">
-            <div class="d-flex align-items-center jusify-content-center gap-2">
-              <router-link class="btn btn-warning d-flex align-items-center" :to="{ name:'h2lciq' }">再診断</router-link>
-              <router-link class="btn btn-primary d-flex align-items-center" :to="{ name:'profile-edit' }">編集<i class="bi bi-chevron-right"></i></router-link>            
+
+      <nav class="tab-nav d-flex gap-2 mb-3" aria-label="マイページタブ">
+        <button
+          type="button"
+          :class="['tab-btn', { active: activeTab === 'matched' }]"
+          @click="activeTab = 'matched'">
+          <IconBrandTinder />マッチ
+          <span v-if="matched.length" class="badge">{{ matched.length }}</span>
+        </button>
+        <button
+          type="button"
+          :class="['tab-btn', { active: activeTab === 'likes' }]"
+          @click="activeTab = 'likes'">
+          <IconHeart />いいね
+          <span v-if="likeCount" class="badge">{{ likeCount }}</span>
+        </button>
+      </nav>
+
+      <section class="matched" id="matched" v-show="activeTab === 'matched'">
+        <!-- <div class="head-title">マッチしたユーザー</div> -->
+        <div class="area">
+          <template v-if="matched.length">
+            <div class="feed">
+              <UserCard
+                v-for="u in matched"
+                :key="u.id"
+                :user="u"
+                :pfvs="[]"
+                :matched="true"
+                :placeholders="false"
+                @message="$router.push('/chats/' + u.id)"
+                @open="$router.push('/users/' + u.id)"
+              />
             </div>
-            
-          </div>
-        </div>
-
-      </section>
-
-      <section class="score mb-4">
-        <div class="score__wrap">
-          <div class="box like">
-            <div class="title"><i class="fas fa-heart"></i>いいね</div>
-            <div class="numb">{{ likeCount }}</div>
-            <router-link class="btn btn-primary"  :to="{ name:'liked' }">確認する</router-link>
-          </div>
-          <div class="box prof">
-            <div class="title">プロフ充実度</div>
-            <div class="numb">{{ completeness.percent }}</div>
-            <router-link class="btn btn-primary" :to="{ name:'profile-edit' }">編集する</router-link>
-            <div class="point">{{ completeness.answered }} / {{ completeness.total }} 項目回答済み</div>
+          </template>
+          <div v-else class="d-flex justify-content-center align-items-center w-100" style="height: 20vh;">
+            <router-link to="/users">出会いはすぐそこに</router-link>
           </div>
         </div>
       </section>
 
-<section class="matched">
-  <div class="head-title">マッチしたユーザー</div>
-  <div class="area">
-    <div class="feed">
-      <UserCard
-        v-for="u in matched"
-        :key="u.id"
-        :user="u"
-        :pfvs="[]"
-        :matched="true"
-        :placeholders="false"
-        @message="$router.push('/chats/' + u.id)"
-        @open="$router.push('/users/' + u.id)"
-      />
-    </div>
-  </div>
-</section>
+        <!-- 置換: likesTop の描画 -->
+      <section class="followed" id="followed" v-show="activeTab === 'likes'">
+        <!-- <div class="head-title">いいねしてくれたユーザー</div> -->
+        <div class="area">
+            <template v-if="likesTop.length" class="feed feed-mini">
+              <UserCardMini
+                v-for="like in likesTop"
+                :key="like.id"
+                :user="like.from_user"
+                :created-at="like.created_at"
+                :link-to="`/users/${like.from_user?.id}`"
+              />
+              <p class="more text-center">
+                <router-link to="/likes/received">一覧を見る<i class="fas fa-angle-right"></i></router-link>
+              </p>
+            </template>
+            <div v-else class="d-flex justify-content-center align-items-center w-100" style="height: 20vh;">
+              <router-link to="/users">出会いはすぐそこに</router-link>
+            </div>
+          </div>
 
-      <!-- 置換: likesTop の描画 -->
-<section class="followed" id="followed">
-  <div class="head-title">いいねしてくれたユーザー</div>
-  <div class="area">
-      <template v-if="likesTop.length" class="feed feed-mini">
-        <UserCardMini
-          v-for="like in likesTop"
-          :key="like.id"
-          :user="like.from_user"
-          :created-at="like.created_at"
-          :link-to="`/users/${like.from_user?.id}`"
-        />
-      </template>
-      <div v-else class="d-flex justify-content-center align-items-center w-100" style="height: 20vh;">
-        <router-link to="/users">出会いはすぐそこに</router-link>
-      </div>
-    </div>
-    <p class="more text-center">
-      <router-link to="/likes/received">一覧を見る<i class="fas fa-angle-right"></i></router-link>
-    </p>
-</section>
+      </section>
 
       <!-- 折りたたみ①: プロフィール詳細 -->
-      <section class="add-profile">
-        <button
-          class="fw-bold d-flex align-items-center justify-content-center m-auto gap-1"
-          data-bs-toggle="collapse"
-          data-bs-target="#profile-area"
-          aria-expanded="false"
-          aria-controls="profile-area">
-          あなたのプロフィール<IconChevronRight />
-        </button>
-        <div class="collapse wrap" id="profile-area">
-          <div class="area">
-            <div class="box">
-              <div class="head">自己紹介</div>
-              <div class="text">{{ me?.bio || '未設定' }}</div>
-            </div>
-          </div>
-        </div>
-      </section>
+
 
       <!-- 折りたたみ②: 契約情報 -->
-      <section class="user-info">
-        <button
-          class="fw-bold d-flex align-items-center justify-content-center m-auto gap-1"
-          data-bs-toggle="collapse"
-          data-bs-target="#user-area"
-          aria-expanded="false"
-          aria-controls="user-area">
-          ユーザー情報<IconChevronRight />
-        </button>
-        <div id="user-area" class="area collapse">
-          <div class="box grid grid-cols-[150px_1fr]">
-            <div class="head">プラン</div>
-            <div class="text">
-              <template v-if="me?.plan === 'standard'">スタンダードプラン</template>
-              <template v-else>フリープラン</template>
-            </div>
-          </div>
-          <div v-if="me?.plan === 'standard' && me?.plan_expiry" class="box grid grid-cols-[150px_1fr]">
-            <div class="head">プラン有効期限</div>
-            <div class="text">{{ me.plan_expiry }}</div>
-          </div>
-          <div class="box grid grid-cols_[150px_1fr]">
-            <div class="head">プラスプロフィール</div>
-            <div class="text">{{ me?.option_expiry ? 'オプション購入済み' : 'オプション未購入' }}</div>
-          </div>
-          <div v-if="me?.option_expiry" class="box grid grid-cols-[150px_1fr]">
-            <div class="head">オプション有効期限</div>
-            <div class="text">{{ me.option_expiry }}</div>
-          </div>
-        </div>
-      </section>
+
 
       <section class="menu">
         <ul>
-          <li><router-link to="/footprints"><span class="material-symbols-outlined">barefoot</span>あしあと</router-link></li>
-          <li><router-link to="/likes/sent"><span class="material-symbols-outlined">favorite</span>いいね</router-link></li>
-          <li><router-link to="/chats"><span class="material-symbols-outlined">forum</span>メッセージ</router-link></li>
-          <li><router-link :to="{name: 'plan-checkout'}"><span class="material-symbols-outlined">stat_3</span>プラン購入</router-link></li>
-          <li><router-link to="/contact"><span class="material-symbols-outlined">help_center</span>お問い合わせ</router-link></li>
+          <li>
+            <button
+              class="menu-btn"
+              data-bs-toggle="collapse"
+              data-bs-target="#profile-area"
+              aria-expanded="false"
+              aria-controls="profile-area">
+              <span>あなたのプロフィール</span><IconChevronDown />
+            </button>
+            <div class="collapse" id="profile-area">
+              <div class="area">
+                <div class="box">
+                  <div class="head">自己紹介</div>
+                  <div class="text">{{ me?.bio || '未設定' }}</div>
+                </div>
+              </div>
+            </div>
+          </li>
+          <li>
+            <button
+              class="menu-btn"
+              data-bs-toggle="collapse"
+              data-bs-target="#user-area"
+              aria-expanded="false"
+              aria-controls="user-area">
+              <span>ユーザー情報</span><IconChevronDown />
+            </button>
+            <div class="collapse" id="user-area">
+              <div class="area">
+                <div class="box grid grid-cols-[150px_1fr]">
+                  <div class="head">プラン</div>
+                  <div class="text">
+                    <template v-if="me?.plan === 'standard'">スタンダードプラン</template>
+                    <template v-else>フリープラン</template>
+                  </div>
+                </div>
+                <div v-if="me?.plan === 'standard' && me?.plan_expiry" class="box grid grid-cols-[150px_1fr]">
+                  <div class="head">プラン有効期限</div>
+                  <div class="text">{{ me.plan_expiry }}</div>
+                </div>
+                <div class="box grid grid-cols_[150px_1fr]">
+                  <div class="head">プラスプロフィール</div>
+                  <div class="text">{{ me?.option_expiry ? 'オプション購入済み' : 'オプション未購入' }}</div>
+                </div>
+                <div v-if="me?.option_expiry" class="box grid grid-cols-[150px_1fr]">
+                  <div class="head">オプション有効期限</div>
+                  <div class="text">{{ me.option_expiry }}</div>
+                </div>
+              </div>
+            </div>
+          </li>
+          <li><router-link to="/footprints"><IconPaw />あしあと</router-link></li>
+          <li><router-link to="/likes/sent"><IconHeart />いいね</router-link></li>
+          <li><router-link to="/chats"><IconMail />メッセージ</router-link></li>
+          <li><router-link :to="{name: 'plan-checkout'}"><IconConfetti />プラン購入</router-link></li>
+          <li><router-link to="/contact"><IconProgressHelp />お問い合わせ</router-link></li>
         </ul>
       </section>
     </template>
   </div>
 </template>
+
+
+<style lang="scss">
+
+  .first-area{
+    .col-4{
+      .area{
+        
+        .numb{
+          height: 62px;
+          flex-shrink: 0;  // 縮まないように固定
+        }
+      
+      }
+    }
+  }
+
+  .tab-nav{
+    button{
+      border: none;
+      background: transparent;
+      padding: 10px 6px 6px;
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-weight: 700;
+      color: #555;
+      position: relative;
+      transition: color 0.2s ease;
+
+      &::after{
+        content: '';
+        position: absolute;
+        left: 10%;
+        right: 10%;
+        bottom: 0;
+        height: 2px;
+        background: #111;
+        opacity: 0.08;
+        transform: scaleX(0);
+        transform-origin: center;
+        transition: transform 0.2s ease, opacity 0.2s ease;
+      }
+
+      &.active{
+        color: #111;
+
+        &::after{
+          opacity: 1;
+          transform: scaleX(1);
+        }
+      }
+
+      .badge{
+        background: rgba(0,0,0,0.06);
+        color: inherit;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 0.8rem;
+      }
+    }
+  }
+
+
+
+</style>

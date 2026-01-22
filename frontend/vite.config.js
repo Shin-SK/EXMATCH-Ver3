@@ -8,7 +8,7 @@ export default defineConfig({
   plugins: [
     vue(),
     VitePWA({
-      devOptions: { enabled: true },        // ← ローカル開発でもSW有効化
+      devOptions: { enabled: false },        // ← ローカル開発でもSW有効化
       registerType: 'autoUpdate',           // 新ビルドで自動更新
       includeAssets: ['/favicon.svg', '/apple-touch-icon.png'],
       manifest: {
@@ -31,6 +31,14 @@ export default defineConfig({
   },
   css: {
     devSourcemap: true,
-    preprocessorOptions: { scss: { sourceMap: true } },
+    preprocessorOptions: {
+      scss: {
+        sourceMap: true,
+        // node_modules（bootstrap等）由来の警告を抑制
+        quietDeps: true,
+        // deprecation warning を種類ごと黙らせる（今回のログに出てるやつ）
+        silenceDeprecations: ['import', 'global-builtin', 'color-functions'],
+      },
+    },
   },
 })

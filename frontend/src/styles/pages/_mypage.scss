@@ -194,24 +194,60 @@
 
         .menu{
             ul{
-                li{
-                    border-bottom: 1px $mc dotted;
-                    a{
-                        color: $mc;
-                        display: block;
-                        padding: 16px;
-                        @include flex();
-                        justify-content: flex-start;
-                        span{
-                            margin-right: 4px;
-                        }
-                        &:hover{
-                            @include transition();
-                            opacity: 0.5;
-                            text-decoration: unset;
-                        }
+            li{
+                border-bottom: 1px $mc dotted;
+                
+                .menu-btn{
+                border: none;
+                background: transparent;
+                color: $mc;
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                padding: 16px;
+                width: 100%;
+                gap: 8px;
+                cursor: pointer;
+                transition: opacity 0.2s ease;
+
+                &:hover{
+                    opacity: 0.6;
+                    text-decoration: unset;
+                }
+
+                span{
+                    flex: 1;
+                }
+                }
+
+                a{
+                color: $mc;
+                display: block;
+                padding: 16px;
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                gap: 8px;
+                
+                &:hover{
+                    opacity: 0.5;
+                    text-decoration: unset;
+                }
+                }
+
+                .area{
+                padding: 16px;
+                border-top: 1px #e0e0e0 solid;
+
+                .box{
+                    padding: 8px 0;
+                    
+                    .head{
+                    font-weight: bold;
                     }
                 }
+                }
+            }
             }
         }
 
@@ -289,48 +325,22 @@
     max-width: 768px;
     margin: 16px auto;
     .lciq-caution{
-        background-color: $lciq;
-        width: fit-content;
-        margin: auto;
-        border-radius: 100px;
-        padding: 8px 16px;
-        @include flex();
-        margin-bottom: 40px;
         a{
+            background-color: $lciq;
             color: white;
-            @include flex();
-            justify-content: flex-start;
-            gap: 8px;
-            
-            img{
-                height: 30px;
-            }
-            .head{
-                font-weight: bold;
-            }
-            p{
-                @include fs(10);
-            }
         }
     }
     ul{
         li{
-            padding: 8px 16px;
-            background-color: $lb;
-            position: relative;
-            &:nth-child(even){
-                background-color: white;
-            }
+            margin-top: 0;
             a{
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                width: 100%;
+                background-color: $lb;
+                display: block;
+                height: 100%;
                 .head{
                     font-weight: bold;
                 }
                 p{
-                    @include fs(10);
                     color: $mc;
                 }
             }
