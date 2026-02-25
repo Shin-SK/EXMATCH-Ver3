@@ -187,7 +187,7 @@ async function saveAndGo () {
     await api.patch('me/', payload)
     await reloadMe()
     if (userStore.me?.is_profile_complete) {
-      router.push('/mypage')
+      router.push('/onboarding/required')
     }
   } catch (e) {
     err.value = e?.response?.data?.detail || '保存に失敗しました。入力内容をご確認ください'

@@ -119,7 +119,7 @@ watch(() => route.params.uid, v => { uid.value = String(v); load() })
 </script>
 
 <template>
-  <div class="container py-3 profile-detail">
+  <div class="py-3 profile-detail">
     <div v-if="loading" class="text-center py-5">
       <div class="spinner-border" role="status"></div>
     </div>
@@ -166,8 +166,8 @@ watch(() => route.params.uid, v => { uid.value = String(v); load() })
         <p v-else-if="isLiked" class="waiting text-center text-muted m-0 py-2">
           お相手からの返信をお待ちください…
         </p>
-        <button v-else class="btn btn-primary w-100 like" @click="doLike">
-          <span class="material-symbols-outlined me-2">favorite</span>いいね
+        <button v-else class="btn btn-primary w-100 like d-flex align-items-center justify-content-center gap-2" @click="doLike">
+          <IconHeart />いいね
         </button>
       </div>
 

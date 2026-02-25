@@ -108,7 +108,7 @@ const needVerify    = computed(()=> !me.value?.id_doc_verified)
         </router-link>
       </li>
 
-      <li v-if="!plusFilled" class="col-5 p-3">
+      <li v-if="!plusFilled" class="col-5">
         <router-link to="/plan/checkout" class="p-3 rounded">
           <div class="wrap">
             <div class="fw-bold mb-2">プラスプロフィールで、本当に合う人と出会おう</div>

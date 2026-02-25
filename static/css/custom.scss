@@ -1,3 +1,6 @@
+// [0] Sass モジュール読み込み
+@use "sass:color";
+
 // [1] グローバル読み込み
 @use "global/global" as *; 
 @use "global/override";

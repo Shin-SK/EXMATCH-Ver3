@@ -1,3 +1,6 @@
+@use "sass:color";
+@use "sass:math";
+
 $mc: #004C71;
 $pink: #F07884;
 $green: #706C00;
@@ -9,14 +12,13 @@ $brown: #bb9e52;
 $green: #80b567;
 $black: #0f0f0f;
 
-$gray: lighten($black, 40%);
-$lightgray: lighten($black, 90%);
-$lightpink: lighten($pink, 23%);
+$gray: color.adjust($black, $lightness: 40%);
+$lightgray: color.adjust($black, $lightness: 90%);
+$lightpink: color.adjust($pink, $lightness: 23%);
 $gosic: system-ui;
 $mincho: "Times New Roman", "YuMincho", "Hiragino Mincho ProN", "Yu Mincho", "MS PMincho", serif;
 $cinzel: 'Cinzel', serif;
 $tegaki: 'Satisfy', cursive;
-@use "sass:math"; /* 除算math.divを使うのに必要な記述 */
 @mixin fs($fs_min) {
 $width_small: 320;
 $width_large: 1300;
@@ -100,7 +102,7 @@ body{
     a{
         color: $black;
         :hover{
-          color: darken($black, 20%);
+          color: color.adjust($black, $lightness: -20%);
         }
     }
     img{

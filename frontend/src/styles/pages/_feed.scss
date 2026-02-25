@@ -180,18 +180,12 @@
 		@include flex();
 		flex-direction: column;
 		.profile-feed-mini{
-
 			.lciq-score{
 				position: absolute;
-				top: -8px;
-				left: -8px;
-				width: 40px;
-				height: 40px;
 				border-radius: 50%;
 				background-color: $lciq;
 				@include flex();
 				span{
-					@include fs(20);
 					font-weight: bold;
 					color:white;
 				}

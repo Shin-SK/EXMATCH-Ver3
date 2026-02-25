@@ -1,9 +1,10 @@
 <!-- src/views/MyPage.vue -->
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import {
   fetchMe, fetchMatches, fetchLikesReceived,
-  fetchProfileFields, fetchMyCustomFields
+  fetchProfileFields, fetchMyCustomFields,
+  fetchRecommendations,
 } from '@/api'
 import { useProfiles } from '@/stores/useProfiles'
 import { useAuth } from '@/stores/useAuth'
@@ -12,7 +13,11 @@ import UserCardMini from '@/components/UserCardMini.vue'
 import UserCard from '@/components/UserCard.vue'
 import ProfileChecklist from '@/components/ProfileChecklist.vue'
 import { uniqById } from '@/utils/uniq'
-import { IconChevronRight, IconMapPin, IconHeart, IconPencil } from '@tabler/icons-vue'
+import {
+  IconMapPin, IconHeart, IconPencil,
+  IconZoomCheck, IconBrandTinder, IconChevronDown,
+  IconPaw, IconMail, IconConfetti, IconProgressHelp,
+} from '@tabler/icons-vue'
 
 const me = ref(null)
 const matched = ref([])
@@ -28,15 +33,23 @@ const profiles = useProfiles()
 const auth = useAuth()
 const doLogout = async () => { await auth.logout(); location.href = '/login' }
 
+// おすすめ
+const recos = ref([])
+const recoLoading = ref(false)
+const recoErr = ref('')
+const recoTop = computed(() => recos.value.slice(0, 6))
+
 onMounted(async () => {
   loading.value = true
+  recoLoading.value = true
   try {
-    const [meData, mData, lData, fields, custom] = await Promise.all([
+    const [meData, mData, lData, fields, custom, recoItems] = await Promise.all([
       fetchMe(),
       fetchMatches(1),
       fetchLikesReceived(1),
       fetchProfileFields(),
       fetchMyCustomFields(),
+      fetchRecommendations().catch(() => { recoErr.value = 'おすすめの取得に失敗しました'; return [] }),
     ])
     me.value = meData
 
@@ -61,11 +74,15 @@ onMounted(async () => {
     const answered = reqKeys.filter(k => !!customObj[k]).length
     const total    = reqKeys.length || 1
     completeness.value = { percent: Math.round((answered/total)*100), answered, total }
+
+    // --- おすすめ：items をそのまま保持（compat_score/compat_reasons を残す） ---
+    recos.value = recoItems
   } catch (e) {
     err.value = '読み込みに失敗しました'
     console.error('[MyPage]', e?.response?.status, e?.response?.data || e)
   } finally {
     loading.value = false
+    recoLoading.value = false
   }
 })
 
@@ -94,8 +111,8 @@ onMounted(async () => {
             <div class="lciq-box area d-flex flex-column align-items-center flex-column h-100">
               <div class="box numb position-relative">
                 <div class="fw-bold p-2" style="font-size: 2rem;">{{ me.lciq_score ?? me.lciq ?? '-' }}</div>
-                  <router-link 
-                    class="position-absolute" 
+                  <router-link
+                    class="position-absolute"
                     :to="{ name:'profile-edit' }"
                     style="top: -8px; right: -8px;">
                     <IconPencil :size="16" />
@@ -111,7 +128,7 @@ onMounted(async () => {
             <div class="like-box area d-flex flex-column align-items-center flex-column h-100">
               <div class="numb position-relative df-center">
                 <div class="fw-bold p-2" style="font-size: 2rem;">{{ likeCount }}</div>
-                <router-link 
+                <router-link
                   class="position-absolute"
                   :to="{ name:'liked' }"
                   style="top: -8px; right: -8px;"><IconZoomCheck :size="16" />
@@ -142,10 +159,61 @@ onMounted(async () => {
           </div>
         </div>
       </section>
-          
+
 
       <section class="checklist mb-0">
         <ProfileChecklist />
+      </section>
+
+      <!-- あおいさんのおすすめ -->
+      <section class="recos py-3">
+        <div class="d-flex align-items-center justify-content-center px-3 mb-4">
+          <img style="width: 80px; height: auto;" src="/img/aoi-reco.svg" alt="あおいさんのおすすめ">
+          <div class="fw-bold fs-5">
+            AI仲人あおいさんの<br>
+            おすすめ</div>
+        </div>
+
+        <div v-if="recoLoading" class="text-center py-3 text-muted">Loading...</div>
+        <div v-else-if="recoErr" class="px-3 text-danger small">{{ recoErr }}</div>
+
+        <template v-else-if="recoTop.length">
+          <div class="reco-scroll d-flex gap-3 overflow-x-auto px-3 pb-2">
+            <div
+              v-for="item in recoTop"
+              :key="item.id"
+              class="reco-card flex-shrink-0"
+              style="cursor:pointer;"
+              @click="$router.push('/users/' + item.id)"
+            >
+              <UserCardMini
+                :user="item"
+                :width="160"
+                :size="160"
+                :link-to="`/users/${item.id}`"
+              />
+              <div v-if="item.compat_score != null" class="text-center mt-1">
+                <span class="badge bg-secondary" style="font-size:.7rem;">{{ item.compat_score }}%</span>
+              </div>
+              <div v-if="item.compat_reasons && item.compat_reasons.length" class="small text-muted text-center mt-1" style="font-size:.65rem; line-height:1.3;">
+                {{ item.compat_reasons.slice(0, 3).map(r => r.label || r).join(' / ') }}
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <div v-else class="px-3 py-2">
+          <p class="text-muted small mb-2">おすすめを作成中です。プロフィールを埋めるほど精度が上がります。</p>
+          <router-link :to="{ name: 'profile-edit' }" class="btn btn-sm btn-outline-primary">プロフィールを編集</router-link>
+        </div>
+
+        <div class="px-3 pb-2 mt-4">
+          <router-link to="/questions" class="btn btn-outline-primary btn-sm w-100">
+            もっと質問に答えて正確なおすすめを！
+          </router-link>
+          <p class="text-muted text-center mt-1 mb-0" style="font-size: 0.75rem;">回答が増えるほどおすすめの精度がUPします</p>
+        </div>
+
       </section>
 
 
@@ -288,12 +356,12 @@ onMounted(async () => {
   .first-area{
     .col-4{
       .area{
-        
+
         .numb{
           height: 62px;
           flex-shrink: 0;  // 縮まないように固定
         }
-      
+
       }
     }
   }
@@ -346,6 +414,23 @@ onMounted(async () => {
     }
   }
 
+  .recos {
+    .reco-scroll {
+      scrollbar-width: none;
+      &::-webkit-scrollbar { display: none; }
+    }
+    .reco-card {
+      min-width: 90px;
+    }
+  }
 
+  .profile-feed-mini{
+      margin-bottom: 8px;
+      .media--avatar{
+          display: flex;
+          align-items: center;
+          justify-content: center;
+      }
+  }
 
 </style>

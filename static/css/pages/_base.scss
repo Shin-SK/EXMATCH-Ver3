@@ -1,3 +1,4 @@
+@use "sass:color";
 @use "../global/global" as *;
 
 .base{
@@ -307,7 +308,7 @@
                     transition: background-color 0.3s ease;
                     color: white;
                     &:hover{
-                        background-color: lighten($mc, 10%);
+                        background-color: color.adjust($mc, $lightness: 10%);
                     }
                     a{
                         color: white;

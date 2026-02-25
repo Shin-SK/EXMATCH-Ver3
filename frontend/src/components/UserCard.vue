@@ -45,7 +45,7 @@ const href = computed(() => props.linkTo || `/users/${props.user?.id}`)
 </script>
 
 <template>
-  <div class="box d-flex flex-column justify-content-between" :class="{'option-user': hasOption}">
+  <div class="box d-flex flex-column justify-content-between user-card" :class="{'option-user': hasOption}">
     <div class="box__wrap">
       <div class="slide-area position-relative">
         <Splide
@@ -92,10 +92,11 @@ const href = computed(() => props.linkTo || `/users/${props.user?.id}`)
             </button>
           </SplideSlide>
         </Splide>
-
+        <div v-if="lciqScore !== null" class="lciq-score bg-lciq position-absolute fs-2 p-2">
+          <span>{{ lciqScore }}</span>
+        </div>
         <!-- オーバーレイ -->
         <div class="absolute-area">
-          <div v-if="lciqScore !== null" class="lciq-score"><span>{{ lciqScore }}</span></div>
           <div class="text-area">
             <div class="name d-flex align-items-center">
               {{ name }}
@@ -174,14 +175,29 @@ const href = computed(() => props.linkTo || `/users/${props.user?.id}`)
 
 /* オーバーレイ（既存） */
 .absolute-area{ position:absolute; inset:auto 0 0 0; padding:.5rem .75rem; pointer-events:none; }
-.lciq-score{ position:absolute; top:.5rem; right:.5rem; }
-.lciq-score span{ display:inline-block; background:#ff2e63; color:#fff; padding:.2rem .45rem; border-radius:9999px; font-weight:700; }
+
 
 .media--avatar { position: relative; }
 .lciq-blur :deep(img){
   filter: blur(10px) saturate(.9);
   transform: scale(1.02);
   transition: filter .2s ease;
+}
+
+
+.user-card{
+  .lciq-score{
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color:white;
+    font-size: 0.8rem;
+  }
 }
 
 </style>

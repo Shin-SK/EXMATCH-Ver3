@@ -20,10 +20,12 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .models import (UserProfile,Match, Message, Block, Footprint, VerificationSubmission, ProfileField, ProfileFieldValue, Report, set_current_user,
+from .models import (UserProfile, Match, Message, Block, Footprint, VerificationSubmission, ProfileField, ProfileFieldValue, Report, set_current_user,
+                     MatchingRuleSet,
 )
 from .api_serializers import (ProfileSerializer, ProfileUpdateSerializer, MatchSerializer, MessageSerializer, LikeReceivedSerializer, LikeSentSerializer, FootprintSerializer, UserBriefSerializer, ReportSerializer, VerificationSubmissionSerializer, ProfileFieldSerializer,
 )
+from .compat import score_candidate
 
 User = get_user_model()
 
@@ -717,6 +719,86 @@ class ChatThreadReadAPI(_Base):
             user=me, content_type=ct, object_id__in=mids, is_read=False
         ).update(is_read=True)
         return Response({"ok": True, "changed": changed})
+
+
+class MePreferenceAPI(_Base):
+    """GET/PATCH /api/me/preference/ — 廃止済み（410 Gone）"""
+
+    def get(self, request):
+        return Response({"detail": "このエンドポイントは廃止されました。"}, status=410)
+
+    def patch(self, request):
+        return Response({"detail": "このエンドポイントは廃止されました。"}, status=410)
+
+
+class RecommendationsAPI(_Base):
+    """GET /api/recommendations/ - グローバル採点ルールによるおすすめ一覧（上位50件）"""
+
+    def get(self, request):
+        viewer = request.user.userprofile
+
+        # グローバルルールセット取得（無ければ自動作成）
+        ruleset, _ = MatchingRuleSet.objects.get_or_create(
+            name="default", defaults={"is_active": True}
+        )
+        rules = list(
+            ruleset.rules
+            .filter(enabled=True)
+            .exclude(desired_value="")
+            .select_related("field")
+        )
+
+        # ベースQS（ProfilesAPIと同じブロック除外）
+        blk_to = Block.objects.filter(blocker=request.user).values_list("blocked_id", flat=True)
+        blk_from = Block.objects.filter(blocked=request.user).values_list("blocker_id", flat=True)
+        qs = (UserProfile.objects
+              .select_related("user")
+              .exclude(user=request.user)
+              .exclude(user_id__in=blk_to)
+              .exclude(user_id__in=blk_from))
+
+        # 性指向フォールバック（ProfilesAPIと同等）
+        my_sexual_pref = getattr(viewer, "sexual_object_pref", None)
+        if my_sexual_pref:
+            qs = qs.filter(gender=my_sexual_pref)
+
+        qs = qs.distinct()
+
+        # N+1 対策: ProfileFieldValue を全候補分まとめて取得し
+        # custom_values キャッシュを事前に構築する
+        candidates = list(qs)
+        if candidates:
+            pfvs = (ProfileFieldValue.objects
+                    .filter(user_profile__in=candidates)
+                    .select_related("field"))
+            pfv_map: dict = {}
+            for pfv in pfvs:
+                pid = pfv.user_profile_id
+                if pid not in pfv_map:
+                    pfv_map[pid] = {}
+                pfv_map[pid][pfv.field.field_key] = pfv.value or ""
+            for c in candidates:
+                c._cached_custom_values = pfv_map.get(c.pk, {})
+
+        # Python側でスコアリング → eligible のみ残す
+        results = []
+        for candidate in candidates:
+            result = score_candidate(viewer, candidate, rules)
+            if result["eligible"]:
+                results.append((result["score"], result["reasons"], candidate))
+
+        # score 降順で上位50件
+        results.sort(key=lambda x: x[0], reverse=True)
+        results = results[:50]
+
+        items = []
+        for score, reasons, candidate in results:
+            profile_data = dict(ProfileSerializer(candidate, context={"request": request}).data)
+            profile_data["compat_score"] = score
+            profile_data["compat_reasons"] = reasons
+            items.append(profile_data)
+
+        return Response({"items": items})
 
 
 

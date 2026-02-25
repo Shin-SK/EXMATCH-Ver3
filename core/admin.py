@@ -8,7 +8,8 @@ from .utils import geocode_address
 from .models import (
     UserProfile, Match, Message,
     ProfileField, ProfileFieldValue,
-    Footprint, VerificationSubmission, Report, Block
+    Footprint, VerificationSubmission, Report, Block,
+    MatchingRuleSet, MatchingRule,
 )
 
 # === import-export ===
@@ -21,6 +22,8 @@ User = get_user_model()
 
 
 # ---------- Resources（フィールド定義）----------
+# core/admin.py
+
 class UserProfileResource(resources.ModelResource):
     user = fields.Field(
         column_name='username',
@@ -31,12 +34,31 @@ class UserProfileResource(resources.ModelResource):
     class Meta:
         model = UserProfile
         import_id_fields = ('user',)
-        # 画像や内部用を除外（必要に応じて調整）
+
+        # 画像は除外のままでOK
         exclude = (
             'lciq_image',
             'id_doc_image',
         )
-        # export_order を固定したければ明示的に並べる
+
+        # ここを追加：インポート対象の列を明示
+        fields = (
+            'user',                 # ← column_name が username になる
+            'nickname',
+            'blood_type',
+            'gender',
+            'sexual_object_pref',
+            'plan',
+            'lciq_score',
+            'plan_expiry',
+            'option_expiry',
+            'date_of_birth',
+            'main_area',
+            'latitude',
+            'longitude',
+            'id_doc_verified',      # 使うなら（adminでexcludeしてるけどCSV入力は可にしたい場合）
+        )
+        export_order = fields
 
 class ProfileFieldResource(resources.ModelResource):
     class Meta:
@@ -229,3 +251,38 @@ class ReportAdmin(CSVOnlyAdmin):
 class BlockAdmin(CSVOnlyAdmin):
     resource_classes = [BlockResource]
     list_display = ('blocker','blocked','created_at')
+
+
+
+class MatchingRuleResource(resources.ModelResource):
+    field = fields.Field(
+        column_name='field_key',
+        attribute='field',
+        widget=ForeignKeyWidget(ProfileField, 'field_key')
+    )
+
+    class Meta:
+        model = MatchingRule
+        import_id_fields = ('id',)
+        fields = ('id', 'ruleset', 'field', 'mode', 'weight', 'desired_value', 'match_type', 'enabled')
+        export_order = fields
+
+
+class MatchingRuleInline(admin.TabularInline):
+    model = MatchingRule
+    extra = 1
+    fields = ('field', 'mode', 'weight', 'desired_value', 'match_type', 'enabled')
+
+
+@admin.register(MatchingRuleSet)
+class MatchingRuleSetAdmin(CSVOnlyAdmin):
+    list_display = ('name', 'is_active', 'updated_at')
+    list_filter = ('is_active',)
+    inlines = [MatchingRuleInline]
+
+
+@admin.register(MatchingRule)
+class MatchingRuleAdmin(CSVOnlyAdmin):
+    resource_classes = [MatchingRuleResource]
+    list_display = ('ruleset', 'field', 'mode', 'weight', 'desired_value', 'match_type', 'enabled')
+    list_filter = ('ruleset', 'mode', 'match_type', 'enabled')

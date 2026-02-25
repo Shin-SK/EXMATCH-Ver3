@@ -158,6 +158,9 @@ export const register = ({ username, email, password1, password2 }) =>
      .then(r => r.data)
 
 
+export const fetchRecommendations = () =>
+  api.get('recommendations/').then(r => r.data?.items ?? [])
+
 /* ── 開発用: 健全性チェック ── */
 export function __apiCheck() {
   const tests = [

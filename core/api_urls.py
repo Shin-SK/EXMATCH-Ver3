@@ -3,10 +3,11 @@ from .api_views import (
     ProfilesAPI, MeAPI, LikeAPI, MatchesAPI,
     MessagesAPI, BlockToggleAPI, ChatThreadsAPI, ProfileDetailAPI, BlocksAPI,
     ReportCreateAPI, ReportsSentAPI, ReportsReceivedAPI,
-    ProfileFieldsAPI, MeCustomFieldsAPI, MeAvatarAPI, MeLciqImageAPI,  # ★追加
+    ProfileFieldsAPI, MeCustomFieldsAPI, MeAvatarAPI, MeLciqImageAPI,
     VerificationsAPI, VerificationDeleteAPI,
     LikesSentAPI, FootprintTouchAPI, UnmatchAPI, LikesReceivedAPI, FootprintsAPI,
-    ChatUnreadMapAPI, ChatThreadReadAPI
+    ChatUnreadMapAPI, ChatThreadReadAPI,
+    MePreferenceAPI, RecommendationsAPI,
 )
 from payments.api_views import PaymentsCheckoutAPI
 from core.api_contact import ContactAPI
@@ -39,4 +40,6 @@ urlpatterns = [
     path("chats/<int:user_id>/read/", ChatThreadReadAPI.as_view(), name="api_chat_read_thread"),
     path("payments/checkout/", PaymentsCheckoutAPI.as_view(), name="api_payments_checkout"),
     path("contact/", ContactAPI.as_view(), name="api_contact"),
+    path("me/preference/", MePreferenceAPI.as_view(), name="api_me_preference"),
+    path("recommendations/", RecommendationsAPI.as_view(), name="api_recommendations"),
 ]

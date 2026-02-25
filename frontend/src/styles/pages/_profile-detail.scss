@@ -60,7 +60,7 @@
 		.area{
 			.title{
 				@include logoFont;
-				@include fs(30);
+				font-size: 2rem;
 				@include flex();
 				justify-content: flex-start;
 				gap: 16px;
@@ -95,6 +95,7 @@
 			margin-top: 40px;
 			.fields{
 				.field{
+					padding: 1rem;
 					&:nth-of-type(odd){
 						background-color: $lightpink;
 					}

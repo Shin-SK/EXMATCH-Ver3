@@ -39,9 +39,33 @@ const sizePx = computed(() =>
   typeof props.size === 'number' ? `${props.size}px` : props.size
 )
 
+// Cloudinary URL のサイズパラメータを変換
+function resizeCloudinaryUrl(url, size) {
+  if (!url || !url.includes('cloudinary')) return url
+  const numSize = typeof size === 'number' ? size : parseInt(size) || 80
+  
+  // c_fill でアスペクト比を維持しつつ短辺基準でクロップ
+  const transform = `w_${numSize},h_${numSize},c_fill`
+  
+  // 既存の w_XXX,h_XXX,c_XXX パラメータを置き換え
+  if (url.match(/\/w_\d+,h_\d+(,c_\w+)?/)) {
+    return url.replace(/\/w_\d+,h_\d+(,c_\w+)?\//, `/${transform}/`)
+  }
+  // パラメータがない場合は upload の後に追加
+  if (url.includes('/upload/')) {
+    return url.replace('/upload/', `/upload/${transform}/`)
+  }
+  return url
+}
+
 const imgSrc = computed(() => {
   failed.value = false
-  return props.src || props.fallback
+  const baseUrl = props.src || props.fallback
+  // fixed モードの場合のみ Cloudinary URL を変換
+  if (props.mode === 'fixed' && props.size) {
+    return resizeCloudinaryUrl(baseUrl, props.size)
+  }
+  return baseUrl
 })
 
 const wrapperStyle = computed(() => {

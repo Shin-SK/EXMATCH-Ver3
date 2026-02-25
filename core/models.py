@@ -184,16 +184,6 @@ class UserProfile(models.Model):
             return None
         return {1: 'blue', 2: 'pink', 3: 'silver'}.get(cnt, 'gold')
 
-    @property
-    def is_verified(self):
-        """旧 is_verified 互換（年齢確認が承認済みか）"""
-        from core.models import VerificationSubmission
-        return self.user.verifications.filter(
-            doc_type=VerificationSubmission.DocType.IDENTIFY,
-            status=VerificationSubmission.Status.APPROVED
-        ).exists()
-
-
 # ======================================================================
 # 2) 可変項目用: Adminで「ラジオ/セレクト/テキスト」項目を自由に追加
 # ======================================================================
@@ -246,8 +236,48 @@ class ProfileFieldValue(models.Model):
         return f"{self.user_profile} - {self.field.field_key} = {self.value}"
 
 
+# ======================================================================
+# 5) 運営グローバル採点ルール
+# ======================================================================
+class MatchingRuleSet(models.Model):
+    """運営が管理画面で定義するグローバル採点ルールセット（1セット運用）"""
+    name = models.CharField(max_length=50, default="default", unique=True)
+    is_active = models.BooleanField(default=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"MatchingRuleSet({self.name})"
+
+
+class MatchingRule(models.Model):
+    """MatchingRuleSet に紐づく ProfileField 単位の採点ルール"""
+    MODE_CHOICES = [("must", "must"), ("bonus", "bonus")]
+    MATCH_TYPE_CHOICES = [("eq", "eq"), ("contains", "contains")]
+
+    ruleset = models.ForeignKey(
+        MatchingRuleSet, on_delete=models.CASCADE, related_name="rules"
+    )
+    field = models.ForeignKey(
+        ProfileField, on_delete=models.CASCADE, related_name="matching_rules"
+    )
+    mode = models.CharField(max_length=10, choices=MODE_CHOICES, default="bonus")
+    weight = models.PositiveSmallIntegerField(default=10)
+    desired_value = models.TextField(blank=True, default="")
+    match_type = models.CharField(
+        max_length=10, choices=MATCH_TYPE_CHOICES, default="eq"
+    )
+    enabled = models.BooleanField(default=True)
+
+    class Meta:
+        unique_together = ("ruleset", "field")
+        ordering = ["-weight", "id"]
+
+    def __str__(self):
+        return f"{self.ruleset.name} / {self.field.field_key} [{self.mode}]"
+
+
 class Match(models.Model):
-    
+
     STATUS_CHOICES = [
         ('like', 'Like'),
         ('matched', 'Matched'),

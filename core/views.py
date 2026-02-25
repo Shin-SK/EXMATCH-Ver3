@@ -23,6 +23,8 @@ from django.template.loader import render_to_string
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.db import IntegrityError
+from django.core.exceptions import ImproperlyConfigured
+from django.templatetags.static import static
 
 from .filters import DynamicProfileFilter
 from .forms import ProfileEditForm, DynamicProfileFieldForm, VerificationUploadForm
@@ -639,6 +641,10 @@ class UserProfileListView(LoginRequiredMixin, FilterView):
 		"""
 		if filterset_class is None:
 			filterset_class = self.get_filterset_class()
+		if filterset_class is None:
+			raise ImproperlyConfigured(
+				f"{self.__class__.__name__} requires a valid filterset_class."
+			)
 
 		fs = filterset_class(
 			data=self.request.GET,

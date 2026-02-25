@@ -78,19 +78,19 @@ async function loadAll() {
     const vals = await fetchMyCustomFields()
     customVals.value = vals?.values || {}
 
-	for (const f of fields.value) {
-	const k = f.field_key
-	if (isCheckbox(f)) {
-		const v = customVals.value[k]
-		if (Array.isArray(v)) continue
-		if (typeof v === 'string' && v.length) {
-		customVals.value[k] = v.split(',').map(s => s.trim()).filter(Boolean)
-		} else {
-		customVals.value[k] = []
-		}
-	}
-	}
-	
+    for (const f of fields.value) {
+      const k = f.field_key
+      if (isCheckbox(f)) {
+        const v = customVals.value[k]
+        if (Array.isArray(v)) continue
+        if (typeof v === 'string' && v.length) {
+          customVals.value[k] = v.split(',').map(s => s.trim()).filter(Boolean)
+        } else {
+          customVals.value[k] = []
+        }
+      }
+    }
+
     // 本人確認
     const vs = await listVerifications()
     verifsRaw.value = listify(vs)
@@ -115,7 +115,6 @@ async function saveAll() {
       const k = f.field_key
       let v = customVals.value[k] ?? ''
       if (isCheckbox(f)) {
-        // v: array | string
         if (Array.isArray(v)) v = v.join(',')
       }
       payload[k] = v
@@ -160,7 +159,7 @@ async function onVerifyChange(docKey, e) {
   if (!f) return
   busy.value = true
   try {
-    await uploadVerification(docKey, f) // → PENDINGで作成
+    await uploadVerification(docKey, f)
     const vs = await listVerifications()
     verifsRaw.value = listify(vs)
   } finally {
@@ -171,7 +170,7 @@ async function onVerifyChange(docKey, e) {
 async function onVerifyDelete(pk) {
   busy.value = true
   try {
-    await deleteVerification(pk) // PENDINGのみ削除可
+    await deleteVerification(pk)
     const vs = await listVerifications()
     verifsRaw.value = listify(vs)
   } finally { busy.value = false }
@@ -250,66 +249,51 @@ async function onVerifyDelete(pk) {
       </div>
     </div>
 
+
     <!-- カスタム項目（動的） -->
     <div class="card mb-3">
       <div class="card-header fw-bold">選択項目</div>
       <div class="card-body row g-3">
         <template v-for="f in fields" :key="f.field_key">
-          <div class="col-12" v-if="f.category==='normal'">
+          <div class="col-12" v-if="f.category === 'normal'">
             <label class="form-label">{{ f.field_label }}</label>
 
             <template v-if="isText(f)">
               <input v-model="customVals[f.field_key]" type="text" class="form-control">
             </template>
 
-			<template v-else-if="isCheckbox(f)">
-			<div class="d-flex flex-wrap gap-2">
-				<template v-for="(c,i) in f.choices" :key="c">
-				<input
-					class="btn-check"
-					type="checkbox"
-					:id="`cb-${f.field_key}-${i}`"
-					:value="c"
-					v-model="customVals[f.field_key]"
-				/>
-				<label class="btn btn-outline-primary" :for="`cb-${f.field_key}-${i}`">
-					{{ c }}
-				</label>
-				</template>
-			</div>
-			</template>
-
-			<template v-else-if="isRadio(f)">
-			<div class="d-flex flex-wrap gap-2">
-				<template v-for="(c,i) in f.choices" :key="c">
-				<input
-					class="btn-check"
-					type="radio"
-					:name="`f-${f.field_key}`"
-					:id="`r-${f.field_key}-${i}`"
-					:value="c"
-					v-model="customVals[f.field_key]"
-				/>
-				<label class="btn btn-outline-primary" :for="`r-${f.field_key}-${i}`">
-					{{ c }}
-				</label>
-				</template>
-			</div>
-			</template>
-
-
             <template v-else-if="isCheckbox(f)">
-              <div class="d-flex gap-3 flex-wrap">
-                <label v-for="c in f.choices" :key="c" class="form-check">
-					<!-- 置き換え後（OK）：素直に配列をバインド -->
-					<input
-					class="form-check-input"
-					type="checkbox"
-					:value="c"
-					v-model="customVals[f.field_key]"
-					>
-                  <span class="form-check-label">{{ c }}</span>
-                </label>
+              <div class="d-flex flex-wrap gap-2">
+                <template v-for="(c, i) in f.choices" :key="c">
+                  <input
+                    class="btn-check"
+                    type="checkbox"
+                    :id="`cb-${f.field_key}-${i}`"
+                    :value="c"
+                    v-model="customVals[f.field_key]"
+                  />
+                  <label class="btn btn-outline-primary" :for="`cb-${f.field_key}-${i}`">
+                    {{ c }}
+                  </label>
+                </template>
+              </div>
+            </template>
+
+            <template v-else-if="isRadio(f)">
+              <div class="d-flex flex-wrap gap-2">
+                <template v-for="(c, i) in f.choices" :key="c">
+                  <input
+                    class="btn-check"
+                    type="radio"
+                    :name="`f-${f.field_key}`"
+                    :id="`r-${f.field_key}-${i}`"
+                    :value="c"
+                    v-model="customVals[f.field_key]"
+                  />
+                  <label class="btn btn-outline-primary" :for="`r-${f.field_key}-${i}`">
+                    {{ c }}
+                  </label>
+                </template>
               </div>
             </template>
           </div>
@@ -317,70 +301,67 @@ async function onVerifyDelete(pk) {
       </div>
     </div>
 
-    <!-- プラスプロフィール（表示だけ。編集は権限制御がある想定ならここで判定してもOK） -->
-<!-- ▼ プラスプロフィールのブロックだけ置き換え -->
-<div class="card mb-3">
-  <div class="card-header fw-bold">プラスプロフィール</div>
-  <div class="card-body row g-3">
-    <template v-for="f in fields" :key="f.field_key">
-      <div class="col-12" v-if="f.category==='plus'">
-        <label class="form-label">{{ f.field_label }}</label>
+    <!-- プラスプロフィール -->
+    <div class="card mb-3">
+      <div class="card-header fw-bold">プラスプロフィール</div>
+      <div class="card-body row g-3">
+        <template v-for="f in fields" :key="f.field_key">
+          <div class="col-12" v-if="f.category === 'plus'">
+            <label class="form-label">{{ f.field_label }}</label>
 
-        <template v-if="isText(f)">
-          <input v-model="customVals[f.field_key]" type="text" class="form-control">
+            <template v-if="isText(f)">
+              <input v-model="customVals[f.field_key]" type="text" class="form-control">
+            </template>
+
+            <template v-else-if="isSelect(f)">
+              <select v-model="customVals[f.field_key]" class="form-select">
+                <option value="">-----</option>
+                <option v-for="c in f.choices" :key="c" :value="c">{{ c }}</option>
+              </select>
+            </template>
+
+            <template v-else-if="isRadio(f)">
+              <div class="d-flex flex-wrap gap-2">
+                <template v-for="(c, i) in f.choices" :key="c">
+                  <input
+                    class="btn-check"
+                    type="radio"
+                    :name="`plus-${f.field_key}`"
+                    :id="`plus-r-${f.field_key}-${i}`"
+                    :value="c"
+                    v-model="customVals[f.field_key]"
+                  />
+                  <label class="btn btn-outline-primary" :for="`plus-r-${f.field_key}-${i}`">
+                    {{ c }}
+                  </label>
+                </template>
+              </div>
+            </template>
+
+            <template v-else-if="isCheckbox(f)">
+              <div class="d-flex flex-wrap gap-2">
+                <template v-for="(c, i) in f.choices" :key="c">
+                  <input
+                    class="btn-check"
+                    type="checkbox"
+                    :id="`plus-cb-${f.field_key}-${i}`"
+                    :value="c"
+                    v-model="customVals[f.field_key]"
+                  />
+                  <label class="btn btn-outline-primary" :for="`plus-cb-${f.field_key}-${i}`">
+                    {{ c }}
+                  </label>
+                </template>
+              </div>
+            </template>
+          </div>
         </template>
 
-        <template v-else-if="isSelect(f)">
-          <select v-model="customVals[f.field_key]" class="form-select">
-            <option value="">-----</option>
-            <option v-for="c in f.choices" :key="c" :value="c">{{ c }}</option>
-          </select>
-        </template>
-
-<!-- ProfileEdit.vue の “プラスプロフィール” 部分の分岐だけ置換 -->
-<template v-else-if="isRadio(f)">
-  <div class="d-flex flex-wrap gap-2">
-    <template v-for="(c,i) in f.choices" :key="c">
-      <input
-        class="btn-check"
-        type="radio"
-        :name="`plus-${f.field_key}`"
-        :id="`plus-r-${f.field_key}-${i}`"
-        :value="c"
-        v-model="customVals[f.field_key]"
-      />
-      <label class="btn btn-outline-pink" :for="`plus-r-${f.field_key}-${i}`">
-        {{ c }}
-      </label>
-    </template>
-  </div>
-</template>
-
-<template v-else-if="isCheckbox(f)">
-  <div class="d-flex flex-wrap gap-2">
-    <template v-for="(c,i) in f.choices" :key="c">
-      <input
-        class="btn-check"
-        type="checkbox"
-        :id="`plus-cb-${f.field_key}-${i}`"
-        :value="c"
-        v-model="customVals[f.field_key]"  <!-- 配列バインド -->
-      />
-      <label class="btn btn-outline-pink" :for="`plus-cb-${f.field_key}-${i}`">
-        {{ c }}
-      </label>
-    </template>
-  </div>
-</template>
-
+        <p v-if="!fields.some(f => f.category === 'plus')" class="text-muted m-0">
+          プラスプロフィール項目はありません。
+        </p>
       </div>
-    </template>
-
-    <p v-if="!fields.some(f=>f.category==='plus')" class="text-muted m-0">
-      プラスプロフィール項目はありません。
-    </p>
-  </div>
-</div>
+    </div>
 
     <!-- 本人確認 -->
     <div class="card mb-3">
@@ -404,9 +385,9 @@ async function onVerifyDelete(pk) {
               <span class="badge"
                     :class="{
                       'text-bg-secondary': !vMap[d.key],
-                      'text-bg-warning' : vMap[d.key]?.status==='pending',
-                      'text-bg-success' : vMap[d.key]?.status==='approved',
-                      'text-bg-danger'  : vMap[d.key]?.status==='rejected'
+                      'text-bg-warning' : vMap[d.key]?.status === 'pending',
+                      'text-bg-success' : vMap[d.key]?.status === 'approved',
+                      'text-bg-danger'  : vMap[d.key]?.status === 'rejected'
                     }">
                 {{ vMap[d.key]?.status || 'none' }}
               </span>
@@ -417,7 +398,7 @@ async function onVerifyDelete(pk) {
                   <input type="file" accept="image/*" class="d-none" @change="e => onVerifyChange(d.key, e)">
                 </label>
                 <button
-                  v-if="vMap[d.key] && vMap[d.key].status==='pending'"
+                  v-if="vMap[d.key] && vMap[d.key].status === 'pending'"
                   class="btn btn-outline-secondary btn-sm"
                   @click="onVerifyDelete(vMap[d.key].id)">
                   削除

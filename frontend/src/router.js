@@ -25,6 +25,8 @@ const routes = [
       { path: 'plan/success', name: 'plan-success', component: () => import('@/views/PlanSuccess.vue'), meta:{ title:'決済完了' } },
       { path: 'signup', name: 'signup', component: () => import('@/views/Signup.vue'), meta:{ title:'新規登録', requiresAuth:false } },
       { path: 'onboarding', name: 'onboarding', component: () => import('@/views/Onboarding.vue'),meta:{ title:'初期設定', requiresAuth:true } },
+      { path: 'onboarding/required', name: 'onboarding-required', component: () => import('@/views/RequiredQuestions.vue'), meta:{ title:'必須プロフィール', requiresAuth:true } },
+      { path: 'questions', name: 'questions', component: () => import('@/views/Questions.vue'), meta:{ title:'質問に答える', requiresAuth:true } },
 
     ],
   },
