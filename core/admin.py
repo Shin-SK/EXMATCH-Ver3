@@ -56,7 +56,9 @@ class UserProfileResource(resources.ModelResource):
             'main_area',
             'latitude',
             'longitude',
-            'id_doc_verified',      # 使うなら（adminでexcludeしてるけどCSV入力は可にしたい場合）
+            'id_doc_verified',
+            "profile_image",
+            "lciq_image",
         )
         export_order = fields
 
