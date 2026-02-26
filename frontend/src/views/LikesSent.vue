@@ -31,7 +31,7 @@ onMounted(() => load(1))
 </script>
 
 <template>
-  <div class="container py-3">
+  <div class="py-3">
     <div class="h2 fw-bold my-3">いいねしたユーザー</div>
 
     <div v-if="loading" class="text-center py-5"><div class="spinner-border" role="status"></div></div>

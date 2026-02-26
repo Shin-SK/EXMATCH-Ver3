@@ -56,7 +56,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="container py-3">
+  <div class="py-3">
     <div class="h2 fw-bold my-3">マッチした人</div>
 
 

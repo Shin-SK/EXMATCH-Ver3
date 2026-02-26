@@ -178,7 +178,7 @@ async function onVerifyDelete(pk) {
 </script>
 
 <template>
-  <div class="container py-3" v-if="me">
+  <div class="py-3" v-if="me">
     <h1 class="h2 fw-bold my-3">プロフィール編集</h1>
 
     <div v-if="msg" class="alert alert-info py-2">{{ msg }}</div>
@@ -249,9 +249,21 @@ async function onVerifyDelete(pk) {
       </div>
     </div>
 
+    <div class="px-3 pb-2 mt-4">
+      <div class="d-flex align-items-center justify-content-center px-3 mb-4">
+        <img style="width: 80px; height: auto;" src="/img/aoi-reco.svg" alt="あおいさんのおすすめ">
+        <div class="fw-bold fs-5">
+          AI仲人あおいさんの<br>
+          おすすめ</div>
+      </div>
+      <router-link to="/questions" class="btn btn-outline-primary btn w-100">
+        質問に答えて正確なおすすめを！
+      </router-link>
+      <p class="text-muted text-center mt-1 mb-0" style="font-size: 0.75rem;">回答が増えるほどおすすめの精度がUPします</p>
+    </div>
 
     <!-- カスタム項目（動的） -->
-    <div class="card mb-3">
+    <!-- <div class="card mb-3">
       <div class="card-header fw-bold">選択項目</div>
       <div class="card-body row g-3">
         <template v-for="f in fields" :key="f.field_key">
@@ -299,10 +311,10 @@ async function onVerifyDelete(pk) {
           </div>
         </template>
       </div>
-    </div>
+    </div> -->
 
     <!-- プラスプロフィール -->
-    <div class="card mb-3">
+    <!-- <div class="card mb-3">
       <div class="card-header fw-bold">プラスプロフィール</div>
       <div class="card-body row g-3">
         <template v-for="f in fields" :key="f.field_key">
@@ -361,7 +373,7 @@ async function onVerifyDelete(pk) {
           プラスプロフィール項目はありません。
         </p>
       </div>
-    </div>
+    </div> -->
 
     <!-- 本人確認 -->
     <div class="card mb-3">

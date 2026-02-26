@@ -32,7 +32,7 @@ onMounted(() => load(1))
 </script>
 
 <template>
-  <div class="container py-3">
+  <div class="py-3">
     <div class="h2 fw-bold my-3">いいねしてくれたユーザー</div>
 
     <div v-if="loading" class="text-center py-5">
