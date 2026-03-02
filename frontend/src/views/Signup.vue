@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { register } from '@/api'
+import { IconEye, IconEyeOff } from '@tabler/icons-vue'
 
 const router = useRouter()
 const route  = useRoute()
@@ -48,8 +49,9 @@ async function submit(){
 </script>
 
 <template>
-  <div class="container py-4" style="max-width:520px">
-    <h1 class="h2 fw-bold my-3">新規登録</h1>
+  <div class="container py-4 min-vh-100 d-flex align-items-center justify-content-center" style="max-width:520px">
+    <div class="w-100">
+    <h1 class="h2 fw-bold my-3 text-center">新規登録</h1>
 
     <div v-if="ok" class="alert alert-success">
       登録メールを送信しました。メールの案内に従って確認を完了してください。
@@ -75,10 +77,11 @@ async function submit(){
 
       <div class="mb-3">
         <label class="form-label">パスワード</label>
-        <div class="input-group">
-          <input :type="show.p1 ? 'text' : 'password'" class="form-control" v-model="form.password1" autocomplete="new-password" />
-          <button class="btn btn-outline-secondary" type="button" @click="show.p1=!show.p1">
-            {{ show.p1 ? '隠す' : '表示' }}
+        <div class="position-relative">
+          <input :type="show.p1 ? 'text' : 'password'" class="form-control pe-5" v-model="form.password1" autocomplete="new-password" />
+          <button class="btn btn-outline-secondary position-absolute end-0 top-0 h-100 rounded-3 rounded-end pw-toggle" style="z-index: 9;" type="button" @click="show.p1=!show.p1">
+            <IconEyeOff v-if="show.p1" class="ms-1" />
+            <IconEye v-else class="ms-1" />
           </button>
         </div>
         <div v-if="fieldErr.password1" class="text-danger small mt-1">
@@ -88,10 +91,11 @@ async function submit(){
 
       <div class="mb-3">
         <label class="form-label">パスワード（確認）</label>
-        <div class="input-group">
-          <input :type="show.p2 ? 'text' : 'password'" class="form-control" v-model="form.password2" autocomplete="new-password" />
-          <button class="btn btn-outline-secondary" type="button" @click="show.p2=!show.p2">
-            {{ show.p2 ? '隠す' : '表示' }}
+        <div class="position-relative">
+          <input :type="show.p2 ? 'text' : 'password'" class="form-control pe-5" v-model="form.password2" autocomplete="new-password" />
+          <button class="btn btn-outline-secondary position-absolute end-0 top-0 h-100 rounded-3 rounded-end pw-toggle" style="z-index: 9;" type="button" @click="show.p2=!show.p2">
+            <IconEyeOff v-if="show.p2" class="ms-1" />
+            <IconEye v-else class="ms-1" />
           </button>
         </div>
         <div v-if="fieldErr.password2" class="text-danger small mt-1">
@@ -107,5 +111,17 @@ async function submit(){
     <p class="text-muted small mt-3">
       登録ボタンを押すことで、利用規約とプライバシーポリシーに同意したものとみなされます。
     </p>
+    </div>
   </div>
 </template>
+
+<style scoped>
+.pw-toggle,
+.pw-toggle:hover,
+.pw-toggle:active,
+.pw-toggle:focus,
+.pw-toggle:focus-visible {
+  box-shadow: none !important;
+  outline: none !important;
+}
+</style>
