@@ -1,6 +1,81 @@
 @use "../global/global" as *;
 
 
+
+@mixin fs-1 {
+    font-size: calc(2.5rem + 1.5vw);
+    @media (min-width: 1200px) {
+        font-size: 2.5rem;
+    }
+}
+
+@mixin fs-2 {
+    font-size: calc(2rem + 0.9vw);
+    @media (min-width: 1200px) {
+        font-size: 2rem;
+    }
+}
+
+@mixin fs-3 {
+    font-size: calc(1.75rem + 0.6vw);
+    @media (min-width: 1200px) {
+        font-size: 1.75rem;
+    }
+}
+
+@mixin fs-4 {
+    font-size: 1.5rem;
+}
+
+@mixin fs-5 {
+    font-size: 1.25rem;
+}
+
+@mixin fs-6 {
+    font-size: 1rem;
+}
+
+%fs-1 {
+    @include fs-1;
+}
+
+%fs-2 {
+    @include fs-2;
+}
+
+%fs-3 {
+    @include fs-3;
+}
+
+%fs-4 {
+    @include fs-4;
+}
+
+%fs-5 {
+    @include fs-5;
+}
+
+%fs-6 {
+    @include fs-6;
+}
+
+@mixin fuki{
+    &::before, &::after{
+        content: '';
+        background-image: url(/img/fuki1.svg);
+        width: 20px;
+        height: 20px;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: contain;
+    }
+    &::after{
+        transform: scaleX(-1);
+    }
+}
+
+
+
 .mm-spn.mm-spn--light{
     background-color: unset;
 }
@@ -77,8 +152,8 @@
                     flex-direction: column;
                     gap: 40px;
                     background-color: rgba($color: white, $alpha: 0.9);
-                    border-radius: 16px;
-                    padding: 40px 16px;
+                    border-radius: 1rem;
+                    padding: 3rem;
                     width: 70%;
                     max-width: 400px;
                     @include md{
@@ -86,7 +161,7 @@
                     }
                     h2{
                         color: $mc;
-                        @include fs(20);
+                        @include fs-3;
                         font-weight: bold;
                         letter-spacing: 4px;
                         &::after{
@@ -99,8 +174,7 @@
                     }
                     h3{
                         text-align: center;
-                        line-height: 180%;
-                        letter-spacing: 2px;
+                        line-height: 1.6;
                     }
                     .wrap{
                         @include flex();
@@ -157,18 +231,21 @@
             @include flex();
             flex-direction: column;
             .h1{
-                @include fs(20);
+                @include fs-3;
                 color: $mc;
                 text-align: center;
                 font-weight: bold;
                 margin-bottom: 16px;
                 @include md{
-                    @include fs(20);
+                    @include fs-5;
                 }
             }
             p{
                 text-align: center;
                 margin-bottom: 16px;
+                @include md{
+                    text-align: left;
+                }
             }
             .banner{
                 &__wrap{
@@ -191,12 +268,12 @@
         }//midashi
         .mainTitle{
             @include flex();
-            @include fs(20);
+            @include fs-3;
             font-weight: bold;
             color: $mc;
             letter-spacing: 10px;
             @include md{
-                @include fs(20);
+                @include fs-4;    
                 letter-spacing: normal;
                 margin-bottom: 16px;
             }
@@ -208,11 +285,14 @@
                     .title{
                         margin-bottom: 16px;
                         .honki{
-                            @include fs(20);
+                            @include fs-3;
                             @include flex();
                             gap: 16px;
                             color: $mc;
                             font-weight: bold;
+                            @include md{
+                                @include fs-5;
+                            }
                             &::before, &::after{
                                 content: '';
                                 background-image: url(/img/fuki1.svg);
@@ -227,10 +307,13 @@
                             }
                         }
                         .subtitle{
-                            @include fs(20);
+                            @include fs-3;
                             text-align: center;
                             margin-top: 8px;
                             font-weight: bold;
+                            @include md{
+                                @include fs-5;
+                            }
                         }
                     }
                     .outer{
@@ -253,10 +336,13 @@
                                 .head{
                                     font-weight: bold;
                                     margin: 8px auto 4px;
-                                    @include fs(18);
+                                    @include fs-4;
+                                    @include md{
+                                        @include fs-5;
+                                    }
                                 }
                                 p{
-                                    @include fs(14);
+                                    font-size: 1rem;
                                 }
                             }
                         }
@@ -287,10 +373,16 @@
                         .head{
                             font-weight: bold;
                             margin: 8px auto 4px;
-                            @include fs(14);
+                            @include fs-6;
+                            @include md{
+                                @include fs-5;
+                            }
                         }
                         p{
-                            @include fs(14);
+                            @include fs-6;
+                            @include md{
+                                font-size: 1rem;
+                            }
                         }
                     }
                 }
@@ -341,7 +433,7 @@
                         gap: 4px;
                         .name{
                             font-weight: bold;
-                            @include fs(10);
+                            @include fs-6;
                             &::after{
                                 content: '/';
                                 margin-left: 4px;
@@ -350,12 +442,12 @@
                         }
                         .lciq{
                             margin-left: 8px;
-                            @include fs(10);
+                            @include fs-6;
                             @include flex();
                             align-items: baseline;
                             &::after{
                                 content: '/LCIQ';
-                                @include fs(12);
+                                @include fs-6;
                                 font-family: $mincho;
                                 margin-left: 4px;
                             }
@@ -404,11 +496,16 @@
             margin-top: 24px;
             @include md{
                 margin-top: 8px;
+                text-align: left;
             }
             span{
                 display: block;
-                @include fs(10);
                 text-align: center;
+                @include md{
+                    font-size: 12px;
+                    text-align: left;
+                    margin-top: 4px;
+                }
             }
         }
 
@@ -424,12 +521,18 @@
                 .numb-month{
                     display: flex;
                     align-items: baseline;
-                    @include fs(40);
+                    @include fs-2();
                     font-weight: bold;
                     gap: 4px;
+                    @include md{
+                        @include fs-2;
+                    }
                     &::after{
                         content: '円/月';
-                        @include fs(16);
+                        @include fs-5;
+                        @include md{
+                            @include fs-6;
+                        }
                     }
 
                 }
@@ -460,8 +563,11 @@
                                     flex-direction: column;
                                     gap: 16px;
                                     p{
-                                        @include fs(14);
+                                        @include fs-6;
                                         text-align: center;
+                                        @include md{
+                                            @include fs-5;
+                                        }
                                     }
                                 }
                                 .right{
@@ -482,7 +588,11 @@
                     .catch{
                         text-align: center;
                         @include flex();
-                        margin: 24px auto;
+                        margin: 80px auto;
+                        display: flex;
+                        align-items: end;
+                        justify-content: center;
+                        @include fuki();
                     }
                     .plan{
                         @include flex();
@@ -520,7 +630,7 @@
                             font-weight: bold;
                             @include flex();
                             .getugaku{
-                                @include fs(40);
+                                @include fs-2;
                                 justify-content: center;
                             }
                         }
@@ -532,12 +642,8 @@
                                 content: '合計';
                                 padding: 4px 16px;
                                 background-color:gray;
-                                @include fs(10);
                                 color: white;
                                 margin-right: 4px;
-                            }
-                            span{
-                                @include fs(10);
                             }
                         }
                         .special{
@@ -555,9 +661,12 @@
                                     @include flex();
                                     align-items: baseline;
                                     font-weight: bold;
-                                    @include fs(40);
+                                    @include fs-2();
+                                    @include md{
+                                        @include fs-2;
+                                    }
                                     span{
-                                        @include fs(16);
+                                        @include fs-5;
                                     }
                                 }
                                 .inner{
@@ -602,9 +711,12 @@
                                 }
                                 .span{
                                     font-weight: bold;
-                                    @include fs(40);
+                                    @include fs-2();
                                     color: $pink;
                                     @include flex();
+                                    @include md{
+                                        @include fs-3;
+                                    }
                                 }
                             }
                         }
@@ -615,6 +727,9 @@
                     .catch{
                         text-align: center;
                         @include flex();
+                        @include md{
+                            text-align: left;
+                        }
                     }
                     .box{
                         .head{
@@ -671,18 +786,18 @@
                                             gap: $tri-gap;
                                             .triangle{
                                                 span{
-                                                    @include fs(20);
+                                                    @include fs-3;
                                                 }
                                             }
                                             .numb-month{
-                                                @include fs(40);
+                                                @include fs-2();
                                                 font-weight: bold;
                                                 @include flex();
                                                 align-items: flex-end;
                                                 gap: 4px;
                                                 color: red;
                                                 span{
-                                                    @include fs(16);
+                                                    @include fs-5;
                                                     margin-bottom: 4px;
                                                 }
                                             }
@@ -721,7 +836,7 @@
                     flex-direction: column;
                     gap: 8px;
                     span{
-                        @include fs(10);
+                        @include fs-6;
                     }
                 }
             }
@@ -739,7 +854,7 @@
                             color: $mc;
                             &::before{
                                 content: 'Q';
-                                @include fs(30);
+                                @include fs-3;
                                 font-weight: bold;
                                 margin-right: 16px;
                             }
@@ -759,7 +874,7 @@
                             }
                             &::before{
                                 content: 'A';
-                                @include fs(30);
+                                @include fs-2;
                                 font-weight: bold;
                                 margin-right: 16px;
                             }
@@ -832,7 +947,7 @@
                         font: var(--fa-font-solid);
                         content: '\f090';
                         color: white;
-                        @include fs(12);
+                        @include fs-6;
                     }
                 }
             }   
@@ -865,7 +980,7 @@
                     &::after{
                         font: var(--fa-font-solid);
                         content: '\f105';
-                        @include fs(16);
+                        @include fs-5;
                         color: $mc;
                     }
                 }
@@ -886,7 +1001,7 @@
                     font: var(--fa-font-solid);
                     content: '\f090';
                     color: white;
-                    @include fs(12);
+                    @include fs-6;
                 }
             }
         }
@@ -917,7 +1032,7 @@
             }
             li{
                 a{
-                    @include fs(12);
+                    @include fs-6;
                 }
             }
         }

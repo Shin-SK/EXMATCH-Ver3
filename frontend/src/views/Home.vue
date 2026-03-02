@@ -149,22 +149,11 @@ onUnmounted(() => document.body.classList.remove('lp-scroll'))
         そんな願いをかなえました。
       </div>
 
-      <!-- PC用／SP用はSCSSでメディアクエリ切り替え前提 -->
-      <p class="lead-pc">
-        総合婚活サービスEXMarry®が運営するマッチングサービスです。<br>
-        恋愛偏差値®を使うことで相手との相性がすぐにわかります。<br>
+      <p>
+        総合婚活サービスEXMarry®が運営する<br class="d-md-none">マッチングサービスです。<br>
+        恋愛偏差値®を使うことで<br class="d-md-none">相手との相性がすぐにわかります。<br>
         本気で、手軽に。<br>
-        相性のいい相手としか出会うことができないサービスです。
-      </p>
-
-      <p class="lead-sp">
-        総合婚活サービスEXMarry®が運営する<br>
-        マッチングサービスです。<br>
-        恋愛偏差値®を使うことで<br>
-        相手との相性がすぐにわかります。<br>
-        本気で、手軽に。<br>
-        相性のいい相手としか<br>
-        出会うことができないサービスです。
+        相性のいい相手としか<br class="d-md-none">出会うことができないサービスです。
       </p>
     </section>
 
@@ -204,7 +193,7 @@ onUnmounted(() => document.body.classList.remove('lp-scroll'))
         <div class="area">
           <div class="title">
             <div class="honki">EXMATCHが本気な理由<span>2</span></div>
-            <div class="subtitle">プラスプロフィールで相手の深い部分を知る</div>
+            <div class="subtitle">プラスプロフィールで<br class="d-md-none">相手の深い部分を知る</div>
           </div>
 
           <div class="outer">
@@ -277,7 +266,7 @@ onUnmounted(() => document.body.classList.remove('lp-scroll'))
           </div>
         </div>
 
-        <div class="oaite__loop mt-3">
+        <div class="oaite__loop mt-3 overflow-hidden">
           <div v-if="loadingPairs" class="loading">読み込み中…</div>
           <div v-else-if="errPairs" class="error">{{ errPairs }}</div>
           <Splide :options="carouselOpts" :extensions="{ AutoScroll }" :key="currentLoop" class="oaite__splide">
@@ -340,7 +329,7 @@ onUnmounted(() => document.body.classList.remove('lp-scroll'))
         <div class="standard-area">
           <div class="catch">
             わずらわしいポイントはありません。<br>
-            有料プランは、すべての機能がご利用いただけます。
+            有料プランは<br class="d-md-none">すべての機能がご利用いただけます。
           </div>
 
           <div class="plan">
@@ -408,7 +397,7 @@ onUnmounted(() => document.body.classList.remove('lp-scroll'))
         <div class="option-area">
           <div class="catch">
             オプションも明朗会計。<br>
-            こちらもポイント制ではなく、お申し込みいただければ<br>
+            こちらもポイント制ではなく、<br class="d-md-none">お申し込みいただければ<br>
             すぐにご利用いただけます。
           </div>
           <div class="frame-area">
