@@ -716,30 +716,30 @@ onUnmounted(() => document.body.classList.remove('lp-scroll'))
 
     <!-- footer -->
     <footer class="footer-home">
-      <div class="sns">
-        <a class="youtube" href="#" target="_blank"><img src="/img/sns-youtube.webp" alt=""></a>
-        <a class="tiktok"  href="#" target="_blank"><img src="/img/sns-tiktok.webp"  alt=""></a>
+      <div class="container">
+        <div class="sns">
+          <a class="youtube" href="#" target="_blank"><img src="/img/sns-youtube.webp" alt=""></a>
+          <a class="tiktok"  href="#" target="_blank"><img src="/img/sns-tiktok.webp"  alt=""></a>
+        </div>
+        <div class="footer-home__wrap">
+          <ul>
+            <li><a href="/">会社概要</a></li>
+            <li><a href="/">利用規約</a></li>
+            <li><a href="/">安心・安全の取り組みとガイド</a></li>
+            <li><a href="/">コミュニティガイドライン</a></li>
+            <li><a href="/">プライバシーポリシー</a></li>
+            <li><a href="/">クッキーポリシー</a></li>
+            <li><a href="/">クッキー設定</a></li>
+            <li><a href="/">特定商取引法に基づく表示</a></li>
+            <li><a href="/">ヘルプ</a></li>
+            <li><a href="/">法人･自治体向けサービス</a></li>
+            <li><a href="/">採用サイト</a></li>
+            <li><a href="/">記事提供元一覧</a></li>
+          </ul>
+        </div>
+        <div class="logo"><a href="/"><img src="/img/logo.svg" alt="Logo"></a></div>
+        <div class="cr"><a href="/">&copy; 2024 EXMATCH</a></div>
       </div>
-
-      <div class="footer-home__wrap">
-        <ul>
-          <li><a href="/">会社概要</a></li>
-          <li><a href="/">利用規約</a></li>
-          <li><a href="/">安心・安全の取り組みとガイド</a></li>
-          <li><a href="/">コミュニティガイドライン</a></li>
-          <li><a href="/">プライバシーポリシー</a></li>
-          <li><a href="/">クッキーポリシー</a></li>
-          <li><a href="/">クッキー設定</a></li>
-          <li><a href="/">特定商取引法に基づく表示</a></li>
-          <li><a href="/">ヘルプ</a></li>
-          <li><a href="/">法人･自治体向けサービス</a></li>
-          <li><a href="/">採用サイト</a></li>
-          <li><a href="/">記事提供元一覧</a></li>
-        </ul>
-      </div>
-
-      <div class="logo"><a href="/"><img src="/img/logo.svg" alt="Logo"></a></div>
-      <div class="cr"><a href="/">&copy; 2024 EXMATCH</a></div>
     </footer>
   </section>
 </template>

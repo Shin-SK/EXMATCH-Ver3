@@ -3,6 +3,7 @@
 import { ref, computed } from 'vue'
 import { useAuth } from '@/stores/useAuth'
 import { useRoute, useRouter } from 'vue-router'
+import { IconEye, IconEyeOff } from '@tabler/icons-vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -39,46 +40,59 @@ async function submit () {
 </script>
 
 <template>
-  <div class="container py-4" style="max-width:520px">
-    <h1 class="h2 fw-bold my-3">ログイン</h1>
-
-    <div v-if="err" class="alert alert-danger py-2">{{ err }}</div>
-
-    <form @submit.prevent="submit" novalidate>
-      <div class="mb-3">
-        <label class="form-label">ユーザー名</label>
-        <input
-          class="form-control"
-          v-model.trim="form.username"
-          autocomplete="username"
-          autofocus
-          @keydown.enter.prevent="submit"
-        />
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label">パスワード</label>
-        <div class="input-group">
+  <div class="container py-4 min-vh-100 d-flex align-items-center justify-content-center" style="max-width:520px">
+    <div class="w-100"> 
+      <h1 class="h2 fw-bold my-3 text-center">ログイン</h1>
+      <div v-if="err" class="alert alert-danger py-2">{{ err }}</div>
+      <form @submit.prevent="submit" novalidate>
+        <div class="mb-3">
+          <label class="form-label">ユーザー名</label>
           <input
-            :type="showPw ? 'text' : 'password'"
             class="form-control"
-            v-model="form.password"
-            autocomplete="current-password"
+            v-model.trim="form.username"
+            autocomplete="username"
+            autofocus
             @keydown.enter.prevent="submit"
           />
-          <button class="btn btn-outline-secondary" type="button" @click="showPw = !showPw">
-            {{ showPw ? '隠す' : '表示' }}
-          </button>
         </div>
-      </div>
-
-      <button class="btn btn-primary w-100" type="submit" :disabled="!canSubmit">
-        {{ sending ? 'ログイン中…' : 'ログイン' }}
-      </button>
-      <div class="d-flex align-items-center justify-content-center w-100">
-        <a class="btn btn-link btn-sm " href="/signup">会員登録</a>
-      </div>
+        <div class="mb-3">
+          <label class="form-label">パスワード</label>
+          <div class="position-relative">
+            <input
+              :type="showPw ? 'text' : 'password'"
+              class="form-control pe-5"
+              v-model="form.password"
+              autocomplete="current-password"
+              @keydown.enter.prevent="submit"
+            />
+            <button
+              class="btn btn-outline-secondary position-absolute end-0 top-0 h-100 rounded-3 rounded-end pw-toggle"
+              style="z-index: 9;"
+              type="button" @click="showPw = !showPw">
+              <IconEyeOff v-if="showPw" class="ms-1" />
+              <IconEye v-else class="ms-1" />
+            </button>
+          </div>
+        </div>
+        <button class="btn btn-primary w-100" type="submit" :disabled="!canSubmit">
+          {{ sending ? 'ログイン中…' : 'ログイン' }}
+        </button>
+        <div class="d-flex align-items-center justify-content-center w-100">
+          <a class="btn btn-link btn-sm " href="/signup">会員登録</a>
+        </div>
       
-    </form>
+      </form>
+    </div>
   </div>
 </template>
+
+<style scoped>
+.pw-toggle,
+.pw-toggle:hover,
+.pw-toggle:active,
+.pw-toggle:focus,
+.pw-toggle:focus-visible {
+  box-shadow: none !important;
+  outline: none !important;
+}
+</style>

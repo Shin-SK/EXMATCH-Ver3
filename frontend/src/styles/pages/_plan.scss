@@ -2,7 +2,7 @@
 
 .upgrade-plan{
 	background-color: $lightgray;
-	padding: 40px 16px;
+	padding: 40px 0px;
 	.freeplan{
 		background-color: white;
 		margin: 40px auto;
@@ -19,9 +19,13 @@
 					min-width: 30%;
 				}
 				.inner{
-					@include fs(30);
+					font-size: 3rem;
 					font-weight: bold;
-
+					&::after{
+						content: "円/月";
+						font-size: 1rem;
+						margin-left: 4px;
+					}
 				}
 			}
 		}
@@ -31,7 +35,7 @@
 			display: flex;
 			align-items: center;
 			gap: 8px;
-			margin-bottom: 8px;
+			margin-bottom: 4px;
 			&::before{
 			content: "check";
 			font-family: "Material Symbols Outlined";
@@ -48,7 +52,7 @@
 		p{
 			font-weight: bold;
 			text-align: center;
-			@include fs(18);
+			font-size: 1.25rem;
 		}
 		.option{
 			margin: 24px auto 40px;
@@ -73,20 +77,17 @@
 					}
 					.inner{
 						@include flex();
-						min-height: 160px;
 						gap: 8px;
 						flex-direction: column;
+						margin-bottom: 24px;
 						.wrap{
 							width: 100%;
 							@include flex();
 							flex-direction: column;
 							gap: 8px;
 							.numb{
-								@include fs(40);
+								font-size: 2rem;
 								font-weight: bold;
-								span{
-									@include fs(12);
-								}
 							}
 							label{
 								position: relative;
@@ -98,7 +99,6 @@
 								padding: 4px;
 								@include flex();
 								cursor: pointer;
-								@include fs(14);
 								transition: background .2s, color .2s;
 								input{
 									position: absolute;
@@ -126,7 +126,6 @@
 				}
 				.special{
 					.item{
-						aspect-ratio: 16/9;
 						margin-bottom: 16px;
 						border-radius: 16px;
 						padding: 8px;
@@ -148,24 +147,26 @@
 							display: flex;
 							flex-direction: column;
 							span{
-								@include fs(30);
+								font-size: 1.5rem;
 								display: block;
 								width: 100%;
 							}
 						}
 					}//agel
 					.opening{
-						background: #dfdbff;
-						background: linear-gradient(90deg, rgba(223, 219, 255, 1) 0%, rgba(161, 239, 255, 1) 100%);
 						.head{
 							@include flex();
 							font-weight: bold;
 							color: $mc;
 							margin-top: 8px;
 							gap: 8px;
+							display: flex;
+							align-items: center;
+							justify-content: center;
+							gap: 8px;
 							&::before, &::after{
 								content: '';
-								background-image: url(../img/fuki1.svg);
+								background-image: url(/img/fuki1.svg);
 								width: 20px;
 								height: 20px;
 								background-repeat: no-repeat;
@@ -179,7 +180,7 @@
 						.text{
 							font-weight: bold;
 							@include flex();
-							@include fs(30);
+							font-size: 1.5rem;
 							text-align: center;
 							height: 100%;
 						}
@@ -218,9 +219,9 @@
 				border-radius: 100px;
 				color: $mc;
 				padding: 4px 40px;
+				width: 100%;
 				@include flex();
 				cursor: pointer;
-				@include fs(14);
 				transition: background .2s, color .2s;
 				input{
 					position: absolute;
@@ -235,37 +236,18 @@
 	}//single
 
 	.option{
-		h3{
-			text-align: center;
-			font-weight: normal;
-		}
+		
 		.wrap{
 			@include flex();
 			background-color: white;
 			margin: 40px auto;
+			padding-top: 16px;
+			@include md{
+				flex-direction: column;
+			}
 			.price{
 				padding: 8px;
-				aspect-ratio: 1/1;
-				min-height: 200px;
 				@include flex();
-				.normal{
-					.wrap{
-						@include fs(30);
-						font-weight: bold;
-						@include flex();
-						align-items: flex-end;
-						gap: 4px;
-						span{
-							@include fs(16);
-						}
-					}
-				}
-				.off{
-					display: none;
-				}
-				.sp{
-					display: none;
-				}
 				&.special{
 					$tri-gap: 8px;
 					@include flex();
@@ -275,6 +257,21 @@
 						position: relative;
 						@include flex();
 						gap: 8px;
+						.numb{
+							font-size: 2rem;
+							font-weight: bold;
+							@include flex();
+							align-items: flex-end;
+							gap: 4px;
+							span{
+								font-size: 1rem;
+							}
+						}
+					}
+					.down{
+						@include flex();
+						gap: $tri-gap;
+						position: relative;
 						.off{
 							@include flex();
 							background-color: red;
@@ -285,32 +282,8 @@
 							padding: 8px;
 							text-align: center;
 						}
-						.wrap{
-							@include flex();
-							align-items: flex-end;
-							margin: auto;
-							position: relative;
-							&::before{
-								content: "";
-								height: 2px;
-								position: absolute;
-								width: 100%;
-								top: 50%;
-								background-color: red;
-							}
-						}
-					}
-					.sp{
-						@include flex();
-						flex-direction: column;
-						gap: $tri-gap;
-						.triangle{
-							span{
-								@include fs(20);
-							}
-						}
 						.numb{
-							@include fs(40);
+							font-size: 3rem;
 							font-weight: bold;
 							@include flex();
 							align-items: flex-end;
@@ -329,6 +302,7 @@
 					display: flex;
 					align-items: center;
 					gap: 8px;
+					padding: 40px 0px;
 					&::before{
 					content: "check";
 					font-family: "Material Symbols Outlined";

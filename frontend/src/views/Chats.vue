@@ -79,6 +79,9 @@ onMounted(async () => {
       <div class="spinner-border" role="status"></div>
     </div>
     <div v-else-if="err" class="alert alert-danger">{{ err }}</div>
+    <div v-else-if="threads.length === 0" class="text-center text-muted py-5">
+      出会いはすぐそこに。
+    </div>
 
     <div v-else class="d-flex flex-column gap-3">
       <a

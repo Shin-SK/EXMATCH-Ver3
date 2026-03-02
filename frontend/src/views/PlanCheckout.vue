@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { createCheckout } from '@/api'
+import { IconChevronsDown } from '@tabler/icons-vue'
 
 onMounted(() => { document.title = 'プラン購入' })
 
@@ -12,7 +13,7 @@ const plans = [
     perMonth: '3,850',
     total: '11,550',
     bonuses: [
-      { img: '/img/a-gel.png', text: '4,620円分プレゼント' },
+      { img: '/img/a-gel.png', text: '4,620円分<br>プレゼント' },
       { head: 'オープニングキャンペーン', text: '1ヶ月分<br>プレゼント' }
     ]
   },
@@ -22,7 +23,7 @@ const plans = [
     perMonth: '3,150',
     total: '18,900',
     bonuses: [
-      { img: '/img/a-gel.png', text: '7,560円分プレゼント' },
+      { img: '/img/a-gel.png', text: '7,560円分<br>プレゼント' },
       { head: 'オープニングキャンペーン', text: '2ヶ月分<br>プレゼント' }
     ]
   },
@@ -32,7 +33,7 @@ const plans = [
     perMonth: '2,450',
     total: '29,400',
     bonuses: [
-      { img: '/img/a-gel.png', text: '11,760円分プレゼント' },
+      { img: '/img/a-gel.png', text: '11,760円分<br>プレゼント' },
       { head: 'オープニングキャンペーン', text: '3ヶ月分<br>プレゼント' }
     ]
   },
@@ -101,7 +102,7 @@ async function submitCheckout(){
 
     <!-- Free plan -->
     <div class="freeplan">
-      <div class="wrap">
+      <div class="wrap d-flex flex-column flex-md-row align-items-center">
         <div class="price">
           <div class="inner">0</div>
         </div>
@@ -119,12 +120,7 @@ async function submitCheckout(){
 
     <!-- Standard plan -->
     <div class="standard">
-      <p>スタンダードプランでは<br>すべての機能がご利用いただけます</p>
-      <div class="option">
-        プラスプロフィール（性指向など）が表示できる<br>
-        <a href="#option">追加オプションはこちら</a>
-      </div>
-
+      <p class="mb-3">スタンダードプランでは<br>すべての機能がご利用いただけます</p>
       <form @submit.prevent="submitCheckout">
         <div class="standard__wrap">
           <!-- 複数パック -->
@@ -134,7 +130,7 @@ async function submitCheckout(){
               <div class="inner">
                 <div class="wrap">
                   <div class="numb">
-                    {{ p.perMonth }}<span>円/月</span>
+                    {{ p.perMonth }}<small>円/月</small>
                   </div>
 
                   <!-- ラジオ: label直下にinput（:has用） -->
@@ -171,25 +167,23 @@ async function submitCheckout(){
               </div>
             </div>
           </div>
-
-          <!-- 1ヶ月パック -->
-          <div class="single">
-            <div class="head">{{ single.title }}</div>
-            <div class="price">
-              <div class="numb">{{ single.perMonth }}<span>円/月</span></div>
-              <label>
-                <input
-                  type="radio"
-                  name="plan"
-                  :value="single.key"
-                  v-model="selectedPlan"
-                />
-                購入
-              </label>
-            </div>
+        </div>
+        <!-- 1ヶ月パック -->
+        <div class="single">
+          <div class="head">{{ single.title }}</div>
+          <div class="price">
+            <div class="numb">{{ single.perMonth }}<span>円/月</span></div>
+            <label>
+              <input
+                type="radio"
+                name="plan"
+                :value="single.key"
+                v-model="selectedPlan"
+              />
+              購入
+            </label>
           </div>
         </div>
-
         <!-- 決済へ -->
         <button class="btn btn-primary w-100" type="submit" :disabled="!canSubmit || submitting">
           {{ submitting ? '処理中…' : '購入に進む' }}
@@ -201,20 +195,24 @@ async function submitCheckout(){
     <div class="option" id="option">
       <div class="head-set">
         <h2>PLUS PROFILE</h2>
-        <h3>ご要望にお答えして<br>深い部分までわかる追加オプションを導入しました</h3>
+        <h3>プラン購入</h3>
       </div>
+
+      <p class="text-center my-4">ご要望にお答えして<br>深い部分までわかる追加オプションを導入しました</p>
 
       <div class="wrap">
         <!-- 左: 価格カード（割引表示） -->
         <div class="price special">
           <div class="normal">
-            <div class="off">50%<br>OFF</div>
-            <div class="wrap">
+            <div class="numb">
               1,500<span>円/月</span>
             </div>
           </div>
-          <div class="sp">
-            <div class="triangle"></div>
+          <div class="arrow">
+            <IconChevronsDown />
+          </div>
+          <div class="down">
+            <div class="off">50%<br>OFF</div>
             <div class="numb">750<span>円/月</span></div>
           </div>
         </div>
