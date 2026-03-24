@@ -1,3 +1,6 @@
+import logging
+
+from django.db import transaction
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
@@ -8,6 +11,8 @@ from django.contrib.auth import get_user_model
 from core.models import Match, Message, UserProfile, VerificationSubmission, Report
 from notifications.models import Notification
 from notifications.utils import send_notification_email
+
+logger = logging.getLogger(__name__)
 
 
 
@@ -204,8 +209,6 @@ def notify_verification_events(sender, instance, created, **kwargs):
 
 
 
-# notifications/signals.py （該当シグナルだけ抜粋）
-
 @receiver(post_save, sender=Report)
 def handle_report(sender, instance, created, **kw):
 	if not created:
@@ -218,7 +221,6 @@ def handle_report(sender, instance, created, **kw):
 		context  = {"user": instance.reporter, "now": timezone.now()},
 	)
 
-
 	admin = get_user_model().objects.filter(is_superuser=True).first()
 
 	Notification.objects.create(
@@ -228,34 +230,50 @@ def handle_report(sender, instance, created, **kw):
 		text   = f"{instance.reported} が通報されました ({instance.reason})",
 	)
 
-	# ── 通報回数を取得 ───────────────────────
-	count   = Report.objects.filter(reported=instance.reported).count()
-	remain  = settings.REPORT_BAN_THRESHOLD - count
+	# 原子性保証: 通報数カウントとBAN判定を同一トランザクションで実行
+	with transaction.atomic():
+		# 対象ユーザーを行ロックして並行通報のレースを防止
+		User = get_user_model()
+		target = User.objects.select_for_update().get(pk=instance.reported_id)
 
-	# ── 1〜3 回目：共通警告メール ─────────────
-	if count < settings.REPORT_BAN_THRESHOLD:
-		send_notification_email(
-			user     = instance.reported,
-			template = "report_warning",        # ← さきほど作った柔らか警告
-			context  = {
-				"user"        : instance.reported,
-				"report_count": count,
-				"remain"      : max(remain, 0),
-				"now"         : timezone.now(),
-			},
-		)
-		return
+		count = Report.objects.filter(reported=target).count()
+		remain = settings.REPORT_BAN_THRESHOLD - count
 
-	# ── 4 回目以上：即 BAN ───────────────────
-	target = instance.reported
-	target.is_active = False
-	target.save(update_fields=["is_active"])
+		if count < settings.REPORT_BAN_THRESHOLD:
+			send_notification_email(
+				user     = target,
+				template = "report_warning",
+				context  = {
+					"user"        : target,
+					"report_count": count,
+					"remain"      : max(remain, 0),
+					"now"         : timezone.now(),
+				},
+			)
+			return
+
+		# BAN済みなら二重処理しない
+		if not target.is_active:
+			logger.info("User %s already banned, skipping", target.pk)
+			return
+
+		target.is_active = False
+		target.save(update_fields=["is_active"])
+
+		# BAN時にトークンも失効
+		try:
+			from rest_framework.authtoken.models import Token
+			Token.objects.filter(user=target).delete()
+			logger.info("Tokens invalidated for banned user %s", target.pk)
+		except Exception:
+			pass
+
+		Report.objects.filter(reported=target, status="PENDING")\
+			.update(status="ACTION_TAKEN")
 
 	send_notification_email(
 		user     = target,
-		template = "report_banned",            # ← きつめ通知
+		template = "report_banned",
 		context  = {"user": target, "now": timezone.now()},
 	)
-
-	Report.objects.filter(reported=target, status="PENDING")\
-		.update(status="ACTION_TAKEN")
+	logger.warning("User %s banned after %d reports", target.pk, count)

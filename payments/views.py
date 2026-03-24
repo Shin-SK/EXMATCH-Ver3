@@ -1,15 +1,19 @@
 # payments/views.py
 
+import logging
 import stripe
+from django.db import transaction
 from django.http import HttpResponse
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.decorators import login_required  # ← これを追加
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.shortcuts import render, redirect
-from .models import Payment
+from .models import Payment, ProcessedWebhookEvent
 from django.utils import timezone
 from dateutil.relativedelta import relativedelta
+
+logger = logging.getLogger(__name__)
 
 
 PLAN_INFO = {
@@ -45,7 +49,7 @@ OPTION_PRICE_HALF = {
 
 @csrf_exempt
 def stripe_webhook(request):
-    print("Webhook hit!", timezone.now())
+    logger.info("Webhook hit at %s", timezone.now())
 
     payload = request.body
     sig_header = request.META.get("HTTP_STRIPE_SIGNATURE", "")
@@ -55,17 +59,26 @@ def stripe_webhook(request):
             payload, sig_header, settings.STRIPE_ENDPOINT_SECRET
         )
     except Exception as e:
-        # 署名不一致やパース失敗などは 400 で即終了（event は使わない）
-        print("[WEBHOOK] construct_event error:", repr(e), "has_sig:", bool(sig_header))
+        logger.warning("Webhook construct_event error: %s, has_sig=%s", repr(e), bool(sig_header))
         return HttpResponse(status=400)
 
-    if event.get("type") != "checkout.session.completed":
-        return HttpResponse(status=200)  # 他イベントは無視
+    event_id = event.get("id", "")
+    event_type = event.get("type", "")
+
+    if event_type != "checkout.session.completed":
+        return HttpResponse(status=200)
+
+    # 冪等性チェック: 処理済みイベントなら即200返却
+    if ProcessedWebhookEvent.objects.filter(event_id=event_id).exists():
+        logger.info("Webhook event %s already processed, skipping", event_id)
+        return HttpResponse(status=200)
 
     try:
         s = event["data"]["object"]
-        print(f"[WEBHOOK] completed session={s.get('id')} uid={s.get('client_reference_id')} meta={s.get('metadata')}")
+        session_id = s.get("id")
         user_id = s.get("client_reference_id")
+        logger.info("Webhook completed session=%s uid=%s", session_id, user_id)
+
         if not user_id:
             return HttpResponse(status=200)
 
@@ -75,21 +88,31 @@ def stripe_webhook(request):
         plan   = (s.get("metadata") or {}).get("plan") or "standard_1m"
         option = (s.get("metadata") or {}).get("option") or None
 
-        # 決済レコード
-        Payment.objects.create(user=user, plan=plan or None, option=option or None)
-
-        # 期限更新（現状仕様：上書き型、months 加算）
         info         = PLAN_INFO.get(plan, {"base": 1, "bonus": 0})
         bonus_months = info["bonus"] if getattr(settings, "CAMPAIGN_BONUS_ACTIVE", False) else 0
         total_months = info["base"] + bonus_months
 
-        prof = user.userprofile
-        prof.plan = "standard"
-        prof.plan_expiry = timezone.now() + relativedelta(months=total_months)
-        prof.save(update_fields=["plan", "plan_expiry"])
+        with transaction.atomic():
+            # DB レベルで冪等性を保証（unique 制約で二重挿入を防止）
+            _, created = ProcessedWebhookEvent.objects.get_or_create(
+                event_id=event_id,
+                defaults={"event_type": event_type},
+            )
+            if not created:
+                logger.info("Webhook event %s already processed (race), skipping", event_id)
+                return HttpResponse(status=200)
+
+            Payment.objects.create(user=user, plan=plan or None, option=option or None)
+
+            prof = user.userprofile
+            prof.plan = "standard"
+            prof.plan_expiry = timezone.now() + relativedelta(months=total_months)
+            prof.save(update_fields=["plan", "plan_expiry"])
+
+        logger.info("Webhook event %s processed: user=%s plan=%s months=%d", event_id, user_id, plan, total_months)
         return HttpResponse(status=200)
     except Exception as e:
-        print("[WEBHOOK] handler error:", repr(e))
+        logger.error("Webhook handler error for event %s: %s", event_id, repr(e))
         return HttpResponse(status=500)
 
 @login_required

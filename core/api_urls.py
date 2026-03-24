@@ -7,7 +7,7 @@ from .api_views import (
     VerificationsAPI, VerificationDeleteAPI,
     LikesSentAPI, FootprintTouchAPI, UnmatchAPI, LikesReceivedAPI, FootprintsAPI,
     ChatUnreadMapAPI, ChatThreadReadAPI,
-    MePreferenceAPI, RecommendationsAPI,
+    MePreferenceAPI, RecommendationsAPI, MeDeactivateAPI,
 )
 from payments.api_views import PaymentsCheckoutAPI
 from core.api_contact import ContactAPI
@@ -42,4 +42,5 @@ urlpatterns = [
     path("contact/", ContactAPI.as_view(), name="api_contact"),
     path("me/preference/", MePreferenceAPI.as_view(), name="api_me_preference"),
     path("recommendations/", RecommendationsAPI.as_view(), name="api_recommendations"),
+    path("me/deactivate/", MeDeactivateAPI.as_view(), name="api_me_deactivate"),
 ]

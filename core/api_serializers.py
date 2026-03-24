@@ -83,9 +83,15 @@ class ProfileSerializer(serializers.ModelSerializer):
         return round(float(obj.longitude), 1)
 
     def get_verification_badge(self, obj):
-        return obj.verification_badge
+        cnt = self.get_verification_count(obj)
+        if cnt == 0:
+            return None
+        return {1: 'blue', 2: 'pink', 3: 'silver'}.get(cnt, 'gold')
 
     def get_verification_count(self, obj):
+        # annotate 済みなら DB アクセスしない
+        if hasattr(obj, '_verification_count'):
+            return obj._verification_count
         return obj.verification_count
 
     # ------- ここが肝：必須項目の充足で判定 -------

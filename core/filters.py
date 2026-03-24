@@ -1,10 +1,14 @@
 # core/filters.py
+import logging
+
 import django_filters
 from django_filters import CharFilter, NumberFilter, ChoiceFilter, MultipleChoiceFilter
-from django import forms  # ★ ここがポイント: Djangoのフォームウィジェットを使う
+from django import forms
 from .models import UserProfile, ProfileField
 from .utils import haversine_distance
 from .widgets import CustomRadio
+
+logger = logging.getLogger(__name__)
 
 class DynamicProfileFilter(django_filters.FilterSet):
 
@@ -122,21 +126,20 @@ class DynamicProfileFilter(django_filters.FilterSet):
     # 既存: 距離で絞り込み
     # ---------------------------
     def filter_by_distance(self, queryset, name, value):
-        # ------- ① 受け取った値を即ログ ----------
         lat_str = self.request.GET.get("lat")
         lon_str = self.request.GET.get("lon")
-        print("★params:", lat_str, lon_str, value)   # ← ここ
+        logger.debug("Distance filter params: lat=%s lon=%s radius=%s", lat_str, lon_str, value)
 
         if not (lat_str and lon_str and value):
-            print("★skip: lat/lon/value 無し")
+            logger.debug("Distance filter skipped: missing params")
             return queryset
 
         try:
             user_lat = float(lat_str)
             user_lon = float(lon_str)
-            radius_km = float(value)                 # Choice の value を km として解釈
+            radius_km = float(value)
         except ValueError:
-            print("★skip: value 変換失敗 ->", value)
+            logger.debug("Distance filter skipped: invalid value %s", value)
             return queryset
 
         within = []
@@ -145,12 +148,9 @@ class DynamicProfileFilter(django_filters.FilterSet):
                 dist = haversine_distance(
                     user_lat, user_lon, prof.latitude, prof.longitude
                 )
-                # ------- ② レコード毎の距離と判定 ----------
-                print(f"★{prof.id=} {prof.nickname=} {dist=:.2f} km {radius_km=}")
-
                 if dist <= radius_km:
                     within.append(prof.id)
 
-        print("★hit ids:", within)
+        logger.debug("Distance filter hit count: %d", len(within))
         return queryset.filter(id__in=within)
 

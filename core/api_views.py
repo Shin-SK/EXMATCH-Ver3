@@ -20,6 +20,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.db.models import Subquery, OuterRef
 
 # ── ファイルアップロード バリデーション ──
 ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp"}
@@ -80,7 +81,16 @@ class ProfilesAPI(_Base):
               .select_related("user")
               .exclude(user=request.user)
               .exclude(user_id__in=blk_to)
-              .exclude(user_id__in=blk_from))
+              .exclude(user_id__in=blk_from)
+              .filter(deleted_at__isnull=True)
+              .filter(user__is_active=True)
+              .annotate(
+                  _verification_count=Count(
+                      'user__verifications',
+                      filter=Q(user__verifications__status='approved'),
+                      distinct=True,
+                  )
+              ))
 
         # ─────────────────────────────────────────────────────────────
         # 2) デフォルト：自分の性指向で相手の gender を絞る
@@ -264,9 +274,14 @@ class MatchesAPI(_Base):
     """GET /api/matches/?page=1"""
     def get(self, request):
         me = request.user
-        qs = Match.objects.filter(status="matched").filter(
-            Q(from_user=me) | Q(to_user=me)
-        ).order_by("-id")
+        qs = (Match.objects
+              .select_related(
+                  "from_user", "from_user__userprofile",
+                  "to_user", "to_user__userprofile",
+              )
+              .filter(status="matched")
+              .filter(Q(from_user=me) | Q(to_user=me))
+              .order_by("-id"))
 
         paginator = PageNumberPagination()
         page = paginator.paginate_queryset(qs, request)
@@ -789,7 +804,16 @@ class RecommendationsAPI(_Base):
               .select_related("user")
               .exclude(user=request.user)
               .exclude(user_id__in=blk_to)
-              .exclude(user_id__in=blk_from))
+              .exclude(user_id__in=blk_from)
+              .filter(deleted_at__isnull=True)
+              .filter(user__is_active=True)
+              .annotate(
+                  _verification_count=Count(
+                      'user__verifications',
+                      filter=Q(user__verifications__status='approved'),
+                      distinct=True,
+                  )
+              ))
 
         # 性指向フォールバック（ProfilesAPIと同等）
         my_sexual_pref = getattr(viewer, "sexual_object_pref", None)
@@ -835,4 +859,34 @@ class RecommendationsAPI(_Base):
         return Response({"items": items})
 
 
+class MeDeactivateAPI(_Base):
+    """POST /api/me/deactivate/ - 退会（ソフトデリート）"""
+    def post(self, request):
+        me = request.user
+        prof = me.userprofile
 
+        with transaction.atomic():
+            # ソフトデリート: 個人情報を匿名化
+            prof.deleted_at = timezone.now()
+            prof.nickname = "退会済みユーザー"
+            prof.bio = ""
+            prof.profile_image = None
+            prof.lciq_image = None
+            prof.id_doc_image = None
+            prof.latitude = None
+            prof.longitude = None
+            prof.save(update_fields=[
+                "deleted_at", "nickname", "bio",
+                "profile_image", "lciq_image", "id_doc_image",
+                "latitude", "longitude",
+            ])
+
+            # ユーザーを無効化
+            me.is_active = False
+            me.save(update_fields=["is_active"])
+
+            # トークン失効
+            from rest_framework.authtoken.models import Token
+            Token.objects.filter(user=me).delete()
+
+        return Response({"ok": True, "detail": "退会処理が完了しました"})

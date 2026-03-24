@@ -1,10 +1,16 @@
-from django.test import TestCase
+from io import BytesIO
+from datetime import date
+from unittest.mock import patch
+
+from django.test import TestCase, override_settings
 from django.contrib.auth import get_user_model
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.utils import timezone
 from rest_framework.test import APIClient
 
 from core.models import (
     UserProfile, ProfileField, ProfileFieldValue,
-    Block, VerificationSubmission,
+    Block, Message, VerificationSubmission,
     MatchingRuleSet, MatchingRule,
 )
 from core.compat import score_candidate
@@ -128,3 +134,94 @@ class GlobalRulesCompatTestCase(TestCase):
         for method in ("get", "patch"):
             response = getattr(client, method)("/api/me/preference/")
             self.assertEqual(response.status_code, 410, f"{method} should return 410")
+
+
+class SecurityTestCase(TestCase):
+    """セキュリティ修正の回帰テスト"""
+
+    def setUp(self):
+        self.user = User.objects.create_user(username="secuser", password="pass", email="sec@test.com")
+        self.user.userprofile.gender = "male"
+        self.user.userprofile.sexual_object_pref = "female"
+        self.user.userprofile.date_of_birth = date(1990, 1, 1)
+        self.user.userprofile.save()
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+
+    # --- ContactAPI レートリミット ---
+    @override_settings(
+        REST_FRAMEWORK={
+            "DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework.authentication.TokenAuthentication",),
+            "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+            "DEFAULT_THROTTLE_CLASSES": ["rest_framework.throttling.ScopedRateThrottle"],
+            "DEFAULT_THROTTLE_RATES": {"contact": "2/hour"},
+        }
+    )
+    def test_contact_api_throttled(self):
+        data = {"name": "test", "email": "a@b.com", "subject": "abuse", "message": "test msg"}
+        for _ in range(3):
+            resp = self.client.post("/api/contact/", data, format="json")
+        self.assertEqual(resp.status_code, 429)
+
+    # --- 5MB超の画像アップロードが拒否される ---
+    def test_upload_over_5mb_rejected(self):
+        big_file = SimpleUploadedFile("big.jpg", b"\x00" * (5 * 1024 * 1024 + 1), content_type="image/jpeg")
+        resp = self.client.post("/api/me/avatar/", {"image": big_file}, format="multipart")
+        self.assertEqual(resp.status_code, 400)
+        self.assertIn("ファイルサイズ", resp.data.get("detail", ""))
+
+    # --- 非許可MIMEタイプが拒否される ---
+    def test_upload_invalid_mime_rejected(self):
+        svg_file = SimpleUploadedFile("test.svg", b"<svg></svg>", content_type="image/svg+xml")
+        resp = self.client.post("/api/me/avatar/", {"image": svg_file}, format="multipart")
+        self.assertEqual(resp.status_code, 400)
+        self.assertIn("JPEG", resp.data.get("detail", ""))
+
+    # --- 2000文字超メッセージが拒否される ---
+    def test_message_over_2000_chars_rejected(self):
+        other = User.objects.create_user(username="other", password="pass")
+        long_text = "あ" * 2001
+        resp = self.client.post(f"/api/chats/{other.id}/messages/", {"text": long_text}, format="json")
+        self.assertEqual(resp.status_code, 400)
+        self.assertIn("2000", resp.data.get("detail", ""))
+
+    # --- 非課金ユーザーの送信制限 ---
+    def test_free_user_limited_to_one_message(self):
+        other = User.objects.create_user(username="other2", password="pass")
+        resp1 = self.client.post(f"/api/chats/{other.id}/messages/", {"text": "hello"}, format="json")
+        self.assertEqual(resp1.status_code, 201)
+        resp2 = self.client.post(f"/api/chats/{other.id}/messages/", {"text": "second"}, format="json")
+        self.assertEqual(resp2.status_code, 403)
+        self.assertIn("FIRST_MESSAGE_ONLY", resp2.data.get("detail_code", ""))
+
+    # --- staff は送信制限をバイパスできる ---
+    def test_staff_bypasses_message_limit(self):
+        staff = User.objects.create_user(username="staff", password="pass", is_staff=True)
+        other = User.objects.create_user(username="other3", password="pass")
+        client = APIClient()
+        client.force_authenticate(user=staff)
+        for i in range(3):
+            resp = client.post(f"/api/chats/{other.id}/messages/", {"text": f"msg{i}"}, format="json")
+            self.assertEqual(resp.status_code, 201)
+
+    # --- 緯度経度が丸められて返る ---
+    def test_lat_lon_rounded_in_response(self):
+        prof = self.user.userprofile
+        prof.latitude = 35.6812
+        prof.longitude = 139.7671
+        prof.save(update_fields=["latitude", "longitude"])
+        resp = self.client.get("/api/me/")
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data["latitude"], 35.7)
+        self.assertEqual(resp.data["longitude"], 139.8)
+
+    # --- 退会済みユーザーが一覧に出ない ---
+    def test_deactivated_user_hidden_from_profiles(self):
+        other = User.objects.create_user(username="deleted_user", password="pass")
+        other.userprofile.gender = "female"
+        other.userprofile.deleted_at = timezone.now()
+        other.userprofile.save()
+        resp = self.client.get("/api/profiles/")
+        self.assertEqual(resp.status_code, 200)
+        user_ids = [p["id"] for p in resp.data["results"]]
+        self.assertNotIn(other.id, user_ids)

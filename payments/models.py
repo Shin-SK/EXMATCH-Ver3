@@ -66,3 +66,18 @@ class PlanOption(models.Model):
 
     def __str__(self):
         return f"[{self.category}] {self.name or self.code}"
+
+
+class ProcessedWebhookEvent(models.Model):
+    """Stripe webhook の冪等性を担保するための処理済みイベント記録"""
+    event_id = models.CharField(max_length=255, unique=True, db_index=True)
+    event_type = models.CharField(max_length=100)
+    processed_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["event_id"]),
+        ]
+
+    def __str__(self):
+        return f"{self.event_id} ({self.event_type})"

@@ -86,7 +86,13 @@ class UserProfile(models.Model):
     id_doc_image    = models.ImageField("本人確認書類（表面）", upload_to="id_docs", blank=True, null=True)
     id_doc_verified = models.BooleanField("書類確認済み", default=False)
 
+    deleted_at = models.DateTimeField("退会日時", null=True, blank=True, db_index=True)
+
     tracker = FieldTracker(fields=['id_doc_image', 'id_doc_verified'])
+
+    @property
+    def is_deleted(self):
+        return self.deleted_at is not None
 
     @property
     def is_verified(self):
