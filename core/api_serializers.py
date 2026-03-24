@@ -24,6 +24,8 @@ class ProfileSerializer(serializers.ModelSerializer):
     verification_badge  = serializers.SerializerMethodField()
     verification_count  = serializers.SerializerMethodField()
     is_profile_complete = serializers.SerializerMethodField()   # ★追加
+    latitude            = serializers.SerializerMethodField()
+    longitude           = serializers.SerializerMethodField()
 
     class Meta:
         model  = UserProfile
@@ -68,6 +70,17 @@ class ProfileSerializer(serializers.ModelSerializer):
             return None
         d, t = obj.date_of_birth, date.today()
         return t.year - d.year - ((t.month, t.day) < (d.month, d.day))
+
+    def get_latitude(self, obj):
+        """住所特定防止のため小数第1位に丸める（約10km精度）"""
+        if obj.latitude is None:
+            return None
+        return round(float(obj.latitude), 1)
+
+    def get_longitude(self, obj):
+        if obj.longitude is None:
+            return None
+        return round(float(obj.longitude), 1)
 
     def get_verification_badge(self, obj):
         return obj.verification_badge

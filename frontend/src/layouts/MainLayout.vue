@@ -20,8 +20,10 @@ onUnmounted(() => { if (t) clearTimeout(t) })
     </div>
 
     <!-- メイン -->
-    <main class="container main-scroll">
+    <main class="main-scroll">
+      <div class="container">
         <router-view />
+      </div>
     </main>
 
     <!-- フッター -->

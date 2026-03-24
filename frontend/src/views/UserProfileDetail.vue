@@ -7,6 +7,7 @@ import {
   fetchProfile, fetchMatches, fetchLikesSent,
   likeUser, toggleBlock, createReport, touchFootprint
 } from '@/api'
+import { IconAlertTriangle, IconUserCheck, IconUserX } from '@tabler/icons-vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -174,10 +175,10 @@ watch(() => route.params.uid, v => { uid.value = String(v); load() })
       <!-- 通報・ブロック -->
       <div class="d-flex justify-content-center align-items-center gap-2 mb-2">
         <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="collapse" data-bs-target="#reportBox">
-          <i class="bi bi-exclamation-triangle"></i><span class="ms-1">通報</span>
+          <IconAlertTriangle :size="16" /><span class="ms-1">通報</span>
         </button>
         <button class="btn btn-outline-secondary btn-sm" @click="doToggleBlock">
-          <i v-if="isBlocked" class="bi bi-person-check"></i><i v-else class="bi bi-person-x"></i>
+          <IconUserCheck v-if="isBlocked" :size="16" /><IconUserX v-else :size="16" />
           <span class="ms-1">{{ isBlocked ? 'ブロック解除' : 'ブロック' }}</span>
         </button>
       </div>

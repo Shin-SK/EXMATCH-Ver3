@@ -86,7 +86,7 @@ function skip() {
         <div
           v-for="f in fields"
           :key="f.field_key"
-          class="border rounded p-3"
+          class="rounded-3 p-3 bg-white"
         >
           <div class="fw-bold mb-2 small">{{ f.field_label }}</div>
           <div class="d-flex flex-wrap gap-2">

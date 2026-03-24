@@ -380,7 +380,7 @@ async function onVerifyDelete(pk) {
       <div class="card-header fw-bold">本人確認書類</div>
       <div class="card-body row g-4">
         <div class="col-md-6 col-lg-3" v-for="d in DOCS" :key="d.key">
-          <div class="border rounded p-2 h-100">
+          <div class="rounded-3 p-3 h-100" style="background:#f5f7f9">
             <div class="small text-muted mb-2">{{ d.label }}</div>
 
             <div class="ratio ratio-4x3 mb-2 bg-light rounded d-flex align-items-center justify-content-center overflow-hidden">

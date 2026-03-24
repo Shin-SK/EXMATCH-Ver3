@@ -23,7 +23,7 @@ class ContactSerializer(serializers.Serializer):
 
 class ContactAPI(APIView):
     permission_classes = [AllowAny]          # 未ログインもOK
-    # throttle_scope = "contact"             # レート制限使うなら有効化（settings側設定が必要）
+    throttle_scope = "contact"
 
     def post(self, request):
         ser = ContactSerializer(data=request.data)

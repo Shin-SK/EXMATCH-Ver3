@@ -1,52 +1,75 @@
-/* src/styles/_layout.scss */
-:root{
-	--sat: env(safe-area-inset-top);
-	--sab: env(safe-area-inset-bottom);
-	--header-h: 0px;     /* 使ってるなら 56px などに */
-	--footer-h: 64px;    /* フッターの実高さ */
-  --app-h: 100vh;
-}
-@supports (height: 100dvh) { :root{ --app-h: 100dvh; } }  /* 新Unit */
-@supports (height: 100svh) { :root{ --app-h: 100svh; } }  /* さらに安定 */
+@use "global" as *;
 
-
-/* 100dvhが使える環境で優先（PWA/iOSで安定） */
-
-html, body, #app { height: var(--app-h); }
-body { overflow: hidden; }            /* ルートはスクロールさせない */
-body.lp-scroll { overflow-y: auto !important; }
-
-/* 通常 */
-.main-scroll{
-  height: calc(var(--app-h) - var(--header-h) - var(--footer-h));
-  overflow:auto;
+/* ─── Bootstrap Card 上書き ─── */
+.card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: none;
 }
 
-/* PWAだけ下を安全域ぶん引く（必要なら） */
-@media (display-mode: standalone){
-  .main-scroll{
-    height: calc(var(--app-h) - var(--header-h) - var(--footer-h) - env(safe-area-inset-bottom));
+.card-header {
+  background: none;
+  border-bottom: none;
+  padding: 16px 16px 0;
+  font-size: 0.9rem;
+}
+
+.card-body {
+  padding: 16px;
+}
+
+/* ─── Bootstrap Form 上書き ─── */
+.form-control,
+.form-select {
+  border: none;
+  background-color: #f5f7f9;
+  border-radius: 8px;
+  padding: 10px 12px;
+  transition: background-color 0.2s;
+  &:focus {
+    background-color: #eef1f5;
+    box-shadow: none;
   }
 }
 
-.home{
-  padding-top: var(--sat);
+.form-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 4px;
 }
 
-.app-footer-fixed{
-	position: fixed;
-	left: 0; right: 0; bottom: 0;
-	z-index: 1030;
-	display: flex;
-	align-items: center;
-	background: #fff;
-	border-top: 1px solid #eee;
-}
-
-@media (display-mode: standalone){
-  .app-footer-fixed{
-    padding-bottom: env(safe-area-inset-bottom); /* iOSノッチぶんだけ増える */
+/* ─── Bootstrap btn-outline 上書き ─── */
+.btn-outline-primary {
+  border-color: $mc;
+  color: $mc;
+  border-radius: 100px;
+  &:hover,
+  &.active,
+  &:active {
+    background-color: $mc;
+    border-color: $mc;
+    color: #fff;
   }
 }
 
+.btn-check:checked + .btn-outline-primary {
+  background-color: $mc;
+  border-color: $mc;
+  color: #fff;
+}
 
+.btn-outline-secondary {
+  border-radius: 100px;
+}
+
+/* ─── Alert 上書き ─── */
+.alert {
+  border: none;
+  border-radius: 8px;
+}
+
+/* ─── Badge 上書き ─── */
+.badge {
+  font-weight: 600;
+}

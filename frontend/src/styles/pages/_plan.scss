@@ -1,35 +1,8 @@
 @use "../global/global" as *;
 
 .upgrade-plan{
-	background-color: $lightgray;
 	padding: 40px 0px;
-	.freeplan{
-		background-color: white;
-		margin: 40px auto;
-		.wrap{
-			@include flex();
-			padding: 16px;
-			.price{
-				@include flex();
-				aspect-ratio: 1/1;
-				min-height: 200px;
-				@include sp{
-					aspect-ratio: unset;
-					min-height: unset;
-					min-width: 30%;
-				}
-				.inner{
-					font-size: 3rem;
-					font-weight: bold;
-					&::after{
-						content: "円/月";
-						font-size: 1rem;
-						margin-left: 4px;
-					}
-				}
-			}
-		}
-	}
+
 	ul{
 		li{
 			display: flex;
@@ -47,28 +20,75 @@
 			}
 		}
 	}
+
 	.standard{
 		margin-bottom: 80px;
-		p{
+		.lead{
 			font-weight: bold;
 			text-align: center;
 			font-size: 1.25rem;
-		}
-		.option{
-			margin: 24px auto 40px;
-			text-align: center;
+			margin-bottom: 24px;
 		}
 		&__wrap{
-			display: grid;
-			grid-template-columns: repeat(3,1fr);
-			align-items: start;
-			overflow-x: scroll;
+			display: flex;
 			gap: 16px;
+			overflow-x: auto;
+			-webkit-overflow-scrolling: touch;
+			padding-bottom: 4px;
+			padding-top: 16px;
+			@include sp{
+				flex-direction: column;
+				overflow-x: visible;
+			}
 			.box{
-				max-width: 100%;
+				position: relative;
+				min-width: 260px;
+				flex: 1;
 				background-color: white;
 				padding: 8px;
-				width: 300px;
+				border-radius: 12px;
+				border: 2px solid transparent;
+				cursor: pointer;
+				transition: background-color .2s, border-color .2s;
+				&:hover{
+					background-color: #f0f6f9;
+				}
+				&.selected{
+					background-color: #e8f1f6;
+				}
+				&.recommended{
+					border-color: $mc;
+					.badge-recommend{
+						display: flex;
+					}
+				}
+				.badge-recommend{
+					display: none;
+					position: absolute;
+					top: -14px;
+					left: 50%;
+					transform: translateX(-50%);
+					background: $mc;
+					color: white;
+					font-size: .75rem;
+					font-weight: bold;
+					padding: 6px 20px;
+					border-radius: 100px;
+					white-space: nowrap;
+					z-index: 1;
+					line-height: 1;
+				}
+				.badge-discount{
+					position: absolute;
+					top: 8px;
+					right: 8px;
+					background: #e74c3c;
+					color: white;
+					font-size: .7rem;
+					font-weight: bold;
+					padding: 2px 8px;
+					border-radius: 4px;
+				}
 				.price{
 					.head{
 						@include flex();
@@ -85,9 +105,24 @@
 							@include flex();
 							flex-direction: column;
 							gap: 8px;
+							.original-price{
+								color: #999;
+								font-size: .85rem;
+								s{
+									text-decoration: line-through;
+								}
+							}
 							.numb{
 								font-size: 2rem;
 								font-weight: bold;
+							}
+							.savings{
+								font-size: .75rem;
+								color: #e74c3c;
+								font-weight: 500;
+								strong{
+									font-weight: bold;
+								}
 							}
 							label{
 								position: relative;
@@ -98,14 +133,16 @@
 								color: $mc;
 								padding: 4px;
 								@include flex();
+								gap: 4px;
 								cursor: pointer;
 								transition: background .2s, color .2s;
 								input{
 									position: absolute;
 									opacity: 0;
+									pointer-events: none;
 								}
-								&:has(> input:checked) {
-									background: $mc;      /* 好きな色へ */
+								&.active {
+									background: $mc;
 									color: #fff;
 								}
 							}
@@ -196,6 +233,15 @@
 		width: 100%;
 		margin: 16px auto;
 		border-radius: 16px;
+		border: 2px solid transparent;
+		cursor: pointer;
+		transition: background-color .2s;
+		&:hover{
+			background-color: #f0f6f9;
+		}
+		&.selected{
+			background-color: #e8f1f6;
+		}
 		.head{
 			font-weight: bold;
 			text-align: center
@@ -221,14 +267,16 @@
 				padding: 4px 40px;
 				width: 100%;
 				@include flex();
+				gap: 4px;
 				cursor: pointer;
 				transition: background .2s, color .2s;
 				input{
 					position: absolute;
 					opacity: 0;
+					pointer-events: none;
 				}
-				&:has(> input:checked) {
-					background: $mc;      /* 好きな色へ */
+				&.active {
+					background: $mc;
 					color: #fff;
 				}
 			}
@@ -236,7 +284,7 @@
 	}//single
 
 	.option{
-		
+
 		.wrap{
 			@include flex();
 			background-color: white;
@@ -292,7 +340,7 @@
 							span{
 								@include fs(16);
 								margin-bottom: 4px;
-							}							
+							}
 						}
 					}
 				}
@@ -316,49 +364,139 @@
 			}
 		}
 
-	.cart{
-		.items{
-			display: grid;
-			grid-template-columns: repeat(4,1fr);
-			gap: 16px;
-			background-color: unset;
-			padding: unset;
-			@include sp{
-				grid-template-columns: repeat(2,1fr);
-			}
-			.item{
-				width: 100%;
-				label{
-					position: relative;
-					border-radius: 100px;
-					background-color: white;
+		.cart{
+			.items{
+				display: grid;
+				grid-template-columns: repeat(4,1fr);
+				gap: 16px;
+				background-color: unset;
+				padding: unset;
+				@include sp{
+					grid-template-columns: repeat(2,1fr);
+				}
+				.item{
 					width: 100%;
-					padding: 8px;
+					cursor: pointer;
+					border-radius: 12px;
+					background-color: white;
+					padding: 12px 8px;
 					@include flex();
-					transition: background .2s, color .2s;
-					input{
-						position: absolute;
-						opacity: 0;
+					flex-direction: column;
+					transition: background .2s, color .2s, border-color .2s;
+					border: 2px solid transparent;
+					.item-content{
+						display: flex;
+						flex-direction: column;
+						align-items: center;
+						gap: 4px;
+						.item-label{
+							font-weight: bold;
+							font-size: .95rem;
+						}
+						.item-price{
+							font-size: .8rem;
+							opacity: .7;
+						}
 					}
-					&:has(> input:checked) {
-						background: $mc;      /* 好きな色へ */
+					&.active {
+						background: $mc;
 						color: #fff;
 						border-color: $mc;
+						.item-price{
+							opacity: 1;
+						}
 					}
 				}
 			}
+			.cart-hint{
+				font-size: .75rem;
+				color: #999;
+				text-align: center;
+				margin-top: 12px;
+			}
 		}
-	}
-	
+
 	}//option
 
-	button[type="submit"]{
-		color: white;
-		padding: 8px;
-		@include flex();
-		gap: 8px;
-		span{
-			@include fs(12);
+	// 注文サマリー
+	.order-summary{
+		background: white;
+		border-radius: 12px;
+		padding: 20px;
+		margin: 32px auto 0;
+		h4{
+			font-weight: bold;
+			font-size: 1rem;
+			margin-bottom: 12px;
+			padding-bottom: 8px;
+			border-bottom: 1px solid $lightgray;
+		}
+		.summary-row{
+			display: flex;
+			justify-content: space-between;
+			padding: 6px 0;
+			font-size: .9rem;
+		}
+		.summary-total{
+			display: flex;
+			justify-content: space-between;
+			padding: 12px 0 0;
+			margin-top: 8px;
+			border-top: 2px solid $mc;
+			font-weight: bold;
+			font-size: 1.1rem;
+		}
+	}
+
+	// 購入ボタン
+	.checkout-action{
+		margin: 24px auto 0;
+		button[type="submit"]{
+			color: white;
+			padding: 12px;
+			@include flex();
+			gap: 8px;
+			font-weight: bold;
+			font-size: 1rem;
+			border-radius: 100px;
+			&:disabled{
+				opacity: .5;
+				cursor: not-allowed;
+			}
+		}
+		.error{
+			color: #e74c3c;
+			text-align: center;
+			margin-top: 8px;
+			font-size: .85rem;
+		}
+	}
+
+	// 無料プラン比較（折りたたみ）
+	.free-compare{
+		margin-top: 40px;
+		summary{
+			text-align: center;
+			color: #999;
+			font-size: .85rem;
+			cursor: pointer;
+			padding: 8px;
+			&:hover{
+				color: $mc;
+			}
+		}
+		&__body{
+			background: white;
+			border-radius: 12px;
+			padding: 16px;
+			margin-top: 8px;
+			.free-note{
+				font-size: .8rem;
+				color: #999;
+				text-align: center;
+				margin-top: 12px;
+				margin-bottom: 0;
+			}
 		}
 	}
 

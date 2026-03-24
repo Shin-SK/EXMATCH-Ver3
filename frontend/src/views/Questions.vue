@@ -98,7 +98,7 @@ async function onSelect(fieldKey) {
           v-for="f in fields"
           :key="f.field_key"
           :ref="(el) => setItemRef(el, f.field_key)"
-          class="border rounded overflow-hidden"
+          class="rounded-3 overflow-hidden bg-white"
         >
           <button
             type="button"
@@ -119,7 +119,7 @@ async function onSelect(fieldKey) {
               style="font-size: 0.7rem;"
             >&#9660;</span>
           </button>
-          <div v-show="openKey === f.field_key" class="px-3 pb-3 border-top">
+          <div v-show="openKey === f.field_key" class="px-3 pb-3">
             <div v-if="saving[f.field_key]" class="text-muted small py-1">保存中…</div>
             <div class="d-flex flex-wrap gap-2 pt-2">
               <template v-for="(c, i) in toChoices(f.choices)" :key="c">
@@ -153,7 +153,7 @@ async function onSelect(fieldKey) {
             v-for="f in plusFields"
             :key="f.field_key"
             type="button"
-            class="border rounded p-3 d-flex align-items-center justify-content-between bg-white border-0"
+            class="rounded-3 p-3 d-flex align-items-center justify-content-between bg-white border-0"
             style="cursor: pointer; text-align: left;"
             @click="goToCheckout"
           >

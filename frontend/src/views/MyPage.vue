@@ -270,7 +270,7 @@ onMounted(async () => {
                 :link-to="`/users/${like.from_user?.id}`"
               />
               <p class="more text-center">
-                <router-link to="/likes/received">一覧を見る<i class="fas fa-angle-right"></i></router-link>
+                <router-link to="/likes/received">一覧を見る<IconChevronRight :size="16" /></router-link>
               </p>
             </template>
             <div v-else class="d-flex justify-content-center align-items-center w-100" style="height: 20vh;">

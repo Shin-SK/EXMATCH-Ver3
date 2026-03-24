@@ -20,6 +20,24 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+# ── ファイルアップロード バリデーション ──
+ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp"}
+MAX_UPLOAD_SIZE = 5 * 1024 * 1024  # 5 MB
+
+def _validate_image(f):
+    """画像ファイルのサイズ・MIMEタイプを検証。問題があれば Response を返す。"""
+    if f.size > MAX_UPLOAD_SIZE:
+        return Response(
+            {"detail": f"ファイルサイズは{MAX_UPLOAD_SIZE // (1024*1024)}MB以下にしてください"},
+            status=400,
+        )
+    if getattr(f, "content_type", None) not in ALLOWED_IMAGE_TYPES:
+        return Response(
+            {"detail": "JPEG / PNG / WebP のみアップロード可能です"},
+            status=400,
+        )
+    return None
 from .models import (UserProfile, Match, Message, Block, Footprint, VerificationSubmission, ProfileField, ProfileFieldValue, Report, set_current_user,
                      MatchingRuleSet,
 )
@@ -215,6 +233,7 @@ class MeAPI(_Base):
 # ↓ どこでもOK：クラスを2つ追加
 class LikeAPI(_Base):
     """POST /api/like/  { "user_id": 2 }"""
+    throttle_scope = "like"
     def post(self, request):
         me = request.user
         try:
@@ -257,6 +276,7 @@ class MatchesAPI(_Base):
 
 class MessagesAPI(APIView):
     permission_classes = [IsAuthenticated]
+    throttle_scope = "message"
 
     def get(self, request, user_id):
         me = request.user
@@ -282,8 +302,8 @@ class MessagesAPI(APIView):
         me = request.user
         other = get_object_or_404(User.objects.all(), id=user_id)
 
-        # 送信権限（DEV/staffはバイパス）
-        if not (settings.DEBUG or me.is_staff):
+        # 送信権限（staffのみバイパス）
+        if not me.is_staff:
             if not me.userprofile.can_send_message_to(other):
                 return Response(
                     {"detail": "送信上限（初回1通まで）", "detail_code": "FIRST_MESSAGE_ONLY"},
@@ -294,6 +314,8 @@ class MessagesAPI(APIView):
         txt  = "" if raw is None else str(raw)  # 絵文字/記号もそのまま
         if txt == "":
             return Response({"detail": "textは必須です", "detail_code": "REQUIRED_TEXT"}, status=400)
+        if len(txt) > 2000:
+            return Response({"detail": "メッセージは2000文字以内にしてください", "detail_code": "TEXT_TOO_LONG"}, status=400)
 
         # ブロック中は送信不可
         if Block.objects.filter(blocker=me, blocked=other).exists() or \
@@ -536,6 +558,7 @@ class MeCustomFieldsAPI(_Base):
 class VerificationsAPI(_Base):
     """GET/POST /api/verifications/"""
     parser_classes = (MultiPartParser, FormParser)
+    throttle_scope = "upload"
 
     def get(self, request):
         me = request.user
@@ -565,6 +588,9 @@ class VerificationsAPI(_Base):
         f = request.FILES.get("image")
         if not f:
             return Response({"detail":"imageは必須です"}, status=400)
+        err = _validate_image(f)
+        if err:
+            return err
 
         obj = VerificationSubmission.objects.create(user=me, doc_type=doc_type, image=f)
         return Response(VerificationSubmissionSerializer(obj, context={"request": request}).data, status=201)
@@ -585,11 +611,15 @@ class VerificationDeleteAPI(_Base):
 class MeAvatarAPI(_Base):
     """POST/DELETE /api/me/avatar/  (multipart: image)"""
     parser_classes = (MultiPartParser, FormParser)
+    throttle_scope = "upload"
 
     def post(self, request):
         f = request.FILES.get('image')
         if not f:
             return Response({"detail":"imageは必須です"}, status=400)
+        err = _validate_image(f)
+        if err:
+            return err
         prof = request.user.userprofile
         prof.profile_image = f
         prof.save(update_fields=["profile_image"])
@@ -608,11 +638,15 @@ class MeAvatarAPI(_Base):
 class MeLciqImageAPI(_Base):
     """POST/DELETE /api/me/lciq-image/  (multipart: image)"""
     parser_classes = (MultiPartParser, FormParser)
+    throttle_scope = "upload"
 
     def post(self, request):
         f = request.FILES.get('image')
         if not f:
             return Response({"detail":"imageは必須です"}, status=400)
+        err = _validate_image(f)
+        if err:
+            return err
         prof = request.user.userprofile
         prof.lciq_image = f
         prof.save(update_fields=["lciq_image"])
