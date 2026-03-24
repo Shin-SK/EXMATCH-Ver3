@@ -5,12 +5,14 @@ import Avatar from '@/components/Avatar.vue'
 import { Splide, SplideSlide } from '@splidejs/vue-splide'
 import '@splidejs/splide/css'
 import { useUser } from '@/stores/useUser'
+import { IconCheck } from '@tabler/icons-vue'
 
 const userStore = useUser()
 const props = defineProps({
   user: { type: Object, required: true },
   pfvs: { type: Array, default: () => [] },
   matched: { type: Boolean, default: false },
+  liked: { type: Boolean, default: false },
   linkTo: { type: String, default: '' },
   avatarSize: { type: Number, default: 96 },
   placeholders: { type: Boolean, default: false }, // ← 追加（一覧では false 推奨）
@@ -132,6 +134,9 @@ const href = computed(() => props.linkTo || `/users/${props.user?.id}`)
     <div class="btn__area">
       <button v-if="matched" class="btn btn-pink text-white w-100 d-flex align-items-center justify-content-center gap-1" @click="emit('message', user.id)">
         <IconSend />メッセージ
+      </button>
+      <button v-else-if="liked" class="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-1" disabled>
+        <IconCheck />いいねしました！
       </button>
       <button v-else class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-1" @click="emit('like', user.id)">
         <IconHeart />いいね

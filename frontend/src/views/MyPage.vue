@@ -2,7 +2,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import {
-  fetchMe, fetchMatches, fetchLikesReceived,
+  fetchMe, fetchMatches, fetchLikesReceived, fetchLikesSent,
   fetchProfileFields, fetchMyCustomFields,
   fetchRecommendations,
 } from '@/api'
@@ -23,6 +23,8 @@ const me = ref(null)
 const matched = ref([])
 const likesTop = ref([])
 const likeCount = ref(0)
+const likesSentTop = ref([])
+const likesSentCount = ref(0)
 const completeness = ref({ percent: 0, answered: 0, total: 0 })
 const loading = ref(true)
 const err = ref('')
@@ -43,10 +45,11 @@ onMounted(async () => {
   loading.value = true
   recoLoading.value = true
   try {
-    const [meData, mData, lData, fields, custom, recoItems] = await Promise.all([
+    const [meData, mData, lData, lSentData, fields, custom, recoItems] = await Promise.all([
       fetchMe(),
       fetchMatches(1),
       fetchLikesReceived(1),
+      fetchLikesSent(1).catch(() => ({ results: [], count: 0 })),
       fetchProfileFields(),
       fetchMyCustomFields(),
       fetchRecommendations().catch(() => { recoErr.value = 'おすすめの取得に失敗しました'; return [] }),
@@ -68,6 +71,11 @@ onMounted(async () => {
     likeCount.value = (lData?.count ?? (lData.results?.length || 0))
     likesTop.value  = (lData.results || []).slice(0, 6)
     profiles.ingestList(likesTop.value.map(x => x.from_user).filter(Boolean))
+
+    // --- いいね送信：件数とトップ6 ---
+    likesSentCount.value = (lSentData?.count ?? (lSentData.results?.length || 0))
+    likesSentTop.value = (lSentData.results || []).slice(0, 6)
+    profiles.ingestList(likesSentTop.value.map(x => x.to_user).filter(Boolean))
 
     // --- プロフ充実度 ---
     const reqKeys  = fieldsArr.filter(f => f.required).map(f => f.field_key)
@@ -229,8 +237,15 @@ onMounted(async () => {
           type="button"
           :class="['tab-btn', { active: activeTab === 'likes' }]"
           @click="activeTab = 'likes'">
-          <IconHeart />いいね
+          <IconHeart />いいねされた
           <span v-if="likeCount" class="badge">{{ likeCount }}</span>
+        </button>
+        <button
+          type="button"
+          :class="['tab-btn', { active: activeTab === 'likes-sent' }]"
+          @click="activeTab = 'likes-sent'">
+          <IconHeart />いいねした
+          <span v-if="likesSentCount" class="badge">{{ likesSentCount }}</span>
         </button>
       </nav>
 
@@ -278,6 +293,27 @@ onMounted(async () => {
             </div>
           </div>
 
+      </section>
+
+      <!-- いいねした -->
+      <section class="followed" id="likes-sent" v-show="activeTab === 'likes-sent'">
+        <div class="area">
+            <template v-if="likesSentTop.length" class="feed feed-mini">
+              <UserCardMini
+                v-for="like in likesSentTop"
+                :key="like.id"
+                :user="like.to_user"
+                :created-at="like.created_at"
+                :link-to="`/users/${like.to_user?.id}`"
+              />
+              <p class="more text-center">
+                <router-link to="/likes/sent">一覧を見る<IconChevronRight :size="16" /></router-link>
+              </p>
+            </template>
+            <div v-else class="d-flex justify-content-center align-items-center w-100" style="height: 20vh;">
+              <router-link to="/users">まだいいねしていません</router-link>
+            </div>
+          </div>
       </section>
 
       <!-- 折りたたみ①: プロフィール詳細 -->

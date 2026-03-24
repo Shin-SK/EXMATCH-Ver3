@@ -1,6 +1,6 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
-import { fetchProfiles, fetchMatches, likeUser } from '@/api'
+import { fetchProfiles, fetchMatches, fetchLikesSent, likeUser } from '@/api'
 import UserCard from '@/components/UserCard.vue'
 import { IconMapPin, IconChevronDown, IconLoader2 } from '@tabler/icons-vue'
 import { useRouter } from 'vue-router'
@@ -218,16 +218,45 @@ async function buildMatchedSet(limitPages = 5) {
 	matchedSet.value = s
 }
 
+const likedSet = ref(new Set())
+
 async function like(uid) {
 	try {
 		const r = await likeUser(uid)
-		if (r?.matched) router.push(`/chats/${uid}`)
-		else alert('いいねを送りました')
-	} catch { alert('送信に失敗しました') }
+		if (r?.matched) {
+			matchedSet.value = new Set([...matchedSet.value, uid])
+		} else {
+			likedSet.value = new Set([...likedSet.value, uid])
+		}
+	} catch (e) {
+		console.error('[like]', uid, e?.response?.status, e?.response?.data || e)
+		alert('送信に失敗しました')
+	}
+}
+
+async function buildLikedSet(limitPages = 5) {
+	try {
+		const s = new Set()
+		for (let p = 1; p <= limitPages; p++) {
+			const d = await fetchLikesSent(p)
+			const rows = Array.isArray(d) ? d : (d.results || [])
+			rows.forEach(r => {
+				const uid = r.to_user?.id || r.user?.id
+				if (uid) s.add(uid)
+			})
+			if (!d?.next) break
+		}
+		likedSet.value = s
+	} catch (e) {
+		console.warn('[buildLikedSet]', e)
+	}
 }
 
 onMounted(async () => {
-	await buildMatchedSet()
+	await Promise.all([
+		buildMatchedSet().catch(e => console.warn('[buildMatchedSet]', e)),
+		buildLikedSet(),
+	])
 	await search()
 })
 </script>
@@ -353,13 +382,14 @@ onMounted(async () => {
 			<template v-if="items.length">
 				<UserCard
 					v-for="p in items"
-					:key="p.user?.id"
+					:key="p.id"
 					:user="p"
 					:pfvs="[]"
-					:matched="matchedSet.has(p.user?.id)"
-					@message="$router.push('/chats/' + p.user?.id)"
+					:matched="matchedSet.has(p.id)"
+					:liked="likedSet.has(p.id)"
+					@message="$router.push('/chats/' + p.id)"
 					@like="like"
-					@open="$router.push('/users/' + p.user?.id)"
+					@open="$router.push('/users/' + p.id)"
 				/>
 				<div class="text-center mt-3" v-if="hasNext">
 					<button class="btn btn-outline-primary" @click="more">もっと見る</button>
