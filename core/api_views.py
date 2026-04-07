@@ -24,7 +24,8 @@ from django.db.models import Subquery, OuterRef
 
 # ── ファイルアップロード バリデーション ──
 ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp"}
-MAX_UPLOAD_SIZE = 5 * 1024 * 1024  # 5 MB
+MAX_UPLOAD_SIZE = 10 * 1024 * 1024  # 10 MB（スマホ高画質対応）
+MAX_PHOTOS = 5
 
 def _validate_image(f):
     """画像ファイルのサイズ・MIMEタイプを検証。問題があれば Response を返す。"""
@@ -39,10 +40,10 @@ def _validate_image(f):
             status=400,
         )
     return None
-from .models import (UserProfile, Match, Message, Block, Footprint, VerificationSubmission, ProfileField, ProfileFieldValue, Report, set_current_user,
+from .models import (UserProfile, ProfilePhoto, Match, Message, Block, Footprint, VerificationSubmission, ProfileField, ProfileFieldValue, Report, set_current_user,
                      MatchingRuleSet,
 )
-from .api_serializers import (ProfileSerializer, ProfileUpdateSerializer, MatchSerializer, MessageSerializer, LikeReceivedSerializer, LikeSentSerializer, FootprintSerializer, UserBriefSerializer, ReportSerializer, VerificationSubmissionSerializer, ProfileFieldSerializer,
+from .api_serializers import (ProfileSerializer, ProfileUpdateSerializer, ProfilePhotoSerializer, MatchSerializer, MessageSerializer, LikeReceivedSerializer, LikeSentSerializer, FootprintSerializer, UserBriefSerializer, ReportSerializer, VerificationSubmissionSerializer, ProfileFieldSerializer,
 )
 from .compat import score_candidate
 
@@ -127,7 +128,10 @@ class ProfilesAPI(_Base):
             qs = qs.filter(gender=gender_param)
 
         if (request.GET.get("has_image") or "").lower() in ("1", "true", "yes"):
-            qs = qs.filter(profile_image__isnull=False)
+            has_photo_users = ProfilePhoto.objects.values_list('user_id', flat=True).distinct()
+            qs = qs.filter(
+                Q(profile_image__isnull=False) | Q(user_id__in=has_photo_users)
+            )
 
         if (request.GET.get("verified") or "").lower() in ("1", "true", "yes"):
             qs = qs.filter(
@@ -624,7 +628,7 @@ class VerificationDeleteAPI(_Base):
 
 
 class MeAvatarAPI(_Base):
-    """POST/DELETE /api/me/avatar/  (multipart: image)"""
+    """POST/DELETE /api/me/avatar/  — 後方互換エイリアス（メイン画像を操作）"""
     parser_classes = (MultiPartParser, FormParser)
     throttle_scope = "upload"
 
@@ -635,19 +639,99 @@ class MeAvatarAPI(_Base):
         err = _validate_image(f)
         if err:
             return err
-        prof = request.user.userprofile
-        prof.profile_image = f
-        prof.save(update_fields=["profile_image"])
+        me = request.user
+        # メイン画像(order最小)があれば差し替え、なければ新規追加
+        main = ProfilePhoto.objects.filter(user=me).order_by('order', 'created_at').first()
+        if main:
+            main.image = f
+            main.save(update_fields=['image', 'updated_at'])
+        else:
+            if ProfilePhoto.objects.filter(user=me).count() >= MAX_PHOTOS:
+                return Response({"detail": f"画像は最大{MAX_PHOTOS}枚です"}, status=400)
+            ProfilePhoto.objects.create(user=me, image=f, order=0)
+        ProfilePhoto.sync_main_to_profile(me)
+        prof = me.userprofile
+        prof.refresh_from_db()
         return Response(ProfileSerializer(prof, context={"request": request}).data, status=201)
 
     def delete(self, request):
-        prof = request.user.userprofile
+        me = request.user
+        main = ProfilePhoto.objects.filter(user=me).order_by('order', 'created_at').first()
+        if main:
+            main.image.delete(save=False)
+            main.delete()
+            ProfilePhoto.compact_order(me)
+            ProfilePhoto.sync_main_to_profile(me)
+        # 旧フィールドもクリア
+        prof = me.userprofile
         if prof.profile_image:
-            # Cloudinary等の実体はストレージ側で消える
             prof.profile_image.delete(save=False)
             prof.profile_image = None
             prof.save(update_fields=["profile_image"])
         return Response({"ok": True})
+
+
+class MePhotosAPI(_Base):
+    """GET/POST /api/me/photos/"""
+    parser_classes = (MultiPartParser, FormParser)
+    throttle_scope = "upload"
+
+    def get(self, request):
+        photos = ProfilePhoto.objects.filter(user=request.user).order_by('order', 'created_at')
+        return Response(ProfilePhotoSerializer(photos, many=True, context={"request": request}).data)
+
+    def post(self, request):
+        me = request.user
+        if ProfilePhoto.objects.filter(user=me).count() >= MAX_PHOTOS:
+            return Response({"detail": f"画像は最大{MAX_PHOTOS}枚です"}, status=400)
+
+        f = request.FILES.get('image')
+        if not f:
+            return Response({"detail": "imageは必須です"}, status=400)
+        err = _validate_image(f)
+        if err:
+            return err
+
+        # 末尾に追加
+        last = ProfilePhoto.objects.filter(user=me).order_by('-order').first()
+        new_order = (last.order + 1) if last else 0
+
+        photo = ProfilePhoto.objects.create(user=me, image=f, order=new_order)
+        ProfilePhoto.sync_main_to_profile(me)
+        return Response(ProfilePhotoSerializer(photo, context={"request": request}).data, status=201)
+
+
+class MePhotoDeleteAPI(_Base):
+    """DELETE /api/me/photos/<id>/"""
+
+    def delete(self, request, pk):
+        me = request.user
+        photo = get_object_or_404(ProfilePhoto.objects.filter(user=me), id=pk)
+        photo.image.delete(save=False)
+        photo.delete()
+        ProfilePhoto.compact_order(me)
+        ProfilePhoto.sync_main_to_profile(me)
+        return Response({"ok": True})
+
+
+class MePhotosReorderAPI(_Base):
+    """POST /api/me/photos/reorder/  body: {"ordered_ids": [3, 1, 5]}"""
+
+    def post(self, request):
+        me = request.user
+        ordered_ids = request.data.get('ordered_ids', [])
+        if not isinstance(ordered_ids, list):
+            return Response({"detail": "ordered_ids は配列で指定してください"}, status=400)
+
+        # 自分の写真IDか検証
+        my_ids = set(ProfilePhoto.objects.filter(user=me).values_list('id', flat=True))
+        if set(ordered_ids) != my_ids:
+            return Response({"detail": "ordered_ids が画像一覧と一致しません"}, status=400)
+
+        ProfilePhoto.reorder(me, ordered_ids)
+        ProfilePhoto.sync_main_to_profile(me)
+        photos = ProfilePhoto.objects.filter(user=me).order_by('order', 'created_at')
+        return Response(ProfilePhotoSerializer(photos, many=True, context={"request": request}).data)
 
 
 class MeLciqImageAPI(_Base):
@@ -866,6 +950,9 @@ class MeDeactivateAPI(_Base):
         prof = me.userprofile
 
         with transaction.atomic():
+            # ProfilePhoto も削除
+            ProfilePhoto.objects.filter(user=me).delete()
+
             # ソフトデリート: 個人情報を匿名化
             prof.deleted_at = timezone.now()
             prof.nickname = "退会済みユーザー"

@@ -1,6 +1,11 @@
 // src/utils/pickAvatar.js
-// ① 名前付きヘルパー
+// ① 名前付きヘルパー — photos 配列にも対応
 export function pickAvatar(obj = {}) {
+  // photos 配列があればメイン画像(先頭)を優先
+  if (Array.isArray(obj.photos) && obj.photos.length > 0) {
+    const url = obj.photos[0].image_url
+    if (url) return url
+  }
   const cand = [
     obj.profile_image_url,
     obj.profile_image,

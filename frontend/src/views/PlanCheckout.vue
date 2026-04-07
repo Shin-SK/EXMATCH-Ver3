@@ -149,17 +149,6 @@ async function submitCheckout() {
                   <div class="savings">
                     1ヶ月プランより<strong>{{ formatPrice(basePrice - p.perMonth) }}円/月</strong>おトク
                   </div>
-
-                  <label :class="{ active: selectedPlan === p.key }">
-                    <input
-                      type="radio"
-                      name="plan"
-                      :value="p.key"
-                      v-model="selectedPlan"
-                    />
-                    <IconCheck v-if="selectedPlan === p.key" :size="16" />
-                    {{ selectedPlan === p.key ? '選択中' : '選択する' }}
-                  </label>
                 </div>
               </div>
 
@@ -170,7 +159,7 @@ async function submitCheckout() {
 
             <!-- 特典 -->
             <div class="special">
-              <div class="item agel" v-if="p.bonuses?.[0]">
+              <div class="item agel d-none" v-if="p.bonuses?.[0]">
                 <img :src="p.bonuses[0].img" alt="" />
                 <div class="text">
                   <span v-html="p.bonuses[0].text"></span>
@@ -181,6 +170,17 @@ async function submitCheckout() {
                 <div class="text" v-html="p.bonuses[1].text"></div>
               </div>
             </div>
+
+            <label class="select-btn" :class="{ active: selectedPlan === p.key }">
+              <input
+                type="radio"
+                name="plan"
+                :value="p.key"
+                v-model="selectedPlan"
+              />
+              <IconCheck v-if="selectedPlan === p.key" :size="16" />
+              {{ selectedPlan === p.key ? '選択中' : '選択する' }}
+            </label>
           </div>
         </div>
 
@@ -249,6 +249,17 @@ async function submitCheckout() {
                 <span class="item-label">{{ opt.label }}</span>
                 <span class="item-price">{{ formatPrice(opt.total) }}円</span>
               </div>
+              <label class="select-btn plus" :class="{ active: selectedPlus === opt.key }" @click.stop>
+                <input
+                  type="radio"
+                  name="plus"
+                  :value="opt.key"
+                  :checked="selectedPlus === opt.key"
+                  @click="selectedPlus = selectedPlus === opt.key ? '' : opt.key"
+                />
+                <IconCheck v-if="selectedPlus === opt.key" :size="14" />
+                {{ selectedPlus === opt.key ? '選択中' : '選択する' }}
+              </label>
             </div>
           </div>
           <p class="cart-hint">※ オプションのみの購入はできません。プランと合わせてお選びください。</p>
@@ -302,4 +313,42 @@ async function submitCheckout() {
 
 <style scoped>
 .object-fit-contain{ object-fit:contain }
+
+.select-btn {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  margin-top: 16px;
+  padding: 8px 4px;
+  background-color: #fff;
+  border: 1px solid #004C71;
+  border-radius: 100px;
+  color: #004C71;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.select-btn input {
+  position: absolute;
+  opacity: 0;
+}
+.select-btn.active,
+.select-btn:has(> input:checked) {
+  background: #004C71;
+  color: #fff;
+}
+.select-btn.plus {
+  margin-top: 8px;
+  padding: 6px 4px;
+  font-size: 0.875rem;
+}
+.item.active .select-btn.plus,
+.item.active .select-btn.plus.active {
+  background: #fff;
+  color: #004C71;
+  border-color: #fff;
+}
 </style>

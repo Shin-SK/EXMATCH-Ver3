@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from .utils import geocode_address
 
 from .models import (
-    UserProfile, Match, Message,
+    UserProfile, ProfilePhoto, Match, Message,
     ProfileField, ProfileFieldValue,
     Footprint, VerificationSubmission, Report, Block,
     MatchingRuleSet, MatchingRule,
@@ -195,6 +195,13 @@ class UserProfileAdmin(CSVOnlyAdmin):
             obj.latitude = lat
             obj.longitude = lng
         super().save_model(request, obj, form, change)
+
+
+@admin.register(ProfilePhoto)
+class ProfilePhotoAdmin(admin.ModelAdmin):
+    list_display = ('user', 'order', 'created_at')
+    list_filter = ('user',)
+    ordering = ('user', 'order')
 
 
 @admin.register(ProfileField)

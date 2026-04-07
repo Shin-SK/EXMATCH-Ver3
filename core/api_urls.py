@@ -4,6 +4,7 @@ from .api_views import (
     MessagesAPI, BlockToggleAPI, ChatThreadsAPI, ProfileDetailAPI, BlocksAPI,
     ReportCreateAPI, ReportsSentAPI, ReportsReceivedAPI,
     ProfileFieldsAPI, MeCustomFieldsAPI, MeAvatarAPI, MeLciqImageAPI,
+    MePhotosAPI, MePhotoDeleteAPI, MePhotosReorderAPI,
     VerificationsAPI, VerificationDeleteAPI,
     LikesSentAPI, FootprintTouchAPI, UnmatchAPI, LikesReceivedAPI, FootprintsAPI,
     ChatUnreadMapAPI, ChatThreadReadAPI,
@@ -28,6 +29,9 @@ urlpatterns = [
     path("profile-fields/",       ProfileFieldsAPI.as_view(),   name="api_profile_fields"),
     path("me/custom-fields/",     MeCustomFieldsAPI.as_view(),  name="api_me_custom_fields"),
     path("me/avatar/",      MeAvatarAPI.as_view(),     name="api_me_avatar"),
+    path("me/photos/",         MePhotosAPI.as_view(),         name="api_me_photos"),
+    path("me/photos/reorder/", MePhotosReorderAPI.as_view(),  name="api_me_photos_reorder"),
+    path("me/photos/<int:pk>/", MePhotoDeleteAPI.as_view(),   name="api_me_photo_delete"),
     path("me/lciq-image/",  MeLciqImageAPI.as_view(),  name="api_me_lciq_image"),  # ★追加
     path("verifications/", VerificationsAPI.as_view(), name="api_verifications"),
     path("verifications/<int:pk>/", VerificationDeleteAPI.as_view(), name="api_verification_delete"),

@@ -3,9 +3,10 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import {
   fetchMe, updateMe,
   fetchProfileFields, fetchMyCustomFields, updateMyCustomFields,
-  uploadAvatar, deleteAvatar,
+  fetchMyPhotos, uploadPhoto, deletePhoto, reorderPhotos,
   listVerifications, uploadVerification, deleteVerification
 } from '@/api'
+import ImageCropModal from '@/components/ImageCropModal.vue'
 
 // 定数（API側のchoicesと揃える）
 const BLOODS  = ['A','B','O','AB']
@@ -15,6 +16,12 @@ const PREFS   = ['male','female']
 const me   = ref(null)
 const busy = ref(false)
 const msg  = ref('')
+const msgType = ref('info')  // 'info' | 'danger'
+
+function showMsg(text, type = 'info') {
+  msg.value = text
+  msgType.value = type
+}
 
 // 固定項目フォーム
 const form = reactive({
@@ -91,6 +98,9 @@ async function loadAll() {
       }
     }
 
+    // プロフィール画像
+    await loadPhotos()
+
     // 本人確認
     const vs = await listVerifications()
     verifsRaw.value = listify(vs)
@@ -121,10 +131,10 @@ async function saveAll() {
     }
     await updateMyCustomFields(payload)
 
-    msg.value = '保存しました'
+    showMsg('保存しました')
     await loadAll()
   } catch (e) {
-    msg.value = '保存に失敗しました'
+    showMsg('保存に失敗しました', 'danger')
     // eslint-disable-next-line no-console
     console.error(e)
   } finally {
@@ -132,25 +142,101 @@ async function saveAll() {
   }
 }
 
-// アバター
-async function onAvatarChange(e) {
+// ---- プロフィール画像（複数枚） ----
+const photos = ref([])
+const MAX_PHOTOS = 5
+const showCrop = ref(false)
+const cropFile = ref(null)
+const dragging = ref(null)
+const dragOver = ref(null)
+
+async function loadPhotos() {
+  photos.value = await fetchMyPhotos()
+}
+
+function onPhotoFileSelect(e) {
   const f = e.target.files?.[0]
   if (!f) return
-  busy.value = true
-  try {
-    await uploadAvatar(f)
-    await loadAll()
-  } finally {
-    busy.value = false
-    e.target.value = ''
+  e.target.value = ''
+  if (photos.value.length >= MAX_PHOTOS) {
+    showMsg(`画像は最大${MAX_PHOTOS}枚です`, 'danger')
+    return
   }
+  cropFile.value = f
+  showCrop.value = true
 }
-async function onAvatarDelete() {
+
+async function onCropConfirm(croppedFile) {
+  showCrop.value = false
+  cropFile.value = null
   busy.value = true
   try {
-    await deleteAvatar()
-    await loadAll()
+    await uploadPhoto(croppedFile)
+    await loadPhotos()
+  } catch (e) {
+    showMsg(e?.response?.data?.detail || '画像アップロードに失敗しました', 'danger')
   } finally { busy.value = false }
+}
+
+function onCropCancel() {
+  showCrop.value = false
+  cropFile.value = null
+}
+
+async function onPhotoDelete(photoId) {
+  if (!confirm('この画像を削除しますか？')) return
+  busy.value = true
+  try {
+    await deletePhoto(photoId)
+    await loadPhotos()
+  } finally { busy.value = false }
+}
+
+// --- 並び替え（デスクトップ D&D + モバイル タッチ対応） ---
+function onDragStart(idx) { dragging.value = idx }
+function onDragOverItem(e, idx) { e.preventDefault(); dragOver.value = idx }
+function onDragLeave() { dragOver.value = null }
+function onDrop(idx) {
+  dragOver.value = null
+  applyReorder(idx)
+}
+function onDragEnd() { dragging.value = null; dragOver.value = null }
+
+// モバイルタッチ
+let touchStartIdx = null
+function onTouchStart(idx) { touchStartIdx = idx; dragging.value = idx }
+function onTouchMove(e) {
+  const touch = e.touches[0]
+  const el = document.elementFromPoint(touch.clientX, touch.clientY)
+  const item = el?.closest('[data-photo-idx]')
+  if (item) dragOver.value = Number(item.dataset.photoIdx)
+}
+function onTouchEnd() {
+  if (dragOver.value !== null && touchStartIdx !== null) {
+    applyReorder(dragOver.value)
+  }
+  touchStartIdx = null
+  dragging.value = null
+  dragOver.value = null
+}
+
+function applyReorder(targetIdx) {
+  if (dragging.value === null || dragging.value === targetIdx) {
+    dragging.value = null
+    return
+  }
+  const prev = [...photos.value]
+  const arr = [...photos.value]
+  const [moved] = arr.splice(dragging.value, 1)
+  arr.splice(targetIdx, 0, moved)
+  photos.value = arr
+  dragging.value = null
+
+  const orderedIds = arr.map(p => p.id)
+  reorderPhotos(orderedIds).catch(() => {
+    photos.value = prev  // ロールバック
+    showMsg('並び替えに失敗しました', 'danger')
+  })
 }
 
 // 本人確認：アップロード/削除
@@ -181,29 +267,66 @@ async function onVerifyDelete(pk) {
   <div class="py-3" v-if="me">
     <h1 class="h2 fw-bold my-3">プロフィール編集</h1>
 
-    <div v-if="msg" class="alert alert-info py-2">{{ msg }}</div>
+    <div v-if="msg" class="alert py-2" :class="`alert-${msgType}`">{{ msg }}</div>
 
-    <!-- アバター -->
+    <!-- プロフィール画像（複数枚） -->
     <div class="card mb-3">
-      <div class="card-header fw-bold">プロフィール画像</div>
-      <div class="card-body d-flex align-items-center gap-3">
-        <img
-          :src="me.profile_image_url || '/img/noimage.jpg'"
-          alt=""
-          class="rounded"
-          style="width:100px;height:100px;object-fit:cover"
-        />
-        <div class="d-flex gap-2">
-          <label class="btn btn-outline-primary mb-0">
-            画像を選択
-            <input type="file" accept="image/*" class="d-none" @change="onAvatarChange">
+      <div class="card-header fw-bold d-flex justify-content-between align-items-center">
+        <span>プロフィール画像</span>
+        <span class="text-muted small">{{ photos.length }} / {{ MAX_PHOTOS }}</span>
+      </div>
+      <div class="card-body">
+        <div class="photo-grid">
+          <div
+            v-for="(photo, idx) in photos"
+            :key="photo.id"
+            :data-photo-idx="idx"
+            class="photo-item"
+            :class="{
+              'photo-dragging': dragging === idx,
+              'photo-dragover': dragOver === idx && dragging !== idx,
+            }"
+            draggable="true"
+            @dragstart="onDragStart(idx)"
+            @dragover="e => onDragOverItem(e, idx)"
+            @dragleave="onDragLeave"
+            @drop="onDrop(idx)"
+            @dragend="onDragEnd"
+            @touchstart.prevent="onTouchStart(idx)"
+            @touchmove.prevent="onTouchMove"
+            @touchend="onTouchEnd"
+          >
+            <img :src="photo.image_url || '/img/noimage.jpg'" alt="" />
+            <span v-if="idx === 0" class="photo-badge">メイン</span>
+            <button
+              type="button"
+              class="photo-delete"
+              @click.stop="onPhotoDelete(photo.id)"
+              title="削除"
+            >&times;</button>
+            <span class="photo-order">{{ idx + 1 }}</span>
+          </div>
+
+          <!-- 追加ボタン -->
+          <label v-if="photos.length < MAX_PHOTOS" class="photo-item photo-add">
+            <span class="photo-add-icon">+</span>
+            <span class="photo-add-label">追加</span>
+            <input type="file" accept="image/jpeg,image/png,image/webp" class="d-none" @change="onPhotoFileSelect">
           </label>
-          <button class="btn btn-outline-secondary" :disabled="!me.profile_image_url" @click="onAvatarDelete">
-            削除
-          </button>
         </div>
+        <p class="text-muted small mt-2 mb-0">
+          長押しで並び替え。1枚目がメイン画像になります。
+        </p>
       </div>
     </div>
+
+    <!-- 画像編集モーダル -->
+    <ImageCropModal
+      :show="showCrop"
+      :file="cropFile"
+      @confirm="onCropConfirm"
+      @cancel="onCropCancel"
+    />
 
     <!-- 固定項目 -->
     <div class="card mb-3">
@@ -435,3 +558,74 @@ async function onVerifyDelete(pk) {
     <div class="spinner-border" role="status"></div>
   </div>
 </template>
+
+<style scoped>
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.photo-item {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f0f0f0;
+  cursor: grab;
+}
+.photo-item:active { cursor: grabbing; }
+.photo-dragging { opacity: 0.4; }
+.photo-dragover { outline: 2px solid #0d6efd; outline-offset: -2px; }
+.photo-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.photo-badge {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  background: rgba(0,0,0,.6);
+  color: #fff;
+  font-size: 0.65rem;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+.photo-delete {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: rgba(0,0,0,.5);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-size: 16px;
+  line-height: 22px;
+  text-align: center;
+  cursor: pointer;
+}
+.photo-delete:hover { background: rgba(220,53,69,.8); }
+.photo-order {
+  position: absolute;
+  bottom: 4px;
+  right: 6px;
+  font-size: 0.65rem;
+  color: rgba(255,255,255,.8);
+  text-shadow: 0 1px 2px rgba(0,0,0,.5);
+}
+.photo-add {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed #ccc;
+  cursor: pointer;
+  transition: border-color .2s;
+}
+.photo-add:hover { border-color: #0d6efd; }
+.photo-add-icon { font-size: 2rem; color: #999; line-height: 1; }
+.photo-add-label { font-size: 0.75rem; color: #999; }
+</style>

@@ -2,12 +2,29 @@
 from datetime import date
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from .models import (UserProfile, Match, Message, Footprint, Report, ProfileField, VerificationSubmission,
+from .models import (UserProfile, ProfilePhoto, Match, Message, Footprint, Report, ProfileField, VerificationSubmission,
 )
 from .utils import geocode_address
 
 
 User = get_user_model()
+
+
+class ProfilePhotoSerializer(serializers.ModelSerializer):
+    image_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ProfilePhoto
+        fields = ("id", "image_url", "order")
+
+    def _abs_url(self, url):
+        req = self.context.get("request")
+        return req.build_absolute_uri(url) if (req and url) else url
+
+    def get_image_url(self, obj):
+        if obj.image and getattr(obj.image, "name", ""):
+            return self._abs_url(obj.image.url)
+        return None
 
 
 class UserMiniSerializer(serializers.ModelSerializer):
@@ -19,6 +36,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     id                  = serializers.SerializerMethodField()   # user.id を返す
     username            = serializers.SerializerMethodField()
     profile_image_url   = serializers.SerializerMethodField()
+    photos              = serializers.SerializerMethodField()
     lciq_image_url      = serializers.SerializerMethodField()
     age                 = serializers.SerializerMethodField()
     verification_badge  = serializers.SerializerMethodField()
@@ -32,7 +50,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = (
             "id","username",
             "nickname","bio","main_area","date_of_birth",
-            "age","profile_image_url","lciq_image_url",
+            "age","profile_image_url","photos","lciq_image_url",
             "blood_type","gender","sexual_object_pref",
             "plan","plan_expiry","option_expiry",
             "lciq_score","id_doc_verified",
@@ -53,10 +71,18 @@ class ProfileSerializer(serializers.ModelSerializer):
         return getattr(obj.user, "username", None)
 
     def get_profile_image_url(self, obj):
+        # ProfilePhoto が正本。なければ旧 profile_image にフォールバック
+        main = ProfilePhoto.objects.filter(user=obj.user).order_by('order', 'created_at').first()
+        if main and main.image and getattr(main.image, "name", ""):
+            return self._abs_url(main.image.url)
         f = getattr(obj, "profile_image", None)
         if f and getattr(f, "name", ""):
             return self._abs_url(f.url)
         return None
+
+    def get_photos(self, obj):
+        photos = ProfilePhoto.objects.filter(user=obj.user).order_by('order', 'created_at')
+        return ProfilePhotoSerializer(photos, many=True, context=self.context).data
 
     def get_lciq_image_url(self, obj):
         f = getattr(obj, "lciq_image", None)
@@ -97,7 +123,10 @@ class ProfileSerializer(serializers.ModelSerializer):
     # ------- ここが肝：必須項目の充足で判定 -------
     def get_is_profile_complete(self, obj):
         ok_nickname  = bool(obj.nickname and obj.nickname.strip())
-        ok_avatar    = bool(getattr(obj, "profile_image", None) and getattr(obj.profile_image, "name", ""))
+        ok_avatar    = (
+            ProfilePhoto.objects.filter(user=obj.user).exists()
+            or bool(getattr(obj, "profile_image", None) and getattr(obj.profile_image, "name", ""))
+        )
         ok_blood     = bool(obj.blood_type)
         ok_gender    = bool(obj.gender)
         ok_pref      = bool(obj.sexual_object_pref)
@@ -180,9 +209,15 @@ class UserBriefSerializer(serializers.ModelSerializer):
         return getattr(prof, "nickname", None)
 
     def get_profile_image_url(self, obj):
+        req = self.context.get("request")
+        # ProfilePhoto が正本
+        main = ProfilePhoto.objects.filter(user=obj).order_by('order', 'created_at').first()
+        if main and main.image and getattr(main.image, "name", ""):
+            url = main.image.url
+            return req.build_absolute_uri(url) if req else url
+        # フォールバック: 旧 profile_image
         prof = getattr(obj, "userprofile", None)
         if prof and prof.profile_image and hasattr(prof.profile_image, "url"):
-            req = self.context.get("request")
             url = prof.profile_image.url
             return req.build_absolute_uri(url) if req else url
         return None

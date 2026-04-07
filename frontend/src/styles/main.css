@@ -3359,7 +3359,8 @@ body {
 .upgrade-plan .standard__wrap .box .price .inner .wrap .numb span {
   font-size: clamp(1.2rem, 1.1346938776rem + 0.2040816327vw, 1.4rem);
 }
-.upgrade-plan .standard__wrap .box .price .inner .wrap label {
+.upgrade-plan .standard__wrap .box .price .inner .wrap label,
+.upgrade-plan .standard__wrap .box > label.select-btn {
   position: relative;
   width: 100%;
   background-color: white;
@@ -3378,9 +3379,13 @@ body {
   position: absolute;
   opacity: 0;
 }
-.upgrade-plan .standard__wrap .box .price .inner .wrap label:has(> input:checked) {
+.upgrade-plan .standard__wrap .box .price .inner .wrap label:has(> input:checked),
+.upgrade-plan .standard__wrap .box > label.select-btn:has(> input:checked) {
   background: #004C71; /* 好きな色へ */
   color: #fff;
+}
+.upgrade-plan .standard__wrap .box > label.select-btn {
+  margin-top: 16px;
 }
 .upgrade-plan .standard__wrap .box .price .amount {
   display: flex;

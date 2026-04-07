@@ -237,14 +237,14 @@ onMounted(async () => {
           type="button"
           :class="['tab-btn', { active: activeTab === 'likes' }]"
           @click="activeTab = 'likes'">
-          <IconHeart />いいねされた
+          もらった<IconHeart />
           <span v-if="likeCount" class="badge">{{ likeCount }}</span>
         </button>
         <button
           type="button"
           :class="['tab-btn', { active: activeTab === 'likes-sent' }]"
           @click="activeTab = 'likes-sent'">
-          <IconHeart />いいねした
+          した<IconHeart />
           <span v-if="likesSentCount" class="badge">{{ likesSentCount }}</span>
         </button>
       </nav>

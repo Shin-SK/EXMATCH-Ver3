@@ -9,7 +9,7 @@ from django.utils import timezone
 from rest_framework.test import APIClient
 
 from core.models import (
-    UserProfile, ProfileField, ProfileFieldValue,
+    UserProfile, ProfilePhoto, ProfileField, ProfileFieldValue,
     Block, Message, VerificationSubmission,
     MatchingRuleSet, MatchingRule,
 )
@@ -163,9 +163,9 @@ class SecurityTestCase(TestCase):
             resp = self.client.post("/api/contact/", data, format="json")
         self.assertEqual(resp.status_code, 429)
 
-    # --- 5MB超の画像アップロードが拒否される ---
-    def test_upload_over_5mb_rejected(self):
-        big_file = SimpleUploadedFile("big.jpg", b"\x00" * (5 * 1024 * 1024 + 1), content_type="image/jpeg")
+    # --- 10MB超の画像アップロードが拒否される ---
+    def test_upload_over_10mb_rejected(self):
+        big_file = SimpleUploadedFile("big.jpg", b"\x00" * (10 * 1024 * 1024 + 1), content_type="image/jpeg")
         resp = self.client.post("/api/me/avatar/", {"image": big_file}, format="multipart")
         self.assertEqual(resp.status_code, 400)
         self.assertIn("ファイルサイズ", resp.data.get("detail", ""))
@@ -225,3 +225,123 @@ class SecurityTestCase(TestCase):
         self.assertEqual(resp.status_code, 200)
         user_ids = [p["id"] for p in resp.data["results"]]
         self.assertNotIn(other.id, user_ids)
+
+
+class ProfilePhotoTestCase(TestCase):
+    """ProfilePhoto 複数画像 API のテスト"""
+
+    def setUp(self):
+        self.user = User.objects.create_user(username="photouser", password="pass")
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+
+    def _make_image(self, name="test.jpg", size=100, content_type="image/jpeg"):
+        return SimpleUploadedFile(name, b"\xff\xd8\xff\xe0" + b"\x00" * size, content_type=content_type)
+
+    # --- 画像追加 ---
+    def test_add_photo(self):
+        resp = self.client.post("/api/me/photos/", {"image": self._make_image()}, format="multipart")
+        self.assertEqual(resp.status_code, 201)
+        self.assertEqual(resp.data["order"], 0)
+        self.assertEqual(ProfilePhoto.objects.filter(user=self.user).count(), 1)
+
+    # --- 画像一覧取得 ---
+    def test_list_photos(self):
+        ProfilePhoto.objects.create(user=self.user, image="profiles/a.jpg", order=0)
+        ProfilePhoto.objects.create(user=self.user, image="profiles/b.jpg", order=1)
+        resp = self.client.get("/api/me/photos/")
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(len(resp.data), 2)
+        self.assertEqual(resp.data[0]["order"], 0)
+        self.assertEqual(resp.data[1]["order"], 1)
+
+    # --- 5枚上限 ---
+    def test_max_5_photos(self):
+        for i in range(5):
+            ProfilePhoto.objects.create(user=self.user, image=f"profiles/{i}.jpg", order=i)
+        resp = self.client.post("/api/me/photos/", {"image": self._make_image()}, format="multipart")
+        self.assertEqual(resp.status_code, 400)
+        self.assertIn("最大", resp.data["detail"])
+
+    # --- 削除後にorderが詰まる ---
+    def test_delete_compacts_order(self):
+        p0 = ProfilePhoto.objects.create(user=self.user, image="profiles/a.jpg", order=0)
+        p1 = ProfilePhoto.objects.create(user=self.user, image="profiles/b.jpg", order=1)
+        p2 = ProfilePhoto.objects.create(user=self.user, image="profiles/c.jpg", order=2)
+        self.client.delete(f"/api/me/photos/{p1.id}/")
+        remaining = list(ProfilePhoto.objects.filter(user=self.user).order_by("order"))
+        self.assertEqual(len(remaining), 2)
+        self.assertEqual(remaining[0].order, 0)
+        self.assertEqual(remaining[1].order, 1)
+
+    # --- reorder API ---
+    def test_reorder(self):
+        p0 = ProfilePhoto.objects.create(user=self.user, image="profiles/a.jpg", order=0)
+        p1 = ProfilePhoto.objects.create(user=self.user, image="profiles/b.jpg", order=1)
+        p2 = ProfilePhoto.objects.create(user=self.user, image="profiles/c.jpg", order=2)
+        resp = self.client.post(
+            "/api/me/photos/reorder/",
+            {"ordered_ids": [p2.id, p0.id, p1.id]},
+            format="json",
+        )
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data[0]["id"], p2.id)
+        self.assertEqual(resp.data[0]["order"], 0)
+
+    # --- reorder: 不正なID ---
+    def test_reorder_invalid_ids(self):
+        p0 = ProfilePhoto.objects.create(user=self.user, image="profiles/a.jpg", order=0)
+        resp = self.client.post(
+            "/api/me/photos/reorder/",
+            {"ordered_ids": [p0.id, 9999]},
+            format="json",
+        )
+        self.assertEqual(resp.status_code, 400)
+
+    # --- 0枚でもAPIが壊れない ---
+    def test_zero_photos_ok(self):
+        resp = self.client.get("/api/me/photos/")
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data, [])
+
+    # --- 詳細APIにphotosが返る ---
+    def test_profile_detail_includes_photos(self):
+        other = User.objects.create_user(username="other_photo", password="pass")
+        other.userprofile.gender = "female"
+        other.userprofile.save()
+        ProfilePhoto.objects.create(user=other, image="profiles/x.jpg", order=0)
+        resp = self.client.get(f"/api/profiles/{other.id}/")
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn("photos", resp.data)
+        self.assertEqual(len(resp.data["photos"]), 1)
+
+    # --- avatar API 後方互換 ---
+    def test_avatar_api_compat_post(self):
+        resp = self.client.post("/api/me/avatar/", {"image": self._make_image()}, format="multipart")
+        self.assertEqual(resp.status_code, 201)
+        self.assertEqual(ProfilePhoto.objects.filter(user=self.user).count(), 1)
+
+    def test_avatar_api_compat_delete(self):
+        ProfilePhoto.objects.create(user=self.user, image="profiles/a.jpg", order=0)
+        resp = self.client.delete("/api/me/avatar/")
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(ProfilePhoto.objects.filter(user=self.user).count(), 0)
+
+    # --- MIME制限 ---
+    def test_invalid_mime_rejected(self):
+        svg = SimpleUploadedFile("test.svg", b"<svg></svg>", content_type="image/svg+xml")
+        resp = self.client.post("/api/me/photos/", {"image": svg}, format="multipart")
+        self.assertEqual(resp.status_code, 400)
+
+    # --- サイズ制限 (10MB超) ---
+    def test_oversize_rejected(self):
+        big = SimpleUploadedFile("big.jpg", b"\x00" * (10 * 1024 * 1024 + 1), content_type="image/jpeg")
+        resp = self.client.post("/api/me/photos/", {"image": big}, format="multipart")
+        self.assertEqual(resp.status_code, 400)
+
+    # --- 他人の画像は削除できない ---
+    def test_cannot_delete_others_photo(self):
+        other = User.objects.create_user(username="other2", password="pass")
+        p = ProfilePhoto.objects.create(user=other, image="profiles/x.jpg", order=0)
+        resp = self.client.delete(f"/api/me/photos/{p.id}/")
+        self.assertEqual(resp.status_code, 404)

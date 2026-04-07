@@ -40,7 +40,7 @@ export default defineConfig({
         // node_modules（bootstrap等）由来の警告を抑制
         quietDeps: true,
         // deprecation warning を種類ごと黙らせる（今回のログに出てるやつ）
-        silenceDeprecations: ['import', 'global-builtin', 'color-functions'],
+        silenceDeprecations: ['import', 'global-builtin', 'color-functions', 'if-function'],
       },
     },
   },

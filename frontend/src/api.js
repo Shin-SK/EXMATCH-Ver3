@@ -120,7 +120,7 @@ export const updateMe = (payload) =>
 export const updateMyCustomFields = (values) =>
   api.patch('me/custom-fields/', values).then(r => r.data)
 
-// アバター
+// アバター（後方互換）
 export const uploadAvatar = (file) => {
   const fd = new FormData()
   fd.append('image', file)
@@ -129,6 +129,23 @@ export const uploadAvatar = (file) => {
 }
 export const deleteAvatar = () =>
   api.delete('me/avatar/').then(r => r.data)
+
+// プロフィール画像（複数枚）
+export const fetchMyPhotos = () =>
+  api.get('me/photos/').then(r => r.data)
+
+export const uploadPhoto = (file) => {
+  const fd = new FormData()
+  fd.append('image', file)
+  return api.post('me/photos/', fd, { headers:{ 'Content-Type':'multipart/form-data' }})
+           .then(r => r.data)
+}
+
+export const deletePhoto = (photoId) =>
+  api.delete(`me/photos/${photoId}/`).then(r => r.data)
+
+export const reorderPhotos = (orderedIds) =>
+  api.post('me/photos/reorder/', { ordered_ids: orderedIds }).then(r => r.data)
 
 // 本人確認（提出一覧・提出・削除）
 export const listVerifications = (params={}) =>

@@ -139,6 +139,9 @@ REST_FRAMEWORK = {
         "like":    "60/minute",
         "message": "30/minute",
         "upload":  "20/hour",
+        "dj_rest_auth": "20/minute",
+        "dj_rest_auth_password_reset": "5/hour",
+        "dj_rest_auth_register": "10/hour",
     },
 }
 

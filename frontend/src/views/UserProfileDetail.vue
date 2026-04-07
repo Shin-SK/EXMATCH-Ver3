@@ -3,6 +3,8 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Avatar from '@/components/Avatar.vue'
+import { Splide, SplideSlide } from '@splidejs/vue-splide'
+import '@splidejs/splide/css'
 import {
   fetchProfile, fetchMatches, fetchLikesSent,
   likeUser, toggleBlock, createReport, touchFootprint
@@ -120,23 +122,39 @@ watch(() => route.params.uid, v => { uid.value = String(v); load() })
 </script>
 
 <template>
-  <div class="py-3 profile-detail">
+  <div class="pb-3 profile-detail">
     <div v-if="loading" class="text-center py-5">
       <div class="spinner-border" role="status"></div>
     </div>
     <div v-else-if="err" class="alert alert-danger">{{ err }}</div>
 
     <template v-else>
-      <!-- アイコン・自己紹介 -->
-      <div class="avator mb-3">
-        <Avatar
-          :src="$avatar.user(prof)"
-          mode="block"
-          ratio="16/9"
-          fit="cover"
-          radius="none"
-          eager
-        />
+      <!-- プロフィール画像（複数枚対応） -->
+      <div class="profile-photos mb-3">
+        <template v-if="prof.photos && prof.photos.length > 1">
+          <Splide :options="{ type: 'loop', perPage: 1, pagination: true, arrows: false, gap: '0px' }">
+            <SplideSlide v-for="photo in prof.photos" :key="photo.id">
+              <div class="profile-photo-slide">
+                <img :src="photo.image_url" alt="" />
+                <div class="photo-overlay"></div>
+                <div class="photo-name-area">
+                  <div class="photo-name">{{ name }}</div>
+                  <div class="photo-area">{{ area }}</div>
+                </div>
+              </div>
+            </SplideSlide>
+          </Splide>
+        </template>
+        <template v-else>
+          <div class="profile-photo-slide single">
+            <img :src="prof.photos?.[0]?.image_url || $avatar.user(prof)" alt="" />
+            <div class="photo-overlay"></div>
+            <div class="photo-name-area">
+              <div class="photo-name">{{ name }}</div>
+              <div class="photo-area">{{ area }}</div>
+            </div>
+          </div>
+        </template>
       </div>
 
       <div class="profile">
@@ -205,3 +223,73 @@ watch(() => route.params.uid, v => { uid.value = String(v); load() })
     </template>
   </div>
 </template>
+
+<style scoped>
+.profile-photos {
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  width: 100vw;
+  overflow: hidden;
+}
+.profile-photo-slide {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4/5;
+  overflow: hidden;
+  background: #111;
+}
+.profile-photo-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.photo-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0) 55%, rgba(0,0,0,0.7) 100%);
+  pointer-events: none;
+}
+.photo-name-area {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: 24px;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  pointer-events: none;
+}
+.photo-name {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.photo-area {
+  font-size: 0.9rem;
+  opacity: 0.95;
+  margin-top: 4px;
+}
+.profile-photos :deep(.splide__pagination) {
+  bottom: auto;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  padding: 0;
+  display: flex;
+  gap: 4px;
+}
+.profile-photos :deep(.splide__pagination__page) {
+  flex: 1;
+  height: 3px;
+  width: auto;
+  margin: 0;
+  border-radius: 2px;
+  background: rgba(255,255,255,0.4);
+  opacity: 1;
+  transform: none;
+}
+.profile-photos :deep(.splide__pagination__page.is-active) {
+  background: #fff;
+  transform: none;
+}
+</style>

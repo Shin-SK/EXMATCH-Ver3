@@ -37,6 +37,11 @@ PLAN_CHOICES = (
 # ======================================================================
 # 1) ユーザーのProfile。 ここには血液型・性別など”すでに確定しているカラム”が残る
 # ======================================================================
+def _profile_photo_path(_, filename):
+    ext = filename.split('.')[-1]
+    return f"profiles/{uuid4().hex}.{ext}"
+
+
 class UserProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     bio = models.TextField(blank=True, null=True)
@@ -45,6 +50,7 @@ class UserProfile(models.Model):
         ext = filename.split('.')[-1]
         return f"profiles/{uuid4().hex}.{ext}"
 
+    # 後方互換のため残す。正本は ProfilePhoto テーブル。
     profile_image = models.ImageField(upload_to=avatar_path, blank=True, null=True)
 
     nickname = models.CharField(max_length=50, blank=True, null=True)
@@ -189,6 +195,66 @@ class UserProfile(models.Model):
         if cnt == 0:
             return None
         return {1: 'blue', 2: 'pink', 3: 'silver'}.get(cnt, 'gold')
+
+# ======================================================================
+# 1-b) プロフィール画像（複数枚）
+# ======================================================================
+class ProfilePhoto(models.Model):
+    MAX_PHOTOS = 5
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='profile_photos',
+    )
+    image = models.ImageField(upload_to=_profile_photo_path)
+    order = models.PositiveSmallIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['order', 'created_at']
+        indexes = [
+            models.Index(fields=['user', 'order']),
+        ]
+
+    def __str__(self):
+        return f"{self.user.username} photo #{self.order}"
+
+    @classmethod
+    def reorder(cls, user, ordered_ids):
+        """ordered_ids の並び順で order を 0, 1, 2 … に詰め直す"""
+        photos = list(cls.objects.filter(user=user, id__in=ordered_ids))
+        id_to_photo = {p.id: p for p in photos}
+        for i, pid in enumerate(ordered_ids):
+            photo = id_to_photo.get(pid)
+            if photo and photo.order != i:
+                photo.order = i
+                photo.save(update_fields=['order'])
+
+    @classmethod
+    def compact_order(cls, user):
+        """order を 0 始まりで隙間なく詰め直す"""
+        photos = list(cls.objects.filter(user=user).order_by('order', 'created_at'))
+        for i, photo in enumerate(photos):
+            if photo.order != i:
+                photo.order = i
+                photo.save(update_fields=['order'])
+
+    @classmethod
+    def sync_main_to_profile(cls, user):
+        """メイン画像(最小order)を UserProfile.profile_image に同期"""
+        main = cls.objects.filter(user=user).order_by('order', 'created_at').first()
+        prof = user.userprofile
+        if main:
+            if prof.profile_image != main.image:
+                prof.profile_image = main.image.name
+                prof.save(update_fields=['profile_image'])
+        else:
+            if prof.profile_image:
+                prof.profile_image = None
+                prof.save(update_fields=['profile_image'])
+
 
 # ======================================================================
 # 2) 可変項目用: Adminで「ラジオ/セレクト/テキスト」項目を自由に追加
