@@ -85,17 +85,7 @@ async function reloadMe () {
   form.value.lciq_score = me.value?.lciq_score ?? ''
 }
 
-const canSave = computed(() => {
-  const f = form.value
-  return hasAvatar.value
-    && f.nickname?.trim()
-    && f.blood_type
-    && f.gender
-    && f.sexual_object_pref
-    && f.date_of_birth
-    && f.main_area?.trim()
-    && !sending.value
-})
+const canSave = computed(() => !sending.value)
 
 function onAvatarChange (e) {
   const file = e.target.files?.[0]
@@ -172,23 +162,23 @@ async function saveAndGo () {
   sending.value = true
   err.value = ''
   try {
-    // 任意の lciq_score は空文字なら送らない
-    const payload = {
-      nickname: form.value.nickname?.trim(),
-      blood_type: form.value.blood_type,
-      gender: form.value.gender,
-      sexual_object_pref: form.value.sexual_object_pref,
-      date_of_birth: form.value.date_of_birth,
-      main_area: form.value.main_area?.trim(),
+    // 入力済みの項目のみ送信（未入力でもスキップ可）
+    const f = form.value
+    const payload = {}
+    if (f.nickname?.trim()) payload.nickname = f.nickname.trim()
+    if (f.blood_type) payload.blood_type = f.blood_type
+    if (f.gender) payload.gender = f.gender
+    if (f.sexual_object_pref) payload.sexual_object_pref = f.sexual_object_pref
+    if (f.date_of_birth) payload.date_of_birth = f.date_of_birth
+    if (f.main_area?.trim()) payload.main_area = f.main_area.trim()
+    if (f.lciq_score !== '' && f.lciq_score !== null) {
+      payload.lciq_score = Number(f.lciq_score)
     }
-    if (form.value.lciq_score !== '' && form.value.lciq_score !== null) {
-      payload.lciq_score = Number(form.value.lciq_score)
+    if (Object.keys(payload).length > 0) {
+      await api.patch('me/', payload)
+      await reloadMe()
     }
-    await api.patch('me/', payload)
-    await reloadMe()
-    if (userStore.me?.is_profile_complete) {
-      router.push('/onboarding/required')
-    }
+    router.push('/onboarding/required')
   } catch (e) {
     err.value = e?.response?.data?.detail || '保存に失敗しました。入力内容をご確認ください'
   } finally {
