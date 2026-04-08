@@ -1,10 +1,9 @@
 <!-- src/views/UserProfileDetail.vue -->
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Avatar from '@/components/Avatar.vue'
-import { Splide, SplideSlide } from '@splidejs/vue-splide'
-import '@splidejs/splide/css'
+import ProfileCard from '@/components/ProfileCard.vue'
 import {
   fetchProfile, fetchMatches, fetchLikesSent,
   likeUser, toggleBlock, createReport, touchFootprint
@@ -31,25 +30,6 @@ const REASONS = [
   { val:'harass', label:'ストーカー・しつこい連絡' },
   { val:'illegal',label:'違法・不適切コンテンツ' },
 ]
-
-const name = computed(() => prof.value?.nickname || prof.value?.username || '???')
-const area = computed(() => prof.value?.main_area || '未設定')
-const bio  = computed(() => prof.value?.bio || '')
-
-const pairs = computed(() => {
-  if(!prof.value) return []
-  const bt = prof.value.blood_type || '-'
-  const gender = ({male:'男性', female:'女性'})[prof.value.gender] || '-'
-  const target = ({male:'男性', female:'女性'})[prof.value.sexual_object_pref] || '-'
-  const age = prof.value.age ?? '-'
-  return [
-    ['年齢', age],
-    ['血液型', bt],
-    ['性別', gender],
-    ['対象', target],
-    ['メインエリア', area.value],
-  ]
-})
 
 async function checkMatched(userId){
   let p = 1
@@ -123,59 +103,17 @@ watch(() => route.params.uid, v => { uid.value = String(v); load() })
 
 <template>
   <div class="pb-3 profile-detail">
+    <div class="head-set">
+      <h2>PROFILE</h2>
+      <h3>プロフィール</h3>
+    </div>
     <div v-if="loading" class="text-center py-5">
       <div class="spinner-border" role="status"></div>
     </div>
     <div v-else-if="err" class="alert alert-danger">{{ err }}</div>
 
     <template v-else>
-      <!-- プロフィール画像（複数枚対応） -->
-      <div class="profile-photos mb-3">
-        <template v-if="prof.photos && prof.photos.length > 1">
-          <Splide :options="{ type: 'loop', perPage: 1, pagination: true, arrows: false, gap: '0px' }">
-            <SplideSlide v-for="photo in prof.photos" :key="photo.id">
-              <div class="profile-photo-slide">
-                <img :src="photo.image_url" alt="" />
-                <div class="photo-overlay"></div>
-                <div class="photo-name-area">
-                  <div class="photo-name">{{ name }}</div>
-                  <div class="photo-area">{{ area }}</div>
-                </div>
-              </div>
-            </SplideSlide>
-          </Splide>
-        </template>
-        <template v-else>
-          <div class="profile-photo-slide single">
-            <img :src="prof.photos?.[0]?.image_url || $avatar.user(prof)" alt="" />
-            <div class="photo-overlay"></div>
-            <div class="photo-name-area">
-              <div class="photo-name">{{ name }}</div>
-              <div class="photo-area">{{ area }}</div>
-            </div>
-          </div>
-        </template>
-      </div>
-
-      <div class="profile">
-        <div class="profile__main mb-3">
-          <div class="head field h4 fw-bold">{{ name }}</div>
-          <div class="main-area field">
-            <span class="me-2">メインエリア</span>{{ area }}
-          </div>
-          <div class="bio field mt-2">{{ bio || '自己紹介未入力' }}</div>
-        </div>
-
-        <div class="profile__nomal area">
-          <div class="title fw-bold mb-2">PROFILE</div>
-          <div class="fields">
-            <div v-for="[label,v] in pairs" :key="label" class="field d-flex gap-3 py-1">
-              <div class="head" style="min-width:110px">{{ label }}</div>
-              <div class="value">{{ v }}</div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <ProfileCard :user="prof" />
 
       <!-- アクション -->
       <div class="actions my-3">

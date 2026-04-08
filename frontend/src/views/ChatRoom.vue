@@ -118,7 +118,10 @@ watch(() => route.params.uid, async (v) => {
 
 <template>
   <div class="d-flex flex-column">
-    <div class="h2 fw-bold my-3">メッセージ</div>
+    <div class="head-set">
+      <h2>MESSAGE</h2>
+      <h3>トーク</h3>
+    </div>
 
     <div id="chat-body" class="chat-body flex-fill overflow-auto rounded p-2 bg-light">
       <div v-if="loading" class="text-center py-5">

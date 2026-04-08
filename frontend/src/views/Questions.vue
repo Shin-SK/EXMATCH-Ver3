@@ -84,7 +84,10 @@ async function onSelect(fieldKey) {
 
 <template>
   <div class="py-4" style="max-width: 640px;">
-    <h1 class="fw-bold fs-2 mb-1">質問に答える</h1>
+    <div class="head-set">
+      <h2>VALUES</h2>
+      <h3>価値観診断</h3>
+    </div>
     <p class="text-muted small mb-4">回答が増えるほどおすすめの精度がUPします</p>
 
     <div v-if="loading" class="text-center py-5 text-muted">Loading...</div>

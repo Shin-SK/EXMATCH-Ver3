@@ -74,7 +74,10 @@ function skip() {
 
 <template>
   <div class="container py-4" style="max-width: 640px;">
-    <h1 class="fw-bold fs-2 mb-1">必須プロフィール</h1>
+    <div class="head-set">
+      <h2>PROFILE</h2>
+      <h3>必須プロフィール</h3>
+    </div>
     <p class="text-muted small mb-4">おすすめ精度を上げるため、まずはこの質問だけ答えてください</p>
 
     <div v-if="loading" class="text-center py-5 text-muted">Loading...</div>

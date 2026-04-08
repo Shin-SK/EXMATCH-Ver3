@@ -33,7 +33,10 @@ onMounted(() => load(1))
 
 <template>
   <div class="py-3">
-    <h1 class="h2 fw-bold my-3">あしあと</h1>
+    <div class="head-set">
+      <h2>FOOTPRINT</h2>
+      <h3>あしあと</h3>
+    </div>
 
     <div v-if="loading" class="text-center py-5">
       <div class="spinner-border" role="status"></div>

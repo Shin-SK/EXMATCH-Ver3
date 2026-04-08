@@ -8,13 +8,13 @@ import {
 } from '@/api'
 import { useProfiles } from '@/stores/useProfiles'
 import { useAuth } from '@/stores/useAuth'
-import Avatar from '@/components/Avatar.vue'
 import UserCardMini from '@/components/UserCardMini.vue'
 import UserCard from '@/components/UserCard.vue'
+import ProfileCard from '@/components/ProfileCard.vue'
 import ProfileChecklist from '@/components/ProfileChecklist.vue'
 import { uniqById } from '@/utils/uniq'
 import {
-  IconMapPin, IconHeart, IconPencil,
+  IconHeart, IconPencil,
   IconZoomCheck, IconBrandTinder, IconChevronDown,
   IconPaw, IconMail, IconConfetti, IconProgressHelp,
 } from '@tabler/icons-vue'
@@ -99,21 +99,16 @@ onMounted(async () => {
 
 <template>
   <div id="mypage" class="mypage">
+    <div class="head-set">
+      <h2>MY PAGE</h2>
+      <h3>マイページ</h3>
+    </div>
     <div v-if="loading">Loading...</div>
     <div v-else-if="err">{{ err }}</div>
 
     <template v-else>
-      <section class="profile pt-5" v-if="me">
-        <div class="df-center flex-column my-5">
-          <div class="avatar-area">
-            <Avatar :src="$avatar.me(me)" :size="120" :to="href" />
-          </div>
-          <div class="name-area text-center">
-            <div class="fw-bold">{{ me.nickname || me.username }}</div>
-            <div class="df-center"><IconMapPin :size="16" />{{ me.area || me.main_area || '未設定' }}</div>
-          </div>
-
-        </div>
+      <section class="profile mb-0" v-if="me">
+        <ProfileCard :user="me" :editable="true" :edit-to="href" :show-pairs="false" />
         <div class="first-area row g-1 border-top border-bottom py-3 mx-0">
           <div class="col-4">
             <div class="lciq-box area d-flex flex-column align-items-center flex-column h-100">
@@ -338,6 +333,26 @@ onMounted(async () => {
                 <div class="box">
                   <div class="head">自己紹介</div>
                   <div class="text">{{ me?.bio || '未設定' }}</div>
+                </div>
+                <div class="box grid grid-cols-[150px_1fr]">
+                  <div class="head">年齢</div>
+                  <div class="text">{{ me?.age ?? '未設定' }}</div>
+                </div>
+                <div class="box grid grid-cols-[150px_1fr]">
+                  <div class="head">血液型</div>
+                  <div class="text">{{ me?.blood_type || '未設定' }}</div>
+                </div>
+                <div class="box grid grid-cols-[150px_1fr]">
+                  <div class="head">性別</div>
+                  <div class="text">{{ ({male:'男性',female:'女性'})[me?.gender] || '未設定' }}</div>
+                </div>
+                <div class="box grid grid-cols-[150px_1fr]">
+                  <div class="head">対象</div>
+                  <div class="text">{{ ({male:'男性',female:'女性'})[me?.sexual_object_pref] || '未設定' }}</div>
+                </div>
+                <div class="box grid grid-cols-[150px_1fr]">
+                  <div class="head">メインエリア</div>
+                  <div class="text">{{ me?.main_area || '未設定' }}</div>
                 </div>
               </div>
             </div>

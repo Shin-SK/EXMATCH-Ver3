@@ -57,7 +57,10 @@ onMounted(async () => {
 
 <template>
   <div class="py-3">
-    <div class="h2 fw-bold my-3">マッチした人</div>
+    <div class="head-set">
+      <h2>MATCH</h2>
+      <h3>マッチ</h3>
+    </div>
 
 
     <div v-if="loading" class="text-center py-5">

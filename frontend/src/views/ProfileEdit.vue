@@ -1,5 +1,6 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import {
   fetchMe, updateMe,
   fetchProfileFields, fetchMyCustomFields, updateMyCustomFields,
@@ -10,18 +11,18 @@ import ImageCropModal from '@/components/ImageCropModal.vue'
 
 // 定数（API側のchoicesと揃える）
 const BLOODS  = ['A','B','O','AB']
-const GENDERS = ['male','female']
-const PREFS   = ['male','female']
+const GENDERS = [
+  { value: 'male',   label: '男性' },
+  { value: 'female', label: '女性' },
+]
+const PREFS = [
+  { value: 'male',   label: '男性' },
+  { value: 'female', label: '女性' },
+]
 
+const router = useRouter()
 const me   = ref(null)
 const busy = ref(false)
-const msg  = ref('')
-const msgType = ref('info')  // 'info' | 'danger'
-
-function showMsg(text, type = 'info') {
-  msg.value = text
-  msgType.value = type
-}
 
 // 固定項目フォーム
 const form = reactive({
@@ -113,7 +114,6 @@ onMounted(loadAll)
 
 // 保存：固定 + 動的
 async function saveAll() {
-  msg.value = ''
   busy.value = true
   try {
     // 固定
@@ -131,10 +131,11 @@ async function saveAll() {
     }
     await updateMyCustomFields(payload)
 
-    showMsg('保存しました')
-    await loadAll()
+    alert('保存しました！')
+    router.push({ name: 'mypage' })
+    return
   } catch (e) {
-    showMsg('保存に失敗しました', 'danger')
+    alert('保存に失敗しました')
     // eslint-disable-next-line no-console
     console.error(e)
   } finally {
@@ -159,7 +160,7 @@ function onPhotoFileSelect(e) {
   if (!f) return
   e.target.value = ''
   if (photos.value.length >= MAX_PHOTOS) {
-    showMsg(`画像は最大${MAX_PHOTOS}枚です`, 'danger')
+    alert(`画像は最大${MAX_PHOTOS}枚です`)
     return
   }
   cropFile.value = f
@@ -174,7 +175,7 @@ async function onCropConfirm(croppedFile) {
     await uploadPhoto(croppedFile)
     await loadPhotos()
   } catch (e) {
-    showMsg(e?.response?.data?.detail || '画像アップロードに失敗しました', 'danger')
+    alert(e?.response?.data?.detail || '画像アップロードに失敗しました')
   } finally { busy.value = false }
 }
 
@@ -235,7 +236,7 @@ function applyReorder(targetIdx) {
   const orderedIds = arr.map(p => p.id)
   reorderPhotos(orderedIds).catch(() => {
     photos.value = prev  // ロールバック
-    showMsg('並び替えに失敗しました', 'danger')
+    alert('並び替えに失敗しました')
   })
 }
 
@@ -265,9 +266,10 @@ async function onVerifyDelete(pk) {
 
 <template>
   <div class="py-3" v-if="me">
-    <h1 class="h2 fw-bold my-3">プロフィール編集</h1>
-
-    <div v-if="msg" class="alert py-2" :class="`alert-${msgType}`">{{ msg }}</div>
+    <div class="head-set">
+      <h2>PROFILE</h2>
+      <h3>プロフィール編集</h3>
+    </div>
 
     <!-- プロフィール画像（複数枚） -->
     <div class="card mb-3">
@@ -344,14 +346,14 @@ async function onVerifyDelete(pk) {
           <label class="form-label">性別</label>
           <select v-model="form.gender" class="form-select">
             <option value="">未設定</option>
-            <option v-for="g in GENDERS" :key="g" :value="g">{{ g }}</option>
+            <option v-for="g in GENDERS" :key="g.value" :value="g.value">{{ g.label }}</option>
           </select>
         </div>
         <div class="col-md-6">
           <label class="form-label">対象</label>
           <select v-model="form.sexual_object_pref" class="form-select">
             <option value="">未設定</option>
-            <option v-for="s in PREFS" :key="s" :value="s">{{ s }}</option>
+            <option v-for="s in PREFS" :key="s.value" :value="s.value">{{ s.label }}</option>
           </select>
         </div>
         <div class="col-md-6">

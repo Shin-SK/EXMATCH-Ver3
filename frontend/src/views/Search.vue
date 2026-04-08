@@ -1,8 +1,8 @@
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { fetchProfiles, fetchMatches, fetchLikesSent, likeUser } from '@/api'
 import UserCard from '@/components/UserCard.vue'
-import { IconMapPin, IconChevronDown, IconLoader2 } from '@tabler/icons-vue'
+import { IconMapPin, IconLoader2, IconAdjustmentsHorizontal, IconX, IconSearch } from '@tabler/icons-vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -20,6 +20,7 @@ const err = ref('')
 const items = ref([])
 const page = ref(1)
 const hasNext = ref(false)
+const totalCount = ref(0)
 const matchedSet = ref(new Set())
 
 // ── 距離 ──
@@ -38,7 +39,6 @@ function selectDistance(val) {
 	selectedDistance.value = val
 	f.radius = val
 	if (val && !located.value) locate()
-	else search()
 }
 
 function locate() {
@@ -50,7 +50,6 @@ function locate() {
 			f.lon = String(pos.coords.longitude)
 			located.value = true
 			locating.value = false
-			search()
 		},
 		() => {
 			alert('位置情報の取得に失敗しました')
@@ -62,12 +61,11 @@ function locate() {
 	)
 }
 
-// ── 年齢（デュアルレンジスライダー）──
+// ── 年齢 ──
 const AGE_MIN = 18
 const AGE_MAX = 60
 const ageMin = ref(AGE_MIN)
 const ageMax = ref(AGE_MAX)
-let ageTimer = null
 
 const ageLabel = computed(() => {
 	if (ageMin.value === AGE_MIN && ageMax.value === AGE_MAX) return '指定なし'
@@ -86,21 +84,14 @@ function onAgeMinInput(e) {
 	let v = Number(e.target.value)
 	if (v > ageMax.value) v = ageMax.value
 	ageMin.value = v
-	debouncedAgeSearch()
+	f.age_min = v === AGE_MIN ? '' : String(v)
 }
 
 function onAgeMaxInput(e) {
 	let v = Number(e.target.value)
 	if (v < ageMin.value) v = ageMin.value
 	ageMax.value = v
-	debouncedAgeSearch()
-}
-
-function debouncedAgeSearch() {
-	f.age_min = ageMin.value === AGE_MIN ? '' : String(ageMin.value)
-	f.age_max = ageMax.value === AGE_MAX ? '' : String(ageMax.value)
-	clearTimeout(ageTimer)
-	ageTimer = setTimeout(() => search(), 300)
+	f.age_max = v === AGE_MAX ? '' : String(v)
 }
 
 // ── 性別 ──
@@ -109,14 +100,7 @@ const genderOptions = [
 	{ label: '男性', value: 'male' },
 	{ label: '女性', value: 'female' },
 ]
-
-function selectGender(val) {
-	f.gender = val
-	search()
-}
-
-// ── その他（折りたたみ）──
-const showMore = ref(false)
+const genderLabel = computed(() => genderOptions.find(g => g.value === f.gender)?.label || '')
 
 // LCIQ
 const lciqOptions = [
@@ -132,11 +116,39 @@ function selectLciq(opt) {
 	selectedLciq.value = opt.label
 	f.lciq_min = opt.min
 	f.lciq_max = opt.max
-	search()
 }
 
 function toggleFilter(key) {
 	f[key] = !f[key]
+}
+
+// ── アクティブフィルターchip ──
+const activeChips = computed(() => {
+	const arr = []
+	if (selectedDistance.value) arr.push({ key:'distance', label: distanceOptions.find(d=>d.value===selectedDistance.value)?.label })
+	if (ageLabel.value !== '指定なし') arr.push({ key:'age', label: ageLabel.value })
+	if (f.gender) arr.push({ key:'gender', label: genderLabel.value })
+	if (selectedLciq.value !== '指定なし') arr.push({ key:'lciq', label: 'LCIQ ' + selectedLciq.value })
+	if (f.has_plus) arr.push({ key:'has_plus', label: 'プラスプロフ' })
+	if (f.has_image) arr.push({ key:'has_image', label: '写真あり' })
+	if (f.verified) arr.push({ key:'verified', label: '本人確認済' })
+	if (f.area) arr.push({ key:'area', label: f.area })
+	if (f.q) arr.push({ key:'q', label: f.q })
+	return arr
+})
+
+function removeChip(key) {
+	switch (key) {
+		case 'distance': selectedDistance.value=''; f.radius=''; break
+		case 'age': ageMin.value=AGE_MIN; ageMax.value=AGE_MAX; f.age_min=''; f.age_max=''; break
+		case 'gender': f.gender=''; break
+		case 'lciq': selectedLciq.value='指定なし'; f.lciq_min=''; f.lciq_max=''; break
+		case 'has_plus': f.has_plus=false; break
+		case 'has_image': f.has_image=false; break
+		case 'verified': f.verified=false; break
+		case 'area': f.area=''; break
+		case 'q': f.q=''; break
+	}
 	search()
 }
 
@@ -168,6 +180,7 @@ async function search(p = 1) {
 		const rows = Array.isArray(d) ? d : (d.results || d.items || [])
 		items.value = p === 1 ? rows : [...items.value, ...rows]
 		hasNext.value = !!d?.next
+		totalCount.value = d?.count ?? rows.length
 		page.value = p
 	} catch (e) {
 		err.value = '読み込みに失敗しました'
@@ -179,18 +192,21 @@ async function search(p = 1) {
 
 const more = () => { if (hasNext.value) search(page.value + 1) }
 
-// アクティブフィルター数（折りたたみ内）
-function moreFilterCount() {
-	let n = 0
-	if (selectedLciq.value !== '指定なし') n++
-	if (f.has_plus) n++
-	if (f.has_image) n++
-	if (f.verified) n++
-	if (f.area) n++
-	if (f.q) n++
-	return n
-}
+// ── ボトムシート ──
+const sheetOpen = ref(false)
 
+function openSheet() {
+	sheetOpen.value = true
+	document.body.style.overflow = 'hidden'
+}
+function closeSheet() {
+	sheetOpen.value = false
+	document.body.style.overflow = ''
+}
+function applySheet() {
+	closeSheet()
+	search()
+}
 function resetAll() {
 	Object.assign(f, {
 		radius:'', lat:'', lon:'', q:'', gender:'', plan:'',
@@ -200,8 +216,9 @@ function resetAll() {
 	})
 	selectedDistance.value = ''
 	selectedLciq.value = '指定なし'
+	ageMin.value = AGE_MIN
+	ageMax.value = AGE_MAX
 	located.value = false
-	search()
 }
 
 async function buildMatchedSet(limitPages = 5) {
@@ -263,115 +280,34 @@ onMounted(async () => {
 
 <template>
 	<div class="search-page">
-		<h1 class="h2 fw-bold my-3">検索</h1>
-
-		<div class="search-bar">
-			<!-- 距離 -->
-			<div class="search-section">
-				<div class="section-label">
-					<IconMapPin :size="15" />
-					距離
-					<span v-if="locating" class="locating"><IconLoader2 :size="13" class="spin" /> 取得中…</span>
-				</div>
-				<div class="chips">
-					<button
-						v-for="d in distanceOptions" :key="d.value"
-						class="chip" :class="{ active: selectedDistance === d.value }"
-						@click="selectDistance(d.value)"
-					>{{ d.label }}</button>
-				</div>
-			</div>
-
-			<!-- 年齢（デュアルレンジスライダー） -->
-			<div class="search-section">
-				<div class="section-label">
-					年齢
-					<span class="age-value">{{ ageLabel }}</span>
-				</div>
-				<div class="range-slider">
-					<div class="range-track">
-						<div class="range-fill" :style="ageTrackStyle"></div>
-					</div>
-					<input
-						type="range"
-						class="range-input"
-						:min="AGE_MIN" :max="AGE_MAX"
-						:value="ageMin"
-						@input="onAgeMinInput"
-					/>
-					<input
-						type="range"
-						class="range-input"
-						:min="AGE_MIN" :max="AGE_MAX"
-						:value="ageMax"
-						@input="onAgeMaxInput"
-					/>
-					<div class="range-labels">
-						<span>{{ AGE_MIN }}</span>
-						<span>{{ AGE_MAX }}</span>
-					</div>
-				</div>
-			</div>
-
-			<!-- 性別 -->
-			<div class="search-section mt-2">
-				<div class="section-label">性別</div>
-				<div class="chips">
-					<button
-						v-for="g in genderOptions" :key="g.value"
-						class="chip" :class="{ active: f.gender === g.value }"
-						@click="selectGender(g.value)"
-					>{{ g.label }}</button>
-				</div>
-			</div>
-
-			<!-- その他（折りたたみ） -->
-			<button class="more-toggle" @click="showMore = !showMore">
-				その他の条件
-				<span class="more-count" v-if="moreFilterCount()">{{ moreFilterCount() }}</span>
-				<IconChevronDown :size="14" :style="{ transform: showMore ? 'rotate(180deg)' : '', transition: 'transform .2s' }" />
+		<div class="head-set">
+			<h2>SEARCH</h2>
+			<h3>お相手を探す</h3>
+		</div>
+		<!-- ヘッダー -->
+		<div class="search-header">
+			<button class="filter-btn" @click="openSheet">
+				<IconAdjustmentsHorizontal :size="18" />
+				<span>絞り込み</span>
+				<span v-if="activeChips.length" class="badge">{{ activeChips.length }}</span>
 			</button>
+		</div>
 
-			<div class="more-filters" v-show="showMore">
-				<!-- LCIQ -->
-				<div class="more-section">
-					<div class="more-label">LCIQスコア</div>
-					<div class="chips">
-						<button
-							v-for="l in lciqOptions" :key="l.label"
-							class="chip" :class="{ active: selectedLciq === l.label }"
-							@click="selectLciq(l)"
-						>{{ l.label }}</button>
-					</div>
-				</div>
+		<!-- アクティブフィルターchipバー -->
+		<div v-if="activeChips.length" class="active-chips">
+			<button
+				v-for="c in activeChips" :key="c.key"
+				class="active-chip"
+				@click="removeChip(c.key)"
+			>
+				{{ c.label }}
+				<IconX :size="12" />
+			</button>
+		</div>
 
-				<!-- トグル -->
-				<div class="more-section">
-					<div class="chips">
-						<button class="chip" :class="{ active: f.has_plus }" @click="toggleFilter('has_plus')">プラスプロフィール</button>
-						<button class="chip" :class="{ active: f.has_image }" @click="toggleFilter('has_image')">写真あり</button>
-						<button class="chip" :class="{ active: f.verified }" @click="toggleFilter('verified')">本人確認済み</button>
-					</div>
-				</div>
-
-				<!-- エリア・キーワード -->
-				<div class="more-section">
-					<div class="text-fields">
-						<div class="text-field">
-							<label>エリア</label>
-							<input v-model="f.area" class="field-input" placeholder="渋谷、大阪など" @keyup.enter="search()">
-						</div>
-						<div class="text-field">
-							<label>キーワード</label>
-							<input v-model="f.q" class="field-input" placeholder="ニックネーム/自己紹介" @keyup.enter="search()">
-						</div>
-					</div>
-				</div>
-
-				<div class="more-actions">
-					<button class="btn-reset" @click="resetAll">条件をリセット</button>
-				</div>
-			</div>
+		<!-- 結果カウント -->
+		<div v-if="!loading || page > 1" class="result-count">
+			{{ totalCount }}人がヒット
 		</div>
 
 		<!-- 結果 -->
@@ -395,8 +331,110 @@ onMounted(async () => {
 					<button class="btn btn-outline-primary" @click="more">もっと見る</button>
 				</div>
 			</template>
-			<div v-else class="text-center text-muted py-5">条件に合うユーザーがいません</div>
+			<div v-else class="empty">
+				<p>条件に合うユーザーがいません</p>
+				<button class="btn-empty" @click="openSheet">条件を変更する</button>
+			</div>
 		</div>
+
+		<!-- ボトムシート -->
+		<transition name="sheet">
+			<div v-if="sheetOpen" class="sheet-backdrop" @click.self="closeSheet">
+				<div class="sheet">
+					<div class="sheet-handle"></div>
+					<div class="sheet-header">
+						<h2>絞り込み条件</h2>
+						<button class="close-btn" @click="closeSheet"><IconX :size="20" /></button>
+					</div>
+
+					<div class="sheet-body">
+						<!-- 距離 -->
+						<section class="sec">
+							<div class="sec-label">
+								<IconMapPin :size="15" />
+								距離
+								<span v-if="locating" class="locating"><IconLoader2 :size="13" class="spin" /> 取得中…</span>
+							</div>
+							<div class="chips">
+								<button
+									v-for="d in distanceOptions" :key="d.value"
+									class="chip" :class="{ active: selectedDistance === d.value }"
+									@click="selectDistance(d.value)"
+								>{{ d.label }}</button>
+							</div>
+						</section>
+
+						<!-- 年齢 -->
+						<section class="sec">
+							<div class="sec-label">
+								年齢
+								<span class="age-value">{{ ageLabel }}</span>
+							</div>
+							<div class="range-slider">
+								<div class="range-track">
+									<div class="range-fill" :style="ageTrackStyle"></div>
+								</div>
+								<input type="range" class="range-input" :min="AGE_MIN" :max="AGE_MAX" :value="ageMin" @input="onAgeMinInput" />
+								<input type="range" class="range-input" :min="AGE_MIN" :max="AGE_MAX" :value="ageMax" @input="onAgeMaxInput" />
+							</div>
+						</section>
+
+						<!-- 性別 -->
+						<section class="sec">
+							<div class="sec-label">性別</div>
+							<div class="chips">
+								<button
+									v-for="g in genderOptions" :key="g.value"
+									class="chip" :class="{ active: f.gender === g.value }"
+									@click="f.gender = g.value"
+								>{{ g.label }}</button>
+							</div>
+						</section>
+
+						<!-- LCIQ -->
+						<section class="sec">
+							<div class="sec-label">LCIQスコア</div>
+							<div class="chips">
+								<button
+									v-for="l in lciqOptions" :key="l.label"
+									class="chip" :class="{ active: selectedLciq === l.label }"
+									@click="selectLciq(l)"
+								>{{ l.label }}</button>
+							</div>
+						</section>
+
+						<!-- トグル -->
+						<section class="sec">
+							<div class="sec-label">こだわり</div>
+							<div class="chips">
+								<button class="chip" :class="{ active: f.has_plus }" @click="toggleFilter('has_plus')">プラスプロフィール</button>
+								<button class="chip" :class="{ active: f.has_image }" @click="toggleFilter('has_image')">写真あり</button>
+								<button class="chip" :class="{ active: f.verified }" @click="toggleFilter('verified')">本人確認済み</button>
+							</div>
+						</section>
+
+						<!-- エリア・キーワード -->
+						<section class="sec">
+							<div class="sec-label">エリア</div>
+							<input v-model="f.area" class="field-input" placeholder="渋谷、大阪など">
+						</section>
+
+						<section class="sec">
+							<div class="sec-label">キーワード</div>
+							<div class="field-with-icon">
+								<IconSearch :size="16" class="field-icon" />
+								<input v-model="f.q" class="field-input has-icon" placeholder="ニックネーム / 自己紹介">
+							</div>
+						</section>
+					</div>
+
+					<div class="sheet-footer">
+						<button class="btn-reset" @click="resetAll">リセット</button>
+						<button class="btn-apply" @click="applySheet">この条件で検索</button>
+					</div>
+				</div>
+			</div>
+		</transition>
 	</div>
 </template>
 
@@ -407,29 +445,163 @@ $mc: #004C71;
 	padding-top: 8px;
 }
 
-.search-bar {
+/* ── ヘッダー ── */
+.search-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin: 12px 0;
+}
+.page-title {
+	font-size: 1.4rem;
+	font-weight: 700;
+	margin: 0;
+}
+.filter-btn {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 8px 14px;
+	border: 1px solid #e2e6ea;
 	background: #fff;
-	border-radius: 12px;
-	padding: 16px;
-	margin-bottom: 16px;
+	border-radius: 100px;
+	font-size: 0.8rem;
+	font-weight: 600;
+	color: #333;
+	cursor: pointer;
+	transition: all .2s;
+	&:hover { border-color: $mc; color: $mc; }
+	.badge {
+		background: $mc;
+		color: #fff;
+		font-size: 0.65rem;
+		font-weight: 700;
+		min-width: 18px;
+		height: 18px;
+		padding: 0 5px;
+		border-radius: 100px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+	}
 }
 
-.search-section {
-	margin-bottom: 14px;
+/* ── アクティブchip ── */
+.active-chips {
+	display: flex;
+	gap: 6px;
+	overflow-x: auto;
+	padding-bottom: 8px;
+	margin-bottom: 4px;
+	-webkit-overflow-scrolling: touch;
+	scrollbar-width: none;
+	&::-webkit-scrollbar { display: none; }
+}
+.active-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	padding: 5px 10px 5px 12px;
+	border-radius: 100px;
+	border: none;
+	background: $mc;
+	color: #fff;
+	font-size: 0.72rem;
+	font-weight: 600;
+	white-space: nowrap;
+	cursor: pointer;
+	flex-shrink: 0;
 }
 
-.section-label {
+.result-count {
+	font-size: 0.75rem;
+	color: #888;
+	margin-bottom: 10px;
+	padding-left: 2px;
+}
+
+.empty {
+	text-align: center;
+	padding: 60px 20px;
+	color: #888;
+	.btn-empty {
+		margin-top: 12px;
+		padding: 8px 20px;
+		border: 1px solid $mc;
+		background: #fff;
+		color: $mc;
+		border-radius: 100px;
+		font-size: 0.8rem;
+		font-weight: 600;
+		cursor: pointer;
+	}
+}
+
+/* ── ボトムシート ── */
+.sheet-backdrop {
+	position: fixed;
+	inset: 0;
+	background: rgba(0,0,0,.45);
+	z-index: 1050;
+	display: flex;
+	align-items: flex-end;
+	justify-content: center;
+}
+.sheet {
+	background: #fff;
+	width: 100%;
+	max-width: 560px;
+	max-height: 90vh;
+	border-radius: 20px 20px 0 0;
+	display: flex;
+	flex-direction: column;
+	box-shadow: 0 -8px 30px rgba(0,0,0,.15);
+}
+.sheet-handle {
+	width: 40px;
+	height: 4px;
+	background: #d8dde2;
+	border-radius: 2px;
+	margin: 10px auto 0;
+}
+.sheet-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 14px 18px 10px;
+	h2 { font-size: 1rem; font-weight: 700; margin: 0; }
+	.close-btn {
+		border: none;
+		background: none;
+		color: #888;
+		cursor: pointer;
+		padding: 4px;
+		display: flex;
+		&:hover { color: #333; }
+	}
+}
+.sheet-body {
+	padding: 8px 18px 18px;
+	overflow-y: auto;
+	flex: 1;
+}
+.sec {
+	padding: 14px 0;
+	border-bottom: 1px solid #f2f4f6;
+	&:last-child { border-bottom: none; }
+}
+.sec-label {
 	display: flex;
 	align-items: center;
 	gap: 4px;
 	font-size: 0.8rem;
 	font-weight: 600;
 	color: #555;
-	margin-bottom: 8px;
+	margin-bottom: 10px;
 	.locating {
 		font-weight: 400;
 		color: #999;
-		font-size: 0.75rem;
+		font-size: 0.72rem;
 		display: flex;
 		align-items: center;
 		gap: 2px;
@@ -437,64 +609,88 @@ $mc: #004C71;
 	}
 }
 
-/* ── 共通ピル ── */
-.chips {
+.sheet-footer {
 	display: flex;
-	gap: 6px;
-	flex-wrap: wrap;
+	gap: 10px;
+	padding: 12px 18px calc(12px + env(safe-area-inset-bottom));
+	border-top: 1px solid #f0f2f4;
+	background: #fff;
+}
+.btn-reset {
+	flex: 0 0 auto;
+	padding: 12px 22px;
+	border: 1px solid #e2e6ea;
+	border-radius: 100px;
+	background: #fff;
+	color: #666;
+	font-size: 0.85rem;
+	font-weight: 600;
+	cursor: pointer;
+	&:hover { background: #f5f7f9; }
+}
+.btn-apply {
+	flex: 1;
+	padding: 12px;
+	border: none;
+	border-radius: 100px;
+	background: $mc;
+	color: #fff;
+	font-size: 0.9rem;
+	font-weight: 700;
+	cursor: pointer;
+	&:hover { opacity: .9; }
 }
 
+/* ── chip共通 ── */
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
 .chip {
-	padding: 6px 14px;
+	padding: 8px 16px;
 	border-radius: 100px;
-	border: none;
-	background: #f5f7f9;
+	border: 1px solid #e8ecf0;
+	background: #fff;
 	font-size: 0.8rem;
 	color: #333;
 	cursor: pointer;
-	transition: background .2s, color .2s;
+	transition: all .15s;
 	white-space: nowrap;
-	&:hover { background: #e8ecf0; }
+	&:hover { background: #f5f7f9; }
 	&.active {
 		background: $mc;
 		color: #fff;
+		border-color: $mc;
 	}
 }
 
 /* ── 年齢スライダー ── */
 .age-value {
-	font-weight: 400;
+	font-weight: 600;
 	color: $mc;
 	margin-left: auto;
-	font-size: 0.8rem;
+	font-size: 0.85rem;
 }
-
 .range-slider {
 	position: relative;
-	height: 40px;
+	height: 32px;
 	padding-top: 8px;
 }
-
 .range-track {
 	position: absolute;
-	top: 16px;
+	top: 14px;
 	left: 0;
 	right: 0;
 	height: 4px;
 	background: #e8ecf0;
 	border-radius: 2px;
 }
-
 .range-fill {
 	position: absolute;
 	height: 100%;
 	background: $mc;
 	border-radius: 2px;
 }
-
 .range-input {
 	position: absolute;
-	top: 6px;
+	top: 4px;
 	left: 0;
 	width: 100%;
 	-webkit-appearance: none;
@@ -503,15 +699,10 @@ $mc: #004C71;
 	pointer-events: none;
 	margin: 0;
 	height: 24px;
-
-	&::-webkit-slider-runnable-track {
-		height: 4px;
-		background: transparent;
-	}
+	&::-webkit-slider-runnable-track { height: 4px; background: transparent; }
 	&::-webkit-slider-thumb {
 		-webkit-appearance: none;
-		width: 22px;
-		height: 22px;
+		width: 22px; height: 22px;
 		border-radius: 50%;
 		background: #fff;
 		border: 2px solid $mc;
@@ -520,14 +711,9 @@ $mc: #004C71;
 		cursor: pointer;
 		box-shadow: 0 1px 3px rgba(0,0,0,.15);
 	}
-	&::-moz-range-track {
-		height: 4px;
-		background: transparent;
-		border: none;
-	}
+	&::-moz-range-track { height: 4px; background: transparent; border: none; }
 	&::-moz-range-thumb {
-		width: 22px;
-		height: 22px;
+		width: 22px; height: 22px;
 		border-radius: 50%;
 		background: #fff;
 		border: 2px solid $mc;
@@ -537,111 +723,39 @@ $mc: #004C71;
 	}
 }
 
-.range-labels {
-	display: flex;
-	justify-content: space-between;
-	margin-top: 24px;
-	font-size: 0.65rem;
-	color: #bbb;
-}
-
-/* ── その他トグル ── */
-.more-toggle {
-	display: flex;
-	align-items: center;
-	gap: 6px;
-	border: none;
-	background: none;
-	font-size: 0.8rem;
-	font-weight: 600;
-	color: #888;
-	cursor: pointer;
-	padding: 0;
-	&:hover { color: $mc; }
-}
-
-.more-count {
-	background: $mc;
-	color: #fff;
-	font-size: 0.65rem;
-	font-weight: 700;
-	width: 18px;
-	height: 18px;
-	border-radius: 50%;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.more-filters {
-	margin-top: 14px;
-	padding-top: 14px;
-	border-top: 1px solid #f0f0f0;
-}
-
-.more-section {
-	margin-bottom: 12px;
-	&:last-of-type { margin-bottom: 0; }
-}
-
-.more-label {
-	font-size: 0.75rem;
-	font-weight: 600;
-	color: #888;
-	margin-bottom: 6px;
-}
-
-/* ── テキスト入力 ── */
-.text-fields {
-	display: flex;
-	gap: 8px;
-	flex-wrap: wrap;
-}
-
-.text-field {
-	flex: 1;
-	min-width: 140px;
-	label {
-		display: block;
-		font-size: 0.75rem;
-		font-weight: 600;
-		color: #888;
-		margin-bottom: 4px;
-	}
-}
-
+/* ── 入力 ── */
 .field-input {
 	width: 100%;
-	padding: 8px 10px;
-	border-radius: 8px;
-	border: none;
-	background: #f5f7f9;
-	font-size: 0.8rem;
+	padding: 11px 14px;
+	border-radius: 10px;
+	border: 1px solid #e8ecf0;
+	background: #fff;
+	font-size: 0.85rem;
 	color: #333;
-	&:focus { outline: none; background: #e8ecf0; }
+	&:focus { outline: none; border-color: $mc; }
+}
+.field-with-icon {
+	position: relative;
+	.field-icon {
+		position: absolute;
+		left: 12px;
+		top: 50%;
+		transform: translateY(-50%);
+		color: #aaa;
+	}
+	.field-input.has-icon { padding-left: 36px; }
 }
 
-.more-actions {
-	margin-top: 12px;
-	text-align: center;
-}
+.spin { animation: spin 1s linear infinite; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-.btn-reset {
-	padding: 6px 20px;
-	border: none;
-	border-radius: 100px;
-	background: #f5f7f9;
-	color: #666;
-	font-size: 0.8rem;
-	cursor: pointer;
-	&:hover { background: #e8ecf0; }
+/* ── トランジション ── */
+.sheet-enter-active, .sheet-leave-active {
+	transition: opacity .25s ease;
+	.sheet { transition: transform .3s cubic-bezier(.2,.8,.2,1); }
 }
-
-.spin {
-	animation: spin 1s linear infinite;
-}
-@keyframes spin {
-	from { transform: rotate(0deg); }
-	to { transform: rotate(360deg); }
+.sheet-enter-from, .sheet-leave-to {
+	opacity: 0;
+	.sheet { transform: translateY(100%); }
 }
 </style>

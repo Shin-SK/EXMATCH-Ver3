@@ -32,7 +32,10 @@ onMounted(() => load(1))
 
 <template>
   <div class="py-3">
-    <div class="h2 fw-bold my-3">いいねしたユーザー</div>
+    <div class="head-set">
+      <h2>LIKE</h2>
+      <h3>送ったいいね</h3>
+    </div>
 
     <div v-if="loading" class="text-center py-5"><div class="spinner-border" role="status"></div></div>
     <div v-else-if="err" class="alert alert-danger">{{ err }}</div>

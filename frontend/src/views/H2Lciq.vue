@@ -6,6 +6,10 @@ onMounted(() => { document.title = 'LCIQスコアはどうやってはかるの�
 
 <template>
   <section class="h2lciq">
+    <div class="head-set">
+      <h2>LCIQ</h2>
+      <h3>価値観診断</h3>
+    </div>
     <div class="head text-center mb-5">
       <span class="ja d-block fw-bold fs-1">LCIQスコアのはかりかた</span>
       <span class="en">How to measure the score of LCIQ</span>

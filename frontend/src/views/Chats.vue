@@ -73,7 +73,10 @@ onMounted(async () => {
 
 <template>
   <div class="wrap">
-    <div class="h2 fw-bold my-3">メッセージ</div>
+    <div class="head-set">
+      <h2>MESSAGE</h2>
+      <h3>メッセージ</h3>
+    </div>
 
     <div v-if="loading" class="text-center py-5">
       <div class="spinner-border" role="status"></div>

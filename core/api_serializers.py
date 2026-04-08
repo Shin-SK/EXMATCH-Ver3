@@ -120,23 +120,25 @@ class ProfileSerializer(serializers.ModelSerializer):
             return obj._verification_count
         return obj.verification_count
 
-    # ------- ここが肝：必須項目の充足で判定 -------
+    # ------- ここが肝：オンボーディング step1 の必須項目で判定 -------
+    # 画像/血液型/性別/誕生日/メインエリア/LCIQ は「あとで入力」可
     def get_is_profile_complete(self, obj):
-        ok_nickname  = bool(obj.nickname and obj.nickname.strip())
-        ok_avatar    = (
-            ProfilePhoto.objects.filter(user=obj.user).exists()
-            or bool(getattr(obj, "profile_image", None) and getattr(obj.profile_image, "name", ""))
-        )
-        ok_blood     = bool(obj.blood_type)
-        ok_gender    = bool(obj.gender)
-        ok_pref      = bool(obj.sexual_object_pref)
-        ok_dob       = bool(obj.date_of_birth)
-        ok_main_area = bool(obj.main_area)
-        return all([ok_nickname, ok_avatar, ok_blood, ok_gender, ok_pref, ok_dob, ok_main_area])
+        ok_nickname = bool(obj.nickname and obj.nickname.strip())
+        ok_pref     = bool(obj.sexual_object_pref)
+        return all([ok_nickname, ok_pref])
 
 
 
 class ProfileUpdateSerializer(serializers.ModelSerializer):
+    # 空文字を null として受け付ける（必須ではないため）
+    date_of_birth      = serializers.DateField(required=False, allow_null=True)
+    blood_type         = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    gender             = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    sexual_object_pref = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    main_area          = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    bio                = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    nickname           = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+
     class Meta:
         model = UserProfile
         fields = (
@@ -145,6 +147,12 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
             "latitude","longitude",
             "lciq_score",                     # ★任意を保存できるように追加
         )
+
+    def to_internal_value(self, data):
+        # 空文字 → None に正規化（DateField等が "" を弾くため）
+        if isinstance(data, dict):
+            data = {k: (None if v == "" else v) for k, v in data.items()}
+        return super().to_internal_value(data)
 
     def update(self, instance, validated_data):
         old_area = instance.main_area
