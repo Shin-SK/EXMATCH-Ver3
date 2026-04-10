@@ -3,7 +3,7 @@ from datetime import date, timedelta
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.db import transaction
+from django.db import transaction, IntegrityError
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -275,7 +275,7 @@ class LikeAPI(_Base):
         return Response({"ok": True, "matched": matched})
 
 class MatchesAPI(_Base):
-    """GET /api/matches/?page=1"""
+    """GET /api/matches/?page=1&partner_id=123"""
     def get(self, request):
         me = request.user
         qs = (Match.objects
@@ -286,6 +286,9 @@ class MatchesAPI(_Base):
               .filter(status="matched")
               .filter(Q(from_user=me) | Q(to_user=me))
               .order_by("-id"))
+        pid = request.query_params.get("partner_id")
+        if pid:
+            qs = qs.filter(Q(from_user_id=pid) | Q(to_user_id=pid))
 
         paginator = PageNumberPagination()
         page = paginator.paginate_queryset(qs, request)
@@ -480,12 +483,19 @@ class ReportCreateAPI(_Base):
         reported = get_object_or_404(User._base_manager, id=reported_id)
         anonymous = bool(data.get("anonymous", False))
 
-        obj = Report.objects.create(
-            reporter = None if anonymous else me,
-            reported = reported,
-            reason   = reason,
-            comment  = data.get("comment","").strip()
-        )
+        try:
+            with transaction.atomic():
+                obj = Report.objects.create(
+                    reporter = None if anonymous else me,
+                    reported = reported,
+                    reason   = reason,
+                    comment  = data.get("comment","").strip()
+                )
+        except IntegrityError:
+            return Response(
+                {"detail": "本日は同じ内容で既に通報済みです", "detail_code": "DUPLICATE_REPORT"},
+                status=409,
+            )
         return Response(ReportSerializer(obj, context={"request": request}).data, status=201)
 
 # --- 自分が出した通報一覧 ---
@@ -554,6 +564,27 @@ class MeCustomFieldsAPI(_Base):
 
         if not updates:
             return Response({"detail": "更新対象がありません"}, status=400)
+
+        # required バリデーション
+        missing = []
+        for key, field in fields.items():
+            if field.required:
+                val = updates.get(key)
+                if val is None:
+                    # 送信されていない場合、既存値を確認
+                    existing = ProfileFieldValue.objects.filter(
+                        user_profile=prof, field=field
+                    ).values_list("value", flat=True).first()
+                    if not existing or not str(existing).strip():
+                        missing.append(field.field_label)
+                elif not str(val).strip():
+                    missing.append(field.field_label)
+        if missing:
+            return Response({
+                "detail": f"必須項目が未入力です: {', '.join(missing)}",
+                "detail_code": "REQUIRED_FIELDS_MISSING",
+                "missing_fields": missing,
+            }, status=400)
 
         with transaction.atomic():
             for key, val in updates.items():
@@ -761,13 +792,16 @@ class MeLciqImageAPI(_Base):
 
 # 送信したLike一覧
 class LikesSentAPI(_Base):
-    """GET /api/likes/sent/?page=1"""
+    """GET /api/likes/sent/?page=1&to_user_id=123"""
     def get(self, request):
         me = request.user
         qs = (Match.objects
               .select_related("to_user", "to_user__userprofile")
               .filter(from_user=me, status="like")
               .order_by("-created_at"))
+        tid = request.query_params.get("to_user_id")
+        if tid:
+            qs = qs.filter(to_user_id=tid)
         paginator = PageNumberPagination()
         page = paginator.paginate_queryset(qs, request)
         data = LikeSentSerializer(page, many=True, context={"request": request}).data

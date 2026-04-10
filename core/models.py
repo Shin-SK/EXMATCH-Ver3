@@ -462,7 +462,7 @@ class Report(models.Model):
         constraints = [
             # 同一日・同一理由での重複通報ブロック
             models.UniqueConstraint(
-                fields=["reporter","reported","reason","created_at"],
+                fields=["reporter","reported","reason","created_date"],
                 name="uniq_daily_report",
                 condition=models.Q(status="PENDING"),
             )

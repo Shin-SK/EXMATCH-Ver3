@@ -228,7 +228,7 @@ async function buildMatchedSet(limitPages = 5) {
 		const rows = Array.isArray(d) ? d : (d.results || [])
 		rows.forEach(r => {
 			const uid = r.partner?.id || r.user?.id
-			if (uid) s.add(uid)
+			if (uid) s.add(Number(uid))
 		})
 		if (!d?.next) break
 	}
@@ -236,18 +236,26 @@ async function buildMatchedSet(limitPages = 5) {
 }
 
 const likedSet = ref(new Set())
+const likingSet = ref(new Set())
 
 async function like(uid) {
+	const id = Number(uid)
+	if (likingSet.value.has(id)) return
+	likingSet.value = new Set([...likingSet.value, id])
 	try {
-		const r = await likeUser(uid)
+		const r = await likeUser(id)
 		if (r?.matched) {
-			matchedSet.value = new Set([...matchedSet.value, uid])
+			matchedSet.value = new Set([...matchedSet.value, id])
 		} else {
-			likedSet.value = new Set([...likedSet.value, uid])
+			likedSet.value = new Set([...likedSet.value, id])
 		}
 	} catch (e) {
-		console.error('[like]', uid, e?.response?.status, e?.response?.data || e)
+		console.error('[like]', id, e?.response?.status, e?.response?.data || e)
 		alert('送信に失敗しました')
+	} finally {
+		const s = new Set(likingSet.value)
+		s.delete(id)
+		likingSet.value = s
 	}
 }
 
@@ -259,7 +267,7 @@ async function buildLikedSet(limitPages = 5) {
 			const rows = Array.isArray(d) ? d : (d.results || [])
 			rows.forEach(r => {
 				const uid = r.to_user?.id || r.user?.id
-				if (uid) s.add(uid)
+				if (uid) s.add(Number(uid))
 			})
 			if (!d?.next) break
 		}

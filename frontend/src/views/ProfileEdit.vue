@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, onBeforeUnmount, onActivated } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   fetchMe, updateMe,
@@ -90,8 +90,10 @@ async function loadAll() {
       const k = f.field_key
       if (isCheckbox(f)) {
         const v = customVals.value[k]
-        if (Array.isArray(v)) continue
-        if (typeof v === 'string' && v.length) {
+        if (Array.isArray(v)) {
+          // 既に配列ならそのまま（空文字除去だけ）
+          customVals.value[k] = v.filter(Boolean)
+        } else if (typeof v === 'string' && v.length) {
           customVals.value[k] = v.split(',').map(s => s.trim()).filter(Boolean)
         } else {
           customVals.value[k] = []
@@ -112,6 +114,22 @@ async function loadAll() {
 
 onMounted(loadAll)
 
+// 画面復帰時に verification ステータスを再取得
+function onVisibilityChange() {
+  if (!document.hidden && verifsRaw.value.length) {
+    listVerifications().then(vs => {
+      verifsRaw.value = listify(vs)
+    }).catch(() => {})
+  }
+}
+onMounted(() => document.addEventListener('visibilitychange', onVisibilityChange))
+onBeforeUnmount(() => document.removeEventListener('visibilitychange', onVisibilityChange))
+onActivated(() => {
+  listVerifications().then(vs => {
+    verifsRaw.value = listify(vs)
+  }).catch(() => {})
+})
+
 // 保存：固定 + 動的
 async function saveAll() {
   busy.value = true
@@ -125,7 +143,8 @@ async function saveAll() {
       const k = f.field_key
       let v = customVals.value[k] ?? ''
       if (isCheckbox(f)) {
-        if (Array.isArray(v)) v = v.join(',')
+        if (Array.isArray(v)) v = v.filter(Boolean).join(',')
+        else if (typeof v === 'string') v = v.split(',').map(s => s.trim()).filter(Boolean).join(',')
       }
       payload[k] = v
     }
@@ -135,8 +154,8 @@ async function saveAll() {
     router.push({ name: 'mypage' })
     return
   } catch (e) {
-    alert('保存に失敗しました')
-    // eslint-disable-next-line no-console
+    const detail = e?.response?.data?.detail
+    alert(detail || '保存に失敗しました')
     console.error(e)
   } finally {
     busy.value = false

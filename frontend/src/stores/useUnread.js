@@ -29,7 +29,12 @@ export const useUnread = defineStore('unread', {
       this.polling = false
     },
     async readThread(userId){
-      try{ await readChatThread(userId) }catch{}
+      try{
+        await readChatThread(userId)
+      }catch(e){
+        console.error('[useUnread] readThread failed', e)
+        return
+      }
       const n = this.map?.[userId] || 0
       if (n){
         this.count = Math.max(0, this.count - n)

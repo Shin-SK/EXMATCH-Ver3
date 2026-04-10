@@ -15,6 +15,8 @@ const rows = ref([])
 const page = ref(1)
 const hasNext = ref(false)
 
+const partner = (m) => m.partner || m.user || {}
+
 async function load(p=1){
   loading.value = true
   err.value = ''
@@ -40,7 +42,7 @@ async function doUnmatch(uid){
   if(!confirm('この相手とのマッチを解除します。よろしいですか？')) return
   try{
     await unmatchUser(uid)
-    rows.value = rows.value.filter(r => (r.partner?.id || r.user?.id) !== uid)
+    rows.value = rows.value.filter(r => partner(r).id !== uid)
   }catch(e){
     alert('解除に失敗しました')
     console.error('[Unmatch]', e?.response?.status, e?.response?.data || e)
@@ -75,25 +77,25 @@ onMounted(async () => {
         class="list-group-item list-group-item-action"
       >
         <div class="d-flex align-items-center gap-3">
-          <Avatar :src="$avatar.user(m.partner || m.user)" :size="44" />
+          <Avatar :src="$avatar.user(partner(m))" :size="44" />
           <div class="flex-fill">
             <div class="d-flex align-items-center gap-2">
-              <strong>{{ (m.partner || m.user)?.nickname || (m.partner || m.user)?.username || '???' }}</strong>
+              <strong>{{ partner(m).nickname || partner(m).username || '???' }}</strong>
               <span
-                v-if="unread.of((m.partner?.id || m.user?.id))"
+                v-if="unread.of(partner(m).id)"
                 class="badge bg-danger"
               >
-                {{ unread.of((m.partner?.id || m.user?.id)) > 99 ? '99+' : unread.of((m.partner?.id || m.user?.id)) }}
+                {{ unread.of(partner(m).id) > 99 ? '99+' : unread.of(partner(m).id) }}
               </span>
             </div>
             <small class="text-muted">matched at {{ (m.created_at || '').slice(0,16).replace('T',' ') }}</small>
           </div>
 
           <div class="d-flex gap-2">
-            <button class="btn btn-sm btn-primary" @click="toChat(m.partner?.id || m.user?.id)">
+            <button class="btn btn-sm btn-primary" @click="toChat(partner(m).id)">
               チャット
             </button>
-            <button class="btn btn-sm btn-outline-danger" @click="doUnmatch(m.partner?.id || m.user?.id)">
+            <button class="btn btn-sm btn-outline-danger" @click="doUnmatch(partner(m).id)">
               解除
             </button>
           </div>

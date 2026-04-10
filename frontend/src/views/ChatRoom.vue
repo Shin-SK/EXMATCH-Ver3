@@ -59,12 +59,14 @@ async function loadNew() {
     if (rows.length) {
       msgs.value.push(...rows)
       after.value = rows[rows.length - 1].id
-      await unread.readThread(Number(uid.value))
+      unread.readThread(Number(uid.value)).catch(e => {
+        console.warn('[ChatRoom] readThread failed', uid.value, e?.response?.status, e?.response?.data || e)
+      })
       scrollToBottom()
     }
   } catch (e) {
     if (!msgs.value.length) err.value = '読み込みに失敗しました'
-    console.error('[ChatRoom]', e?.response?.status, e?.response?.data || e)
+    console.error('[ChatRoom] loadNew failed', e?.response?.status, e?.response?.data || e)
   } finally {
     loading.value = false
   }
@@ -80,8 +82,16 @@ async function doSend() {
     text.value = ''
     await loadNew()
   } catch (e) {
-    err.value = e?.message || '送信に失敗しました'
-    console.error('[ChatRoom:send]', e)
+    const code = e?.detail_code || ''
+    const ERR_MAP = {
+      FIRST_MESSAGE_ONLY: '初回の1通のみ送信できます。スタンダードプランに加入すると継続してメッセージを送れます。',
+      BLOCKED: 'このユーザーとはメッセージのやり取りができません。',
+      NG_WORD: '不適切な表現が含まれているため送信できません。',
+      TEXT_TOO_LONG: 'メッセージは2000文字以内にしてください。',
+      REQUIRED_TEXT: 'メッセージ本文を入力してください。',
+    }
+    err.value = ERR_MAP[code] || e?.message || '送信に失敗しました'
+    console.error('[ChatRoom:send]', code || e)
   } finally {
     sending.value = false
   }
@@ -97,7 +107,9 @@ function onKeydown(e) {
 
 onMounted(async () => {
   await Promise.all([loadPartner(), loadNew()])
-  await unread.readThread(Number(uid.value))
+  unread.readThread(Number(uid.value)).catch(e => {
+    console.warn('[ChatRoom] initial readThread failed', uid.value, e?.response?.status, e?.response?.data || e)
+  })
   timer = setInterval(loadNew, 4000)
   document.addEventListener('visibilitychange', onVisibilityChange)
 })

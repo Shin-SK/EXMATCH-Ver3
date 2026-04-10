@@ -18,6 +18,8 @@ const threads = ref([])
 const page = ref(1)
 const hasNext = ref(false)
 
+const partner = (t) => t.partner || t.user || {}
+
 /* 視聴者がLCIQ登録済みか（画像 or スコア どちらかがあればOK） */
 const viewerHasLciq = computed(() => {
   const me = userStore?.me || meLocal.value || {}
@@ -89,27 +91,27 @@ onMounted(async () => {
     <div v-else class="d-flex flex-column gap-3">
       <a
         v-for="t in threads"
-        :key="t.partner?.id || t.user?.id"
+        :key="partner(t).id"
         class="position-relative"
-        @click="openThread(t.partner?.id || t.user?.id)"
+        @click="openThread(partner(t).id)"
         style="cursor:pointer"
       >
         <div class="d-flex align-items-center gap-3">
           <!-- ▼ LCIQ未登録なら相手アバターをブラー -->
           <div class="avatar-wrap" :class="{ 'lciq-blur': !viewerHasLciq }">
-            <Avatar :src="$avatar.user(t.partner || t.user)" :size="44" />
+            <Avatar :src="$avatar.user(partner(t))" :size="44" />
           </div>
 
           <div class="flex-fill">
             <div
               class="name"
-              :class="{'fw-bold': unread.of(t.partner?.id || t.user?.id)}"
+              :class="{'fw-bold': unread.of(partner(t).id)}"
             >
-              {{ (t.partner || t.user)?.nickname || (t.partner || t.user)?.username || '???' }}
+              {{ partner(t).nickname || partner(t).username || '???' }}
             </div>
             <div
               class="text-muted small text-truncate"
-              :class="{'fw-bold': unread.of(t.partner?.id || t.user?.id)}"
+              :class="{'fw-bold': unread.of(partner(t).id)}"
             >
               {{ t.last_message?.text || t.preview || '…' }}
             </div>
@@ -120,10 +122,10 @@ onMounted(async () => {
               {{ (t.updated_at || t.last_message?.created_at || '').slice(0,16).replace('T',' ') }}
             </small>
             <span
-              v-if="unread.of(t.partner?.id || t.user?.id)"
+              v-if="unread.of(partner(t).id)"
               class="badge bg-danger mt-1"
             >
-              {{ unread.of(t.partner?.id || t.user?.id) > 99 ? '99+' : unread.of(t.partner?.id || t.user?.id) }}
+              {{ unread.of(partner(t).id) > 99 ? '99+' : unread.of(partner(t).id) }}
             </span>
           </div>
         </div>

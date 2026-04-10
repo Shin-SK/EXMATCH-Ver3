@@ -42,7 +42,7 @@ api.interceptors.response.use(
 
 /* ───────── API wrappers ───────── */
 export const fetchMe              = () => api.get('me/').then(r => r.data)
-export const fetchMatches         = (page=1) => api.get('matches/',        { params:{ page } }).then(r => r.data)
+export const fetchMatches         = (page=1, extra={}) => api.get('matches/',        { params:{ page, ...extra } }).then(r => r.data)
 export const fetchLikesReceived   = (page=1) => api.get('likes/received/', { params:{ page } }).then(r => r.data)
 export const fetchProfileFields   = () => api.get('profile-fields/').then(r => r.data)
 export const fetchMyCustomFields  = () => api.get('me/custom-fields/').then(r => r.data)
@@ -61,12 +61,22 @@ export const fetchChatThreads = () =>
   api.get('chats/').then(res => listify(res.data));
 
 export const sendMessage = (userId, body) =>
-  api.post(`chats/${userId}/messages/`, { text: body })   // ← text に修正
+  api.post(`chats/${userId}/messages/`, { text: body })
     .then(r => r.data)
     .catch(err => {
       const data = err.response?.data || {};
-      if (err.response?.status === 403 && data.detail_code) {
-        throw new Error(`${data.detail} [${data.detail_code}]`);
+      const status = err.response?.status;
+      if (status === 403 && data.detail_code) {
+        const e = new Error(data.detail || 'Forbidden');
+        e.detail_code = data.detail_code;
+        e.status = status;
+        throw e;
+      }
+      if (status === 400 && data.detail_code) {
+        const e = new Error(data.detail || 'Bad Request');
+        e.detail_code = data.detail_code;
+        e.status = status;
+        throw e;
       }
       throw err;
     });
@@ -90,8 +100,8 @@ export const unmatchUser = (userId) =>
 export const fetchFootprints = (page=1) =>
   api.get('footprints/', { params:{ page } }).then(r => r.data)
 
-export const fetchLikesSent = (page=1) =>
-  api.get('likes/sent/', { params:{ page } }).then(r => r.data)
+export const fetchLikesSent = (page=1, extra={}) =>
+  api.get('likes/sent/', { params:{ page, ...extra } }).then(r => r.data)
 
 
 export const fetchProfile = (userId) =>

@@ -21,6 +21,8 @@ const prof = ref(null)
 const isMatched = ref(false)
 const isLiked   = ref(false)
 const isBlocked = ref(false)
+const sendingLike  = ref(false)
+const sendingBlock = ref(false)
 
 const report = ref({ reason:'abuse', comment:'', anonymous:false })
 const REASONS = [
@@ -32,25 +34,15 @@ const REASONS = [
 ]
 
 async function checkMatched(userId){
-  let p = 1
-  while(true){
-    const d = await fetchMatches(p)
-    const list = Array.isArray(d) ? d : (d.results || [])
-    if(list.some(x => (x.partner?.id || x.user?.id) === Number(userId))) return true
-    if(!d?.next) return false
-    p++
-  }
+  const d = await fetchMatches(1, { partner_id: userId })
+  const list = Array.isArray(d) ? d : (d.results || [])
+  return list.length > 0
 }
 
 async function checkLiked(userId){
-  let p = 1
-  while(true){
-    const d = await fetchLikesSent(p)
-    const list = Array.isArray(d) ? d : (d.results || [])
-    if(list.some(x => x.to_user?.id === Number(userId))) return true
-    if(!d?.next) return false
-    p++
-  }
+  const d = await fetchLikesSent(1, { to_user_id: userId })
+  const list = Array.isArray(d) ? d : (d.results || [])
+  return list.length > 0
 }
 
 async function load(){
@@ -72,22 +64,28 @@ async function load(){
 }
 
 async function doLike(){
+  if (sendingLike.value) return
+  sendingLike.value = true
   try{
     const r = await likeUser(uid.value)
     if(r?.matched){ router.push(`/chats/${uid.value}`) }
     else { isLiked.value = true; alert('いいねを送りました') }
   }catch(e){ alert('送信に失敗しました') }
+  finally{ sendingLike.value = false }
 }
 
 function toChat(){ router.push(`/chats/${uid.value}`) }
 
 async function doToggleBlock(){
+  if (sendingBlock.value) return
   const ok = confirm(isBlocked.value ? 'ブロックを解除しますか？' : 'このユーザーをブロックしますか？')
   if(!ok) return
+  sendingBlock.value = true
   try{
     const r = await toggleBlock(uid.value)
     isBlocked.value = !!r.blocked
   }catch(e){ alert('操作に失敗しました') }
+  finally{ sendingBlock.value = false }
 }
 
 async function submitReport(){
@@ -123,8 +121,8 @@ watch(() => route.params.uid, v => { uid.value = String(v); load() })
         <p v-else-if="isLiked" class="waiting text-center text-muted m-0 py-2">
           お相手からの返信をお待ちください…
         </p>
-        <button v-else class="btn btn-primary w-100 like d-flex align-items-center justify-content-center gap-2" @click="doLike">
-          <IconHeart />いいね
+        <button v-else class="btn btn-primary w-100 like d-flex align-items-center justify-content-center gap-2" :disabled="sendingLike" @click="doLike">
+          <IconHeart />{{ sendingLike ? '送信中…' : 'いいね' }}
         </button>
       </div>
 
@@ -133,7 +131,7 @@ watch(() => route.params.uid, v => { uid.value = String(v); load() })
         <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="collapse" data-bs-target="#reportBox">
           <IconAlertTriangle :size="16" /><span class="ms-1">通報</span>
         </button>
-        <button class="btn btn-outline-secondary btn-sm" @click="doToggleBlock">
+        <button class="btn btn-outline-secondary btn-sm" :disabled="sendingBlock" @click="doToggleBlock">
           <IconUserCheck v-if="isBlocked" :size="16" /><IconUserX v-else :size="16" />
           <span class="ms-1">{{ isBlocked ? 'ブロック解除' : 'ブロック' }}</span>
         </button>
