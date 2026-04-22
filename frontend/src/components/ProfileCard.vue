@@ -76,9 +76,7 @@ const mainPhoto = computed(() => photos.value[current.value] || photos.value[0])
 .profile-card { position: relative; }
 
 .profile-photos {
-  margin-left: calc(50% - 50vw);
-  margin-right: calc(50% - 50vw);
-  width: 100vw;
+  width: 100%;
 }
 
 .main-photo {

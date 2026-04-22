@@ -271,14 +271,16 @@ onMounted(async () => {
       <section class="followed" id="followed" v-show="activeTab === 'likes'">
         <!-- <div class="head-title">いいねしてくれたユーザー</div> -->
         <div class="area">
-            <template v-if="likesTop.length" class="feed feed-mini">
-              <UserCardMini
-                v-for="like in likesTop"
-                :key="like.id"
-                :user="like.from_user"
-                :created-at="like.created_at"
-                :link-to="`/users/${like.from_user?.id}`"
-              />
+            <template v-if="likesTop.length">
+              <div class="feed feed-mini">
+                <UserCardMini
+                  v-for="like in likesTop"
+                  :key="like.id"
+                  :user="like.from_user"
+                  :created-at="like.created_at"
+                  :link-to="`/users/${like.from_user?.id}`"
+                />
+              </div>
               <p class="more text-center">
                 <router-link to="/likes/received">一覧を見る<IconChevronRight :size="16" /></router-link>
               </p>
@@ -293,14 +295,16 @@ onMounted(async () => {
       <!-- いいねした -->
       <section class="followed" id="likes-sent" v-show="activeTab === 'likes-sent'">
         <div class="area">
-            <template v-if="likesSentTop.length" class="feed feed-mini">
-              <UserCardMini
-                v-for="like in likesSentTop"
-                :key="like.id"
-                :user="like.to_user"
-                :created-at="like.created_at"
-                :link-to="`/users/${like.to_user?.id}`"
-              />
+            <template v-if="likesSentTop.length">
+              <div class="feed feed-mini">
+                <UserCardMini
+                  v-for="like in likesSentTop"
+                  :key="like.id"
+                  :user="like.to_user"
+                  :created-at="like.created_at"
+                  :link-to="`/users/${like.to_user?.id}`"
+                />
+              </div>
               <p class="more text-center">
                 <router-link to="/likes/sent">一覧を見る<IconChevronRight :size="16" /></router-link>
               </p>

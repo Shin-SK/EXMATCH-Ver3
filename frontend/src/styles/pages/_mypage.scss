@@ -2,6 +2,8 @@
 @use "sass:color";
 
 .mypage{
+        max-width: 768px;
+        margin: 0 auto;
         .toggleTitle{
             font-weight: bold;
             @include flex();
@@ -20,13 +22,6 @@
         }
 
         .profile{
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-            @include md{
-                grid-template-columns: 1fr;
-                gap: 0;
-            }
             .image{
                 position: relative;
                 background-color: $lb;
