@@ -1,22 +1,7 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
-import { fetchUnread } from '@/api'
+import { useUnread } from '@/stores/useUnread'
 
-const unread = ref(0)
-let timer = null
-
-async function loadUnread(){
-  try {
-    const d = await fetchUnread()
-    unread.value = d?.count ?? d?.unread ?? (Array.isArray(d) ? d.length : 0)
-  } catch {}
-}
-
-onMounted(() => {
-  loadUnread()
-  timer = setInterval(loadUnread, 30000)
-})
-onUnmounted(() => timer && clearInterval(timer))
+const unread = useUnread()
 </script>
 
 <template>
@@ -26,7 +11,7 @@ onUnmounted(() => timer && clearInterval(timer))
       <router-link to="/matches">Matches</router-link>
       <router-link to="/chats" class="rel">
         Chats
-        <span v-if="unread>0" class="badge">{{ unread }}</span>
+        <span v-if="unread.count>0" class="badge">{{ unread.count }}</span>
       </router-link>
     </nav>
   </header>

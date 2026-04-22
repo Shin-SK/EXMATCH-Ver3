@@ -9,14 +9,22 @@ export const useUnread = defineStore('unread', {
     count: 0,           // 全チャット未読合計
     map  : {},          // { sender_id: 未読数 }
     polling: false,
+    _refreshing: false, // refresh 同時実行ガード
+    lastFetchedAt: 0,
   }),
   actions: {
     async refresh(){
+      if (this._refreshing) return
+      this._refreshing = true
       try{
         const d = await fetchChatUnreadMap()
         this.count = d?.count | 0
         this.map   = d?.by_sender || {}
+        this.lastFetchedAt = Date.now()
       }catch{}
+      finally{
+        this._refreshing = false
+      }
     },
     startPolling(ms=8000){
       if (this.polling) return

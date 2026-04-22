@@ -11,7 +11,7 @@ from django.db.models import Count
 from django.contrib.contenttypes.models import ContentType
 from notifications.models import Notification
 from math import cos, radians
-from django.db.models import F, Value
+from django.db.models import F, Value, Case, When, IntegerField, Max
 from django.db.models.functions import Abs, Power
 
 from rest_framework import status
@@ -418,25 +418,42 @@ class ChatThreadsAPI(_Base):
     """GET /api/chats/?page=1"""
     def get(self, request):
         me = request.user
-        msgs = (Message.objects
-                .filter(Q(sender=me) | Q(receiver=me))
-                .select_related('sender', 'receiver', 'sender__userprofile', 'receiver__userprofile')
-                .order_by('-id'))
 
-        seen = set()
+        # 1) DB側で partner ごとの最新 message id を集約（全件Pythonループを回避）
+        partner_last = list(
+            Message.objects
+            .filter(Q(sender=me) | Q(receiver=me))
+            .annotate(partner_id=Case(
+                When(sender_id=me.id, then=F('receiver_id')),
+                default=F('sender_id'),
+                output_field=IntegerField(),
+            ))
+            .values('partner_id')
+            .annotate(last_msg_id=Max('id'))
+            .order_by('-last_msg_id')[:200]
+        )
+
+        # 2) 該当 message のみ select_related 付きで取得
+        last_ids = [r['last_msg_id'] for r in partner_last]
+        msg_by_id = {
+            m.id: m for m in (
+                Message.objects
+                .filter(id__in=last_ids)
+                .select_related('sender', 'receiver',
+                                'sender__userprofile', 'receiver__userprofile')
+            )
+        }
+
         items = []
-        for m in msgs:
-            partner = m.receiver if m.sender_id == me.id else m.sender
-            pid = partner.id
-            if pid in seen:
+        for row in partner_last:
+            m = msg_by_id.get(row['last_msg_id'])
+            if not m:
                 continue
-            seen.add(pid)
+            partner = m.receiver if m.sender_id == me.id else m.sender
             items.append({
                 "partner": UserBriefSerializer(partner, context={"request": request}).data,
                 "last_message": MessageSerializer(m, context={"request": request}).data,
             })
-            if len(items) >= 200:
-                break
 
         paginator = PageNumberPagination()
         page = paginator.paginate_queryset(items, request)
